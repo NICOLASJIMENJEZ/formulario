@@ -1,0 +1,28 @@
+/* Custom minimal styles: grey and white theme */
+body {
+  background: #f5f6f7;
+  color: #222;
+}
+.card {
+  background: #fff;
+}
+.btn-dark {
+  background: #343a40;
+  border-color: #343a40;
+}
+.form-label {
+  font-weight: 600;
+}
+/* Small adjustments for mobile */
+@media (max-width: 576px) {
+  .card-body { padding: 1rem; }
+}
+
+/* subtle input focus */
+.form-control:focus {
+  box-shadow: 0 0 0 0.15rem rgba(52,58,64,0.12);
+  border-color: #6c757d;
+}
+
+/* disabled remove button visual */
+button[disabled] { opacity: 0.6; }

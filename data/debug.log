@@ -1,0 +1,2 @@
+[2025-10-03 22:49:24] SQLSTATE[42S22]: Column not found: 1054 Unknown column 'arrived_count' in 'field list'
+[2025-10-03 22:49:32] SQLSTATE[42S22]: Column not found: 1054 Unknown column 'arrived_count' in 'field list'
