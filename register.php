@@ -1,18 +1,12 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-// Iniciar buffer para evitar que HTML se mezcle con JSON
-ob_start();
+// register.php
+// Accepts POST from the form. Saves to DB via db.php ($pdo) if available, otherwise to data/records.json.
+// Returns JSON for AJAX clients. If the request is not AJAX, redirects back to index.php with a message.
 
-// Manejo de errores como excepciones
-set_error_handler(function($severity, $message, $file, $line) {
-    throw new ErrorException($message, 0, $severity, $file, $line);
-});
+require_once __DIR__ . '/db.php'; // should set $USE_FILE_STORAGE (bool) and/or $pdo (PDO)
 
-// Conexión o modo de almacenamiento (archivo o base de datos)
-require_once __DIR__ . '/db.php'; // Debe definir $USE_FILE_STORAGE y opcionalmente $pdo
-
-// Verifica si la petición es AJAX o espera JSON
 function is_ajax_request() {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') return true;
     if (!empty($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) return true;
@@ -20,141 +14,94 @@ function is_ajax_request() {
     return false;
 }
 
-// Función para responder y salir correctamente
-function respond_and_exit($success, $message) {
-    @ob_end_clean();
-    if (is_ajax_request()) {
-        echo json_encode(['success' => $success, 'message' => $message]);
-    } else {
-        $type = $success ? 'success' : 'danger';
-        $url = './index.php?msg=' . urlencode($message) . '&type=' . $type;
-        header('Location: ' . $url);
-    }
+function respond_json($success, $payload = []) {
+    echo json_encode(array_merge(['success' => $success], is_array($payload) ? $payload : ['message' => $payload]));
     exit;
 }
 
-// Función para acceder a datos POST con limpieza
-function post($key) {
-    return isset($_POST[$key]) ? trim($_POST[$key]) : null;
+function respond_redirect($success, $message) {
+    $type = $success ? 'success' : 'danger';
+    $url = './index.php?msg=' . urlencode($message) . '&type=' . $type;
+    header('Location: ' . $url);
+    exit;
 }
 
 try {
-    // Datos del titular
-    $t_nombre    = post('titular_nombre');
-    $t_apellidos = post('titular_apellidos');
-    $t_cc        = post('titular_cc');
-    $t_celular   = post('titular_celular');
-    $t_correo    = post('titular_correo');
-    $hora        = post('hora');
-    $programa    = post('programa');
-    $discapacidad = (isset($_POST['discapacidad']) && $_POST['discapacidad'] === 'si') ? 'si' : 'no';
-    $discapacidad_cual = post('discapacidad_cual');
-
-    if (!$t_nombre || !$t_apellidos) {
-        respond_and_exit(false, 'Nombre y apellidos del titular son obligatorios.');
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (is_ajax_request()) respond_json(false, 'Método no permitido');
+        respond_redirect(false, 'Método no permitido');
     }
 
-    // Recoger hasta 3 invitados
-    $invitados = [];
-    for ($i = 1; $i <= 3; $i++) {
-        $invitados[$i] = [
-            'nombre'    => post("invitado{$i}_nombre"),
-            'apellidos' => post("invitado{$i}_apellidos"),
-            'cc'        => post("invitado{$i}_cc"),
-        ];
-    }
-
-    // Crear registro final
-    $record = [
-        'titular_nombre' => $t_nombre,
-        'titular_apellidos' => $t_apellidos,
-        'titular_cc' => $t_cc,
-        'titular_celular' => $t_celular,
-        'titular_correo' => $t_correo,
-        'hora' => $hora,
-        'programa' => $programa,
-        'discapacidad' => $discapacidad,
-        'discapacidad_cual' => $discapacidad_cual,
-        'fecha_hora' => date('Y-m-d H:i:s'),
+    // Whitelist of expected fields
+    $fields = [
+        'titular_nombre','titular_apellidos','titular_cc','titular_celular','titular_correo',
+        'hora','programa','discapacidad','discapacidad_cual','fecha_hora',
+        'invitado1_nombre','invitado1_apellidos','invitado1_cc','invitado1_discapacidad',
+        'invitado2_nombre','invitado2_apellidos','invitado2_cc','invitado2_discapacidad',
+        'invitado3_nombre','invitado3_apellidos','invitado3_cc','invitado3_discapacidad'
     ];
 
-    // Agregar invitados al registro
-    foreach ($invitados as $index => $invitado) {
-        $record["invitado{$index}_nombre"] = $invitado['nombre'];
-        $record["invitado{$index}_apellidos"] = $invitado['apellidos'];
-        $record["invitado{$index}_cc"] = $invitado['cc'];
+    $record = [];
+    foreach ($fields as $f) {
+        $record[$f] = isset($_POST[$f]) ? trim((string)$_POST[$f]) : null;
     }
 
-    // === ALMACENAMIENTO EN ARCHIVO JSON ===
-    if (isset($USE_FILE_STORAGE) && $USE_FILE_STORAGE === true) {
-        $dataDir = __DIR__ . '/data';
-        if (!is_dir($dataDir)) mkdir($dataDir, 0755, true);
-        $file = $dataDir . '/records.json';
+    // Basic validation
+    if (empty($record['titular_nombre']) || empty($record['titular_apellidos'])) {
+        if (is_ajax_request()) respond_json(false, 'Nombre y apellidos del titular son obligatorios.');
+        respond_redirect(false, 'Nombre y apellidos del titular son obligatorios.');
+    }
 
+    if (empty($record['fecha_hora'])) $record['fecha_hora'] = date('Y-m-d H:i:s');
+    if (!isset($record['discapacidad'])) $record['discapacidad'] = 'no';
+    if (!isset($record['arrived_count'])) $record['arrived_count'] = 0;
+
+    // Persist
+    $dataDir = __DIR__ . '/data';
+    if (!is_dir($dataDir)) @mkdir($dataDir, 0755, true);
+
+    // File fallback
+    if (isset($USE_FILE_STORAGE) && $USE_FILE_STORAGE === true) {
+        $file = $dataDir . '/records.json';
         $fp = fopen($file, 'c+');
         if (!$fp) throw new Exception('No se puede abrir el archivo de datos.');
-
         flock($fp, LOCK_EX);
         rewind($fp);
         $contents = stream_get_contents($fp);
-        $arr = [];
-
-        if ($contents) {
-            $decoded = json_decode($contents, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                $arr = $decoded;
-            }
-        }
-
-        $lastId = 0;
-        foreach ($arr as $item) {
-            if (isset($item['id']) && is_numeric($item['id'])) {
-                $lastId = max($lastId, (int)$item['id']);
-            }
-        }
-
-        $newId = $lastId + 1;
-        $record['id'] = $newId;
-        $arr[] = $record;   
-
-        // Guardar archivo
-        ftruncate($fp, 0);
-        rewind($fp);
-        fwrite($fp, json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        fflush($fp);
-        flock($fp, LOCK_UN);
-        fclose($fp);
-
-        respond_and_exit(true, 'Registro guardado correctamente (ID ' . $newId . ')');
+        $arr = $contents ? json_decode($contents, true) : [];
+        if (!is_array($arr)) $arr = [];
+        $max = 0; foreach ($arr as $it) if (isset($it['id'])) $max = max($max, (int)$it['id']);
+        $record['id'] = $max + 1;
+        $arr[] = $record;
+        ftruncate($fp, 0); rewind($fp);
+        fwrite($fp, json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); fflush($fp);
+        flock($fp, LOCK_UN); fclose($fp);
+        if (is_ajax_request()) respond_json(true, ['id' => $record['id']]);
+        respond_redirect(true, 'Registro guardado (ID ' . $record['id'] . ')');
     }
 
-    // === ALMACENAMIENTO EN BASE DE DATOS (PDO) ===
+    // Database mode
     if (isset($pdo) && $pdo instanceof PDO) {
-        $columns = array_keys($record);
-        $placeholders = implode(',', array_fill(0, count($columns), '?'));
-        $columns_sql = implode(',', $columns);
-        $stmt = $pdo->prepare("INSERT INTO registros ($columns_sql) VALUES ($placeholders)");
-        $stmt->execute(array_values($record));
-        $lastId = $pdo->lastInsertId();
-
-        respond_and_exit(true, 'Registro guardado correctamente (ID ' . $lastId . ')');
+        $cols = array_keys($record);
+        $placeholders = implode(',', array_fill(0, count($cols), '?'));
+        $cols_sql = implode(',', $cols);
+        $stmt = $pdo->prepare("INSERT INTO registros ($cols_sql) VALUES ($placeholders)");
+        $vals = array_map(function($v){ return $v === null ? null : $v; }, array_values($record));
+        $stmt->execute($vals);
+        $id = $pdo->lastInsertId();
+        if (is_ajax_request()) respond_json(true, ['id' => $id]);
+        respond_redirect(true, 'Registro guardado (ID ' . $id . ')');
     }
 
-    // Si no hay método de almacenamiento
-    throw new Exception('No hay método de almacenamiento disponible (ni archivo ni base de datos).');
+    throw new Exception('No hay método de almacenamiento disponible.');
 
 } catch (Throwable $e) {
-    @ob_end_clean();
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Error del servidor: ' . $e->getMessage()
-    ]);
-
-    // Guardar log del error
-    $logDir = __DIR__ . '/data';
-    if (!is_dir($logDir)) mkdir($logDir, 0755, true);
-    file_put_contents($logDir . '/debug.log', date('[Y-m-d H:i:s] ') . $e->getMessage() . PHP_EOL, FILE_APPEND);
-    exit;
+    // Log and return JSON error
+    $log = __DIR__ . '/data/debug.log';
+    @file_put_contents($log, date('[Y-m-d H:i:s] ') . $e->getMessage() . PHP_EOL, FILE_APPEND);
+    if (is_ajax_request()) {
+        http_response_code(500);
+        respond_json(false, 'Error del servidor: ' . $e->getMessage());
+    }
+    respond_redirect(false, 'Error del servidor: ' . $e->getMessage());
 }
- 

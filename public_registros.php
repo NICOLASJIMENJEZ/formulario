@@ -15,10 +15,30 @@
         .panel{background:#fff;padding:10px;border-radius:6px}
         @media(min-width:769px){ #cards{display:none} }
         @media(max-width:768px){ #table{display:none} }
+        .wrap{ position:relative; overflow:hidden }
+        .escudo-center{
+          position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+          width:420px; height:420px; background-repeat:no-repeat; background-position:center; background-size:contain;
+          border-radius:50%; opacity:0.12; pointer-events:none; z-index:0; mix-blend-mode:screen;
+          box-shadow: inset 0 -18px 60px rgba(255,255,255,0.06), inset 0 10px 30px rgba(0,0,0,0.02);
+          background-image: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 25%, rgba(255,255,255,0) 52%), url('/formulario/registros/escudo.png');
+          background-size: contain, contain; background-position: center, center; background-repeat: no-repeat, no-repeat;
+        }
+        .escudo-corner{
+          position:absolute; right:18px; top:12px; width:140px; height:140px; background-repeat:no-repeat; 
+          background-position:center; background-size:contain; opacity:1; pointer-events:none; z-index:1;
+          background-image:url('/formulario/registros/escudo.png');
+        }
+        @media(max-width:720px){ 
+          .escudo-center{ width:260px; height:260px } 
+          .escudo-corner{ right:10px; top:6px; width:110px; height:110px }
+        }
     </style>
 </head>
 <body class="bg-light">
-    <div class="container py-3">
+    <div class="container py-3 wrap">
+        <div class="escudo-center" aria-hidden="true"></div>
+        <div class="escudo-corner" aria-hidden="true"></div>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Registros</h4>
             <div class="d-flex gap-2">
@@ -37,7 +57,7 @@
         </div>
     </div>
     <script>
-        const api = '/formulario/registros/api.php';
+    const api = '/formulario/api.php';
         async function fetchRecords(){
             const res = await fetch(api + '?action=list');
             const j = await res.json(); if(!j.success) return [];

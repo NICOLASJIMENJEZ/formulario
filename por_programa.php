@@ -33,12 +33,64 @@ require_login();
         }
 
         .card-header { font-weight:700 }
+        .wrap{ position:relative; overflow:hidden }
+        .escudo-center{
+          position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+          width:420px; height:420px; background-repeat:no-repeat; background-position:center; background-size:contain;
+          border-radius:50%; opacity:0.12; pointer-events:none; z-index:0; mix-blend-mode:screen;
+          box-shadow: inset 0 -18px 60px rgba(255,255,255,0.06), inset 0 10px 30px rgba(0,0,0,0.02);
+          background-image: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 25%, rgba(255,255,255,0) 52%), url('/formulario/registros/escudo.png');
+          background-size: contain, contain; background-position: center, center; background-repeat: no-repeat, no-repeat;
+        }
+     .escudo-corner{
+        position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* ✅ Centra horizontal y verticalmente */
+  width: 380px; /* ✅ Tamaño grande, puedes ajustar */
+  height: 380px;
+  background-image: url('/formulario/imagenes/logo.png'); /* ✅ Ruta de tu logo */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain; /* ✅ Ajusta proporciones del logo */
+  opacity: 0.15; /* ✅ Semitransparente para no tapar el contenido */
+  z-index: 0; /* ✅ Detrás del contenido */
+  pointer-events: none; /* ✅ No interfiere con clics */
+}
+        @media(max-width:720px){ 
+          .escudo-center{ width:260px; height:260px } 
+          .escudo-corner{ right:10px; top:6px; width:110px; height:110px }
+        }
     </style>
 </head>
 <body class="bg-light">
-    <div class="container py-3">
+    <div class="container py-3 wrap">
+        <div class="escudo-center" aria-hidden="true"></div>
+        <div class="escudo-corner" aria-hidden="true"></div>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Registros por Programa</h4>
+            <!-- 🔘 Botón de salida -->
+<a href="index.php" class="boton-salida">Salir</a>
+
+<style>
+.boton-salida {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #dc3545; /* Rojo */
+    color: white;
+    padding: 10px 18px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: background 0.3s ease;
+}
+.boton-salida:hover {
+    background-color: #c82333;
+}
+</style>
+
             <div class="d-flex gap-2 align-items-center controls">
                 <select id="programFilter" class="form-select form-select-sm">
                     <option value="">Todos los programas</option>
@@ -65,11 +117,18 @@ require_login();
     </div>
 
     <script>
-        const api = '/formulario/registros/api.php';
+    const api = '/formulario/api.php';  
         const alertEl = document.getElementById('alert');
 
         function showAlert(msg, type='success'){
             alertEl.innerHTML = `<div class="alert alert-${type} alert-dismissible" role="alert">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+        }
+
+        async function fetchPrograms(){
+            const res = await fetch(api + '?action=programs');
+            const j = await res.json();
+            if(!j.success) return [];
+            return j.programs || [];
         }
 
         async function fetchRecords(params = {}){
@@ -131,18 +190,12 @@ require_login();
 
         async function load(){
             // populate program select from server
-            const res = await fetch(api + '?action=programs');
-            const j = await res.json();
             const sel = document.getElementById('programFilter');
-            if(j.success){
-                const list = j.programs || [];
-                // map '__EMPTY__' to user-friendly label
-                sel.innerHTML = '<option value="">Todos los programas</option>' + list.map(p => {
-                    if(p === '__EMPTY__') return `<option value="__EMPTY__">(sin programa)</option>`;
-                    return `<option value="${p}">${p}</option>`;
-                }).join('');
-            }
-
+            const list = await fetchPrograms();
+            sel.innerHTML = '<option value="">Todos los programas</option>' + list.map(p => {
+                if(p === '__EMPTY__') return `<option value="__EMPTY__">(sin programa)</option>`;
+                return `<option value="${p}">${p}</option>`;
+            }).join('');
             // initial fetch without filters
             applyFiltersServer();
         }
