@@ -1,17 +1,11 @@
-# Imagen base con PHP y Apache
+# Usa PHP con Apache
 FROM php:8.2-apache
 
-# Copiar el código fuente al contenedor
+# Instala dependencias para PostgreSQL
+RUN apt-get update && apt-get install -y libpq-dev && docker-php-ext-install pdo pdo_pgsql
+
+# Copia tus archivos al contenedor
 COPY . /var/www/html/
 
-# Dar permisos correctos
-RUN chown -R www-data:www-data /var/www/html
-
-# Habilitar extensiones necesarias (opcional: PDO, MySQL, etc.)
-RUN docker-php-ext-install pdo pdo_mysql
-
-# Exponer el puerto 80
-EXPOSE 80
-
-# Comando por defecto de Apache
-CMD ["apache2-foreground"]
+# Habilita Apache rewrite si es necesario
+RUN a2enmod rewrite
