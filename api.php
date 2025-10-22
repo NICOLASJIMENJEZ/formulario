@@ -67,14 +67,14 @@ try {
         }
 
         // Campos permitidos para actualización
-        $allowed = [
-            'titular_nombre', 'titular_apellidos', 'titular_cc', 'titular_celular', 'titular_correo',
-            'hora', 'programa', 'discapacidad',
-            'invitado1_nombre', 'invitado1_cc', 'invitado1_discapacidad',
-            'invitado2_nombre', 'invitado2_cc', 'invitado2_discapacidad',
-            'invitado3_nombre', 'invitado3_cc', 'invitado3_discapacidad',
-            'arrived_count'
-        ];
+   $allowed = [
+    'titular_nombre', 'titular_apellidos', 'titular_cc', 'titular_celular', 'titular_correo',
+    'hora', 'programa', 'discapacidad', 'discapacidad_cual',
+    'invitado1_nombre', 'invitado1_apellidos', 'invitado1_cc',
+    'invitado2_nombre', 'invitado2_apellidos', 'invitado2_cc',
+    'invitado3_nombre', 'invitado3_apellidos', 'invitado3_cc',
+    'arrived_count'
+];
 
         $updates = [];
         $values = [];
