@@ -49,7 +49,7 @@ require_login();
   transform: translate(-50%, -50%); /* ✅ Centra horizontal y verticalmente */
   width: 380px; /* ✅ Tamaño grande, puedes ajustar */
   height: 380px;
-  background-image: url('/formulario/imagenes/logo.png'); /* ✅ Ruta de tu logo */
+  background-image: url('imagenes/logo.png'); /* ✅ Ruta de tu logo */
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain; /* ✅ Ajusta proporciones del logo */
