@@ -1,11 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-
-// register.php
-// Accepts POST from the form. Saves to DB via db.php ($pdo) if available, otherwise to data/records.json.
-// Returns JSON for AJAX clients. If the request is not AJAX, redirects back to index.php with a message.
-
-require_once __DIR__ . '/db.php'; // should set $USE_FILE_STORAGE (bool) and/or $pdo (PDO)
+require_once __DIR__ . '/db.php';
 
 function is_ajax_request() {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') return true;
@@ -32,13 +27,13 @@ try {
         respond_redirect(false, 'Método no permitido');
     }
 
-    // Whitelist of expected fields
+    // ✅ Solo los campos existentes en tu tabla
     $fields = [
         'titular_nombre','titular_apellidos','titular_cc','titular_celular','titular_correo',
         'hora','programa','discapacidad','discapacidad_cual','fecha_hora',
-        'invitado1_nombre','invitado1_apellidos','invitado1_cc','invitado1_discapacidad',
-        'invitado2_nombre','invitado2_apellidos','invitado2_cc','invitado2_discapacidad',
-        'invitado3_nombre','invitado3_apellidos','invitado3_cc','invitado3_discapacidad'
+        'invitado1_nombre','invitado1_apellidos','invitado1_cc',
+        'invitado2_nombre','invitado2_apellidos','invitado2_cc',
+        'invitado3_nombre','invitado3_apellidos','invitado3_cc'
     ];
 
     $record = [];
@@ -46,7 +41,6 @@ try {
         $record[$f] = isset($_POST[$f]) ? trim((string)$_POST[$f]) : null;
     }
 
-    // Basic validation
     if (empty($record['titular_nombre']) || empty($record['titular_apellidos'])) {
         if (is_ajax_request()) respond_json(false, 'Nombre y apellidos del titular son obligatorios.');
         respond_redirect(false, 'Nombre y apellidos del titular son obligatorios.');
@@ -56,11 +50,10 @@ try {
     if (!isset($record['discapacidad'])) $record['discapacidad'] = 'no';
     if (!isset($record['arrived_count'])) $record['arrived_count'] = 0;
 
-    // Persist
     $dataDir = __DIR__ . '/data';
     if (!is_dir($dataDir)) @mkdir($dataDir, 0755, true);
 
-    // File fallback
+    // 📂 Fallback a JSON si no hay DB
     if (isset($USE_FILE_STORAGE) && $USE_FILE_STORAGE === true) {
         $file = $dataDir . '/records.json';
         $fp = fopen($file, 'c+');
@@ -80,13 +73,13 @@ try {
         respond_redirect(true, 'Registro guardado (ID ' . $record['id'] . ')');
     }
 
-    // Database mode
+    // 🗄️ Modo base de datos (Render)
     if (isset($pdo) && $pdo instanceof PDO) {
         $cols = array_keys($record);
         $placeholders = implode(',', array_fill(0, count($cols), '?'));
         $cols_sql = implode(',', $cols);
         $stmt = $pdo->prepare("INSERT INTO registros ($cols_sql) VALUES ($placeholders)");
-        $vals = array_map(function($v){ return $v === null ? null : $v; }, array_values($record));
+        $vals = array_map(fn($v) => $v === null ? null : $v, array_values($record));
         $stmt->execute($vals);
         $id = $pdo->lastInsertId();
         if (is_ajax_request()) respond_json(true, ['id' => $id]);
@@ -96,7 +89,6 @@ try {
     throw new Exception('No hay método de almacenamiento disponible.');
 
 } catch (Throwable $e) {
-    // Log and return JSON error
     $log = __DIR__ . '/data/debug.log';
     @file_put_contents($log, date('[Y-m-d H:i:s] ') . $e->getMessage() . PHP_EOL, FILE_APPEND);
     if (is_ajax_request()) {
@@ -105,3 +97,4 @@ try {
     }
     respond_redirect(false, 'Error del servidor: ' . $e->getMessage());
 }
+?>
