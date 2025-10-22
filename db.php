@@ -2,11 +2,11 @@
 // DB connection. If it fails, we fallback to file storage by setting $USE_FILE_STORAGE = true
 $USE_FILE_STORAGE = false; // default: try DB first
 
-$host = '127.0.0.1';  // o 'localhost'
-$port = 3307;          // Puerto personalizado
-$dbname = 'graduados';  // Cambia por tu DB real
-$username = 'root';     // Usuario MySQL
-$password = '903135Nicolas';  // Contrasea MySQL
+$host = 'dpg-d3sgqbk9c44c73cqc9p0-a.oregon-postgres.render.com'};  // o 'localhost'
+$port = 5432;          // Puerto personalizado
+$dbname = 'base_de_datos_graduandos_yise';  // Cambia por tu DB real
+$username = 'base_de_datos_graduandos_yise_user';     // Usuario MySQL
+$password = 'bFNFGEUwRNts0j15phJfE4Nklpo4KetS';  // Contrasea MySQL
 
 try {
     $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $username, $password);
