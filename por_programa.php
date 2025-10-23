@@ -117,7 +117,7 @@ require_login();
     </div>
 
     <script>
-    const api = '/formulario/api.php';  
+    const api = 'api.php';  
         const alertEl = document.getElementById('alert');
 
         function showAlert(msg, type='success'){
