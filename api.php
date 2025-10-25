@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/db.php'; // db.php está en la misma carpeta
+require_once __DIR__ . '/db.php'; // Conexión PDO a PostgreSQL
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -17,7 +17,7 @@ try {
             $params[':programa'] = $_GET['programa'];
         }
 
-        // Búsqueda general por nombre, apellido o cédula
+        // Búsqueda general
         if (!empty($_GET['q'])) {
             $q = "%" . $_GET['q'] . "%";
             $sql .= " AND (titular_nombre LIKE :q OR titular_apellidos LIKE :q OR titular_cc LIKE :q)";
@@ -29,14 +29,11 @@ try {
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo json_encode([
-            'success' => true,
-            'records' => $rows
-        ]);
+        echo json_encode(['success' => true, 'records' => $rows]);
         exit;
     }
 
-    // 📚 2. LISTAR PROGRAMAS ÚNICOS (para llenar el <select>)
+    // 📚 2. LISTAR PROGRAMAS ÚNICOS
     if ($action === 'programs') {
         $stmt = $pdo->query("SELECT DISTINCT COALESCE(NULLIF(programa,''), '__EMPTY__') AS programa FROM registros ORDER BY programa ASC");
         $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -44,7 +41,58 @@ try {
         exit;
     }
 
-    // ❌ 3. ELIMINAR REGISTRO
+    // 🆕 3. CREAR NUEVO REGISTRO
+    if ($action === 'create') {
+        $required = ['titular_nombre', 'titular_apellidos', 'titular_cc'];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                echo json_encode(['success' => false, 'message' => "El campo $field es obligatorio."]);
+                exit;
+            }
+        }
+
+        $sql = "INSERT INTO registros (
+            titular_nombre, titular_apellidos, titular_cc, titular_celular, titular_correo,
+            hora, programa, discapacidad, discapacidad_cual,
+            invitado1_nombre, invitado1_apellidos, invitado1_cc,
+            invitado2_nombre, invitado2_apellidos, invitado2_cc,
+            invitado3_nombre, invitado3_apellidos, invitado3_cc, arrived_count
+        ) VALUES (
+            :titular_nombre, :titular_apellidos, :titular_cc, :titular_celular, :titular_correo,
+            :hora, :programa, :discapacidad, :discapacidad_cual,
+            :invitado1_nombre, :invitado1_apellidos, :invitado1_cc,
+            :invitado2_nombre, :invitado2_apellidos, :invitado2_cc,
+            :invitado3_nombre, :invitado3_apellidos, :invitado3_cc, :arrived_count
+        )";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':titular_nombre' => $_POST['titular_nombre'] ?? null,
+            ':titular_apellidos' => $_POST['titular_apellidos'] ?? null,
+            ':titular_cc' => $_POST['titular_cc'] ?? null,
+            ':titular_celular' => $_POST['titular_celular'] ?? null,
+            ':titular_correo' => $_POST['titular_correo'] ?? null,
+            ':hora' => $_POST['hora'] ?? null,
+            ':programa' => $_POST['programa'] ?? null,
+            ':discapacidad' => $_POST['discapacidad'] ?? null,
+            ':discapacidad_cual' => $_POST['discapacidad_cual'] ?? null,
+            ':invitado1_nombre' => $_POST['invitado1_nombre'] ?? null,
+            ':invitado1_apellidos' => $_POST['invitado1_apellidos'] ?? null,
+            ':invitado1_cc' => $_POST['invitado1_cc'] ?? null,
+            ':invitado2_nombre' => $_POST['invitado2_nombre'] ?? null,
+            ':invitado2_apellidos' => $_POST['invitado2_apellidos'] ?? null,
+            ':invitado2_cc' => $_POST['invitado2_cc'] ?? null,
+            ':invitado3_nombre' => $_POST['invitado3_nombre'] ?? null,
+            ':invitado3_apellidos' => $_POST['invitado3_apellidos'] ?? null,
+            ':invitado3_cc' => $_POST['invitado3_cc'] ?? null,
+            ':arrived_count' => $_POST['arrived_count'] ?? 0
+        ]);
+
+        echo json_encode(['success' => true, 'message' => 'Registro creado correctamente.']);
+        exit;
+    }
+
+    // ❌ 4. ELIMINAR REGISTRO
     if ($action === 'delete') {
         $id = (int)($_GET['id'] ?? 0);
         if ($id <= 0) {
@@ -58,7 +106,7 @@ try {
         exit;
     }
 
-    // ✏️ 4. ACTUALIZAR REGISTRO
+    // ✏️ 5. ACTUALIZAR REGISTRO
     if ($action === 'update') {
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
@@ -66,15 +114,14 @@ try {
             exit;
         }
 
-        // Campos permitidos para actualización
-   $allowed = [
-    'titular_nombre', 'titular_apellidos', 'titular_cc', 'titular_celular', 'titular_correo',
-    'hora', 'programa', 'discapacidad', 'discapacidad_cual',
-    'invitado1_nombre', 'invitado1_apellidos', 'invitado1_cc',
-    'invitado2_nombre', 'invitado2_apellidos', 'invitado2_cc',
-    'invitado3_nombre', 'invitado3_apellidos', 'invitado3_cc',
-    'arrived_count'
-];
+        $allowed = [
+            'titular_nombre', 'titular_apellidos', 'titular_cc', 'titular_celular', 'titular_correo',
+            'hora', 'programa', 'discapacidad', 'discapacidad_cual',
+            'invitado1_nombre', 'invitado1_apellidos', 'invitado1_cc',
+            'invitado2_nombre', 'invitado2_apellidos', 'invitado2_cc',
+            'invitado3_nombre', 'invitado3_apellidos', 'invitado3_cc',
+            'arrived_count'
+        ];
 
         $updates = [];
         $values = [];
@@ -99,8 +146,10 @@ try {
         exit;
     }
 
+    // ⚠️ Acción inválida
     echo json_encode(['success' => false, 'message' => 'Acción no válida.']);
 
 } catch (Throwable $e) {
     echo json_encode(['success' => false, 'message' => 'Error del servidor: ' . $e->getMessage()]);
 }
+
