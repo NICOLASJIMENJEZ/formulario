@@ -67,7 +67,7 @@ td > .arrive-btn { margin-right: 8px; }
   transform: translate(-50%, -50%);
   width: 380px;
   height: 380px;
-  background-image: url('/formulario/imagenes/logo.png');
+  background-image: url('imagenes/logo.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
