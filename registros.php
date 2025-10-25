@@ -30,22 +30,6 @@
       border-collapse: collapse;
       font-size: clamp(13px, 1.5vw, 16px);
     }
-      .escudo-corner {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 380px;
-        height: 380px;
-        background-image: url('imagenes/logo.png');
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-        opacity: 0.15;
-        z-index: 0;
-        pointer-events: none;
-    }
-    
     .table th, .table td {
       white-space: nowrap;
       vertical-align: middle;
@@ -315,4 +299,5 @@
   </script>
 </body>
 </html>
+
 
