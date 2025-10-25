@@ -1,6 +1,4 @@
-revisa mi codigo porque guarda en un tiempo los registros y despues los elimina php
-// Página de administración de registros sin autenticación.
-// Se eliminó auth.php y require_login(), ya no pide contraseña.
+
 ?>
 <!doctype html>
 <html lang="es">
