@@ -6,7 +6,7 @@ header('Content-Type: application/json; charset=utf-8');
 try {
     $action = $_REQUEST['action'] ?? 'list';
 
-    // 📋 1. LISTAR REGISTROS (con filtros opcionales)
+    // 1. LISTAR REGISTROS (con filtros opcionales)
     if ($action === 'list') {
         $sql = "SELECT * FROM registros WHERE 1=1";
         $params = [];
@@ -33,7 +33,7 @@ try {
         exit;
     }
 
-    // 📚 2. LISTAR PROGRAMAS ÚNICOS
+    //  2. LISTAR PROGRAMAS ÚNICOS
     if ($action === 'programs') {
         $stmt = $pdo->query("SELECT DISTINCT COALESCE(NULLIF(programa,''), '__EMPTY__') AS programa FROM registros ORDER BY programa ASC");
         $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -41,7 +41,7 @@ try {
         exit;
     }
 
-    // 🆕 3. CREAR NUEVO REGISTRO
+    //  3. CREAR NUEVO REGISTRO
     if ($action === 'create') {
         $required = ['titular_nombre', 'titular_apellidos', 'titular_cc'];
         foreach ($required as $field) {
@@ -92,7 +92,7 @@ try {
         exit;
     }
 
-    // ❌ 4. ELIMINAR REGISTRO
+    //  4. ELIMINAR REGISTRO
     if ($action === 'delete') {
         $id = (int)($_GET['id'] ?? 0);
         if ($id <= 0) {
@@ -106,7 +106,7 @@ try {
         exit;
     }
 
-    // ✏️ 5. ACTUALIZAR REGISTRO
+    //  5. ACTUALIZAR REGISTRO
     if ($action === 'update') {
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
