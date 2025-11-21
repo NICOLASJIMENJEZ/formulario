@@ -1,5 +1,5 @@
 <?php
-$host = "dpg-d4gbeguuk2gs73chgoug-a.render.com";
+$host = "dpg-d4gbeguuk2gs73chgoug-a";
 $dbname = "base_de_datos_graduandos_qdwy"; 
 $user = "base_de_datos_graduandos_qdwy_user";
 $pass = "jNjdBda1YMu3XBFVRpmnTFPeZGZHjrj8";
