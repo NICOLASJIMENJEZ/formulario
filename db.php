@@ -1,30 +1,21 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+$host = "dpg-d4gbeguuk2gs73chgoug-a.render.com";
+$dbname = "base_de_datos_graduandos_qdwy"; 
+$user = "base_de_datos_graduandos_qdwy_user";
+$pass = "jNjdBda1YMu3XBFVRpmnTFPeZGZHjrj8";
+$port = "5432";
 
-$host = 'dpg-d3sgqbk9c44c73cqc9p0-a.oregon-postgres.render.com';
-$port = 5432;
-$dbname = 'base_de_datos_graduandos_yise';
-$username = 'base_de_datos_graduandos_yise_user';
-$password = 'bFNFGEUwRNts0j15phJfE4Nklpo4KetS';
+// IMPORTANTE: Render exige verify-full y CA correcta
+$dsn = "pgsql:host=$host;port=5432;dbname=$dbname;sslmode=verify-full";
+
+$options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+];
 
 try {
-
-    // Render SOLO acepta esto:
-    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
-
-    $pdo = new PDO(
-        $dsn,
-        $username,
-        $password,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]
-    );
-
-} catch (PDOException $e) {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (Throwable $e) {
     die("❌ Error al conectar con PostgreSQL: " . $e->getMessage());
 }
-?>
 
