@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/db.php'; // Conexión PDO a PostgreSQL
+require_once __DIR__ . '/db.php'; // Conexión PDO corregida
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -11,13 +11,11 @@ try {
         $sql = "SELECT * FROM registros WHERE 1=1";
         $params = [];
 
-        // Filtro por programa (si se envía)
         if (!empty($_GET['programa'])) {
             $sql .= " AND programa = :programa";
             $params[':programa'] = $_GET['programa'];
         }
 
-        // Búsqueda general
         if (!empty($_GET['q'])) {
             $q = "%" . $_GET['q'] . "%";
             $sql .= " AND (titular_nombre LIKE :q OR titular_apellidos LIKE :q OR titular_cc LIKE :q)";
@@ -146,10 +144,12 @@ try {
         exit;
     }
 
-    // ⚠️ Acción inválida
     echo json_encode(['success' => false, 'message' => 'Acción no válida.']);
 
 } catch (Throwable $e) {
-    echo json_encode(['success' => false, 'message' => 'Error del servidor: ' . $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error del servidor: ' . $e->getMessage()
+    ]);
 }
-
+?>
