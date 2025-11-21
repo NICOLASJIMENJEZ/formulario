@@ -9,9 +9,9 @@ $username = 'base_de_datos_graduandos_yise_user';
 $password = 'bFNFGEUwRNts0j15phJfE4Nklpo4KetS';
 
 try {
-    // Render: solución correcta → verify-ca + sslrootcert=system
-    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;" .
-           "sslmode=verify-ca;sslrootcert=system";
+
+    // Render SOLO acepta esto:
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
 
     $pdo = new PDO(
         $dsn,
@@ -27,3 +27,4 @@ try {
     die("❌ Error al conectar con PostgreSQL: " . $e->getMessage());
 }
 ?>
+
