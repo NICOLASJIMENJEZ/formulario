@@ -8,12 +8,11 @@ $dbname = 'base_de_datos_graduandos_yise';
 $username = 'base_de_datos_graduandos_yise_user';
 $password = 'bFNFGEUwRNts0j15phJfE4Nklpo4KetS';
 
-// DSN con keepalive (solución oficial para Render)
-$dsn = "pgsql:host=$host;port=$port;dbname=$dbname;" .
-       "sslmode=require;sslrootcert=system;" .
-       "keepalives=1;keepalives_idle=5;keepalives_interval=5";
-
 try {
+    // Render: solución correcta → verify-ca + sslrootcert=system
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;" .
+           "sslmode=verify-ca;sslrootcert=system";
+
     $pdo = new PDO(
         $dsn,
         $username,
