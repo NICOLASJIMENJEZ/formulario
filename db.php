@@ -1,12 +1,12 @@
 <?php
-$host = "dpg-d4gbeguuk2gs73chgoug-a";
-$dbname = "base_de_datos_graduandos_qdwy"; 
+$host = "dpg-d4gbeguuk2gs73chgoug-a.render.com";
+$dbname = "base_de_datos_graduandos_qdwy";
 $user = "base_de_datos_graduandos_qdwy_user";
 $pass = "jNjdBda1YMu3XBFVRpmnTFPeZGZHjrj8";
 $port = "5432";
 
-// IMPORTANTE: Render exige verify-full y CA correcta
-$dsn = "pgsql:host=$host;port=5432;dbname=$dbname;sslmode=verify-full";
+// Render: usar sslmode=require (NO verify-full)
+$dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -15,7 +15,7 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
+    echo "Conexión exitosa";
 } catch (Throwable $e) {
     die("❌ Error al conectar con PostgreSQL: " . $e->getMessage());
 }
-
