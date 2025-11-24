@@ -19,4 +19,5 @@ try {
 } catch (Throwable $e) {
     die("❌ Error al conectar con PostgreSQL: " . $e->getMessage());
 }
-s
+
+?>
