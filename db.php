@@ -1,11 +1,11 @@
 <?php
-$host = "dpg-d4gbeguuk2gs73chgoug-a";
+$host = "dpg-d4gbeguuk2gs73chgoug-a.oregon-postgres.render.com";
 $dbname = "base_de_datos_graduandos_qdwy";
 $user = "base_de_datos_graduandos_qdwy_user";
 $pass = "jNjdBda1YMu3XBFVRpmnTFPeZGZHjrj8";
 $port = "5432";
 
-// Render: usar sslmode=require (NO verify-full)
+// Render requiere SSL, pero no verify-full
 $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
 
 $options = [
@@ -19,3 +19,4 @@ try {
 } catch (Throwable $e) {
     die("❌ Error al conectar con PostgreSQL: " . $e->getMessage());
 }
+s
