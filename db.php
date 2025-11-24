@@ -5,7 +5,6 @@ $user = "base_de_datos_graduandos_qdwy_user";
 $pass = "jNjdBda1YMu3XBFVRpmnTFPeZGZHjrj8";
 $port = "5432";
 
-// Render requiere SSL, pero no verify-full
 $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
 
 $options = [
@@ -15,9 +14,9 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
-    echo "Conexión exitosa";
 } catch (Throwable $e) {
-    die("❌ Error al conectar con PostgreSQL: " . $e->getMessage());
+    die(json_encode([
+        'success' => false,
+        'message' => "Error al conectar con PostgreSQL: " . $e->getMessage()
+    ]));
 }
-
-?>
