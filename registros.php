@@ -155,13 +155,11 @@ td > .arrive-btn { margin-right: 8px; }
             <th>Discapacidad</th>
             <th>Invitado 1</th>
             <th>CC 1</th>
-            <th>Disc. 1</th>
             <th>Invitado 2</th>
             <th>CC 2</th>
-            <th>Disc. 2</th>
             <th>Invitado 3</th>
             <th>CC 3</th>
-            <th>Disc. 3</th>
+
             <th style="width:140px">Acciones</th>
           </tr>
         </thead>
