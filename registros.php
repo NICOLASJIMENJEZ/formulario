@@ -307,13 +307,10 @@ async function load(){
     tr.appendChild(createCellInput('discapacidad', item.discapacidad));
     tr.appendChild(createGuestInput(1, item.invitado1_nombre));
     tr.appendChild(createCellInput('invitado1_cc', item.invitado1_cc));
-    tr.appendChild(createCellInput('invitado1_discapacidad', item.invitado1_discapacidad));
     tr.appendChild(createGuestInput(2, item.invitado2_nombre));
     tr.appendChild(createCellInput('invitado2_cc', item.invitado2_cc));
-    tr.appendChild(createCellInput('invitado2_discapacidad', item.invitado2_discapacidad));
     tr.appendChild(createGuestInput(3, item.invitado3_nombre));
     tr.appendChild(createCellInput('invitado3_cc', item.invitado3_cc));
-    tr.appendChild(createCellInput('invitado3_discapacidad', item.invitado3_discapacidad));
     tr.appendChild(createActionsCell(item.id));
     tbody.appendChild(tr);
   }
