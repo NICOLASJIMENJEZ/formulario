@@ -68,26 +68,7 @@ if ($dbConnected) {
               <?php endif; ?>
             </div>
             <!-- 🔘 Botón de salida -->
-<a href="index.php" class="boton-salida">Salir</a>
 
-<style>
-.boton-salida {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #dc3545; /* Rojo */
-    color: white;
-    padding: 10px 18px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: bold;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    transition: background 0.3s ease;
-}
-.boton-salida:hover {
-    background-color: #c82333;
-}
-</style>
 
 
             <form id="regForm" action="register.php" method="post">
