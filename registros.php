@@ -76,7 +76,7 @@ td > .arrive-btn { margin-right: 8px; }
   pointer-events: none;
 }
 
-/* ✅ Gota de agua */
+/*  Gota de agua */
 .gota-fondo {
   position: fixed;
   bottom: 25px;
