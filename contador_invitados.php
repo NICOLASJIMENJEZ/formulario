@@ -30,4 +30,27 @@ try {
         "error" => $e->getMessage()
     ]);
 }
+
+    <script>
+async function actualizarContadorInvitados() {
+    try {
+        const response = await fetch("contador_invitados.php");
+        const data = await response.json();
+
+        if (data.success) {
+            document.getElementById("contadorInvitados").innerText =
+                "Invitados que han llegado: " + data.invitados;
+        }
+    } catch (e) {
+        console.error("Error consultando invitados:", e);
+    }
+}
+
+// Actualiza cada 2 segundos
+setInterval(actualizarContadorInvitados, 2000);
+
+// Llamada inicial
+actualizarContadorInvitados();
+</script>
+
 ?>
