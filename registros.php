@@ -10,6 +10,7 @@
 <title>Registros - Administración</title>
 <link href="/formulario/assets/css/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
 body { font-size: 18px; }
 table { font-size: 18px; }
@@ -60,6 +61,7 @@ td > .arrive-btn { margin-right: 8px; }
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
 }
+
 .escudo-corner {
   position: fixed;
   top: 50%;
@@ -76,7 +78,6 @@ td > .arrive-btn { margin-right: 8px; }
   pointer-events: none;
 }
 
-/*  Gota de agua */
 .gota-fondo {
   position: fixed;
   bottom: 25px;
@@ -98,8 +99,10 @@ td > .arrive-btn { margin-right: 8px; }
   .gota-fondo{ width:100px; height:100px; right:10px; bottom:10px; }
 }
 </style>
+
 </head>
 <body class="bg-light">
+
 <div class="container py-4 wrap">
 
   <div class="escudo-center" aria-hidden="true"></div>
@@ -159,7 +162,6 @@ td > .arrive-btn { margin-right: 8px; }
             <th>CC 2</th>
             <th>Invitado 3</th>
             <th>CC 3</th>
-
             <th style="width:140px">Acciones</th>
           </tr>
         </thead>
@@ -169,7 +171,13 @@ td > .arrive-btn { margin-right: 8px; }
   </div>
 </div>
 
+<!-- ✔ CONTADOR DE INVITADOS AQUÍ -->
+<div class="fw-bold mt-3 text-center">
+  Invitados que han llegado: <span id="contadorInvitados">0</span>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 const api = 'api.php';
 const alertEl = document.getElementById('alert');
@@ -237,6 +245,8 @@ function createActionsCell(id){
         const tr = td.closest('tr');
         tr.className = `semaforo-${n}`;
         tr.querySelector('td:nth-child(2) div').style.background = colors[n];
+
+        actualizarInvitados(); // ✔ actualizar contador
       } else showAlert(j.message || 'Error', 'danger');
     }catch{ showAlert('Error de red', 'danger'); }
   }
@@ -289,6 +299,7 @@ async function load(){
     const tr = document.createElement('tr');
     tr.classList.add(`semaforo-${item.arrived_count ?? 0}`);
     tr.appendChild(Object.assign(document.createElement('td'),{textContent:item.id}));
+
     const semTd = document.createElement('td');
     const circle = document.createElement('div');
     circle.style.width = '20px';
@@ -297,6 +308,7 @@ async function load(){
     circle.style.background = colors[item.arrived_count ?? 0];
     semTd.appendChild(circle);
     tr.appendChild(semTd);
+
     tr.appendChild(createCellInput('titular_nombre', item.titular_nombre));
     tr.appendChild(createCellInput('titular_apellidos', item.titular_apellidos));
     tr.appendChild(createCellInput('titular_cc', item.titular_cc));
@@ -311,17 +323,28 @@ async function load(){
     tr.appendChild(createCellInput('invitado2_cc', item.invitado2_cc));
     tr.appendChild(createGuestInput(3, item.invitado3_nombre));
     tr.appendChild(createCellInput('invitado3_cc', item.invitado3_cc));
+
     tr.appendChild(createActionsCell(item.id));
     tbody.appendChild(tr);
   }
 }
 
-  <div class="fw-bold mt-3">
-    Invitados que han llegado: <span id="contadorInvitados">0</span>
-</div>
+async function actualizarInvitados(){
+  try {
+    const r = await fetch("contador_invitados.php");
+    const data = await r.json();
+    document.getElementById("contadorInvitados").textContent = data.total ?? 0;
+  } catch (e) {
+    console.error("Error contando invitados:", e);
+  }
+}
 
+// ✔ refresca cada 2 segundos
+setInterval(actualizarInvitados, 2000);
+actualizarInvitados();
 
 document.getElementById('reload').addEventListener('click', load);
+
 document.getElementById('searchCedula').addEventListener('input', e=>{
   const q = e.target.value.toLowerCase();
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
@@ -329,7 +352,10 @@ document.getElementById('searchCedula').addEventListener('input', e=>{
     tr.style.display = cedula.includes(q) ? '' : 'none';
   });
 });
+
 load();
 </script>
+
 </body>
 </html>
+
