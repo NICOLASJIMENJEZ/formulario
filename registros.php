@@ -316,6 +316,11 @@ async function load(){
   }
 }
 
+  <div class="fw-bold mt-3">
+    Invitados que han llegado: <span id="contadorInvitados">0</span>
+</div>
+
+
 document.getElementById('reload').addEventListener('click', load);
 document.getElementById('searchCedula').addEventListener('input', e=>{
   const q = e.target.value.toLowerCase();
