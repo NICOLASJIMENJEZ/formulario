@@ -1,4 +1,4 @@
-pero este codigo me diste primero y si funciona <?php
+<?php
 header('Content-Type: application/json');
 require_once "db.php";
 
