@@ -1,32 +1,25 @@
 <?php
-header("Content-Type: application/json; charset=utf-8");
-
-// Conexión Render PostgreSQL
-$host     = "dpg-d4gbeguuk2gs73chgoug-a.oregon-postgres.render.com";
-$port     = "5432";
-$dbname   = "base_de_datos_graduandos_qdwy";
-$user     = "base_de_datos_graduandos_qdwy_user";
-$password = "jNjdBda1YMu3XBFVRpmnTFPeZGZHjrj8";
+header('Content-Type: application/json');
+require_once "db.php";
 
 try {
-    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
 
-    // Contar invitados
-    $sql = "SELECT COUNT(*) AS total_invitados FROM registros WHERE tipo = 'Invitado'";
+    // SUMA total de invitados que han llegado
+    $sql = "SELECT SUM(arrived_count) AS total FROM registros";
     $stmt = $pdo->query($sql);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     echo json_encode([
-        "ok" => true,
-        "total_invitados" => $row["total_invitados"]
+        "success" => true,
+        "total" => intval($row["total"])
     ]);
 
-} catch (PDOException $e) {
+} catch (Exception $e) {
     echo json_encode([
-        "ok" => false,
+        "success" => false,
+        "total" => 0,
         "error" => $e->getMessage()
     ]);
 }
+
 
