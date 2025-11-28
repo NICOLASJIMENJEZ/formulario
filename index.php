@@ -90,9 +90,6 @@ if ($dbConnected) {
               <small class="text-muted">11 de diciembre del 2025</small>
             </h3>
 
-            <!-- CONSENTIMIENTO INFORMADO -->
-            <div id="consentimientoBox" class="alert alert-secondary p-4">
-              <h5 class="mb-3"><b>Consentimiento informado</b></h5>
 
                         <!-- CONSENTIMIENTO INFORMADO -->
             <div id="consentimientoBox" class="alert alert-secondary p-4">
@@ -107,9 +104,9 @@ if ($dbConnected) {
                 <b>Información importante para la ceremonia:</b>
                 <br><br>
 
-                <b>1.</b> La ceremonia de grado se llevará a cabo el día <b>martes 11 de diciembre del 2025</b> en el  
+                <b>1.</b> La ceremonia de grado se llevará a cabo el día <b>jueves 11 de diciembre del 2025</b> en el  
                 <b>Auditorio San Francisco</b> de la Universidad CESMAG, ubicado en  
-                <b>carrera 19 #15A-53, Avenida de las Américas</b>.
+                <b>carrera 19 # 15A-53, Avenida de las Américas</b>.
                 <br><br>
 
                 <b>2.</b> Faltando <b>10 minutos</b> para el inicio de la ceremonia se <b>cerrará el ingreso</b>.  
@@ -120,7 +117,7 @@ if ($dbConnected) {
                 <b>máximo 3 acompañantes</b> por cada graduado.
                 <br><br>
 
-                <b>4.</b> <b>Prohibido el ingreso de menores de edad.</b> Favor no insistir.
+                <b>4.</b> <b>Prohibido el ingreso de menores de edad.</b> FAVOR NO INSISTIR.
               </div>
               <!-- 🔵 FIN BLOQUE NUEVO -->
 
@@ -132,12 +129,7 @@ if ($dbConnected) {
             </div>
 
 
-              <div class="d-grid">
-                <button id="btnDeAcuerdo" class="btn btn-dark btn-lg">
-                  De acuerdo
-                </button>
-              </div>
-            </div>
+             
 
             <!-- FORMULARIO OCULTO -->
             <div id="formularioCompleto" style="display:none;">
