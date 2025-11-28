@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require "conexion.php"; // misma conexión
+require "db.php"; // misma conexión
 
 $action = $_GET["action"] ?? $_POST["action"] ?? "";
 
