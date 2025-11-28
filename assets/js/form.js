@@ -71,36 +71,34 @@
   });
 
   // Program lists for different times
+   // Program lists for different times
   const programsByTime = {
     '09:30': [
-      {v: 'EAUB', t: 'ESPECICALIZACION EN ARQUITECTURA Y URBANISMO BIOCLIMATICO'},
-      {v: 'Administrador_de_Empresas', t: 'Administrador de Empresas'},
-      {v: 'Tecnologia_en_Gestion_Financiera', t: 'Tecnología en Gestión Financiera'}
+      {v: 'ESP_ARQ_URB_BIO', t: 'ESPECIALIZACIÓN DE ARQUITECTURA Y URBANISMO BIOCLIMÁTICO'},
+      {v: 'ESP_DERECHO_EMPRESARIAL', t: 'ESPECIALIZACIÓN DE DERECHO EMPRESARIAL'},
+      {v: 'ESP_GERENCIA_PROYECTOS', t: 'ESPECIALIZACIÓN DE GERENCIA DE PROYECTOS'},
+      {v: 'ESP_INFANCIA_CULTURA_DESARROLLO', t: 'ESPECIALIZACIÓN EN INFANCIA Y CULTURA Y DESARROLLO'},
+      {v: 'ESP_PEDAGOGIA_ENTRENAMIENTO_DEPORTIVO', t: 'ESPECIALIZACIÓN EN PEDAGOGÍA DEL ENTRENAMIENTO DEPORTIVO'}
     ],
-    '10:00': [
-      {v: 'Contaduria_Publica', t: 'Contaduría Pública'},
-      {v: 'Licenciatura_Educacion_Fisica', t: 'Licenciatura en Educación Física'},
-      {v: 'Licenciatura_Educacion_Infantil', t: 'Licenciatura en Educación Infantil'},
-      {v: 'Licenciatura_Quimica', t: 'Licenciatura en Química'},
-      {v: 'Tecnologia_Contabilidad_Finanzas', t: 'Tecnología en Contabilidad y Finanzas'}
-    ]
-    ,
-    '14:00': [
-      {v: 'Arquitectura', t: 'Arquitectura'},
-      {v: 'Diseno_Grafico', t: 'Diseño Gráfico'},
-      {v: 'Especializacion_Arquitectura_Urbanismo_Bioclimatico', t: 'Especialización en Arquitectura, Urbanismo y Bioclimático'},
-      {v: 'Especializacion_Derecho_Empresarial', t: 'Especialización en Derecho Empresarial'},
-      {v: 'Especializacion_Gerencia_Proyectos', t: 'Especialización en Gerencia de Proyectos'},
-      {v: 'Especialista_Infancia_Cultura_Desarrollo', t: 'Especialista en Infancia, Cultura y Desarrollo'},
-      {v: 'Especialista_Pedagogia_Entrenamiento_Deportivo', t: 'Especialista en Pedagogía del Entrenamiento Deportivo'}
-    ]
-    ,
+
+    '02:00': [
+      // A las 02:30 PM dijiste: SOLO Derecho
+      {v: 'DERECHO', t: 'DERECHO'}
+    ],
+
     '16:30': [
-      {v: 'Ingenieria_de_Sistemas', t: 'Ingeniería de Sistemas'},
-      {v: 'Ingenieria_Electronica', t: 'Ingeniería Electrónica'},
-      {v: 'Psicologia', t: 'Psicología'}
+      {v: 'ADMINISTRACION_DE_EMPRESAS', t: 'ADMINISTRACIÓN DE EMPRESAS'},
+      {v: 'ARQUITECTURA', t: 'ARQUITECTURA'},
+      {v: 'CONTADURIA_PUBLICA', t: 'CONTADURÍA PÚBLICA'},
+      {v: 'DISENO_GRAFICO', t: 'DISEÑO GRÁFICO'},
+      {v: 'INGENIERIA_DE_SISTEMAS', t: 'INGENIERÍA DE SISTEMAS'},
+      {v: 'INGENIERIA_ELECTRONICA', t: 'INGENIERÍA ELECTRÓNICA'},
+      {v: 'LIC_EDUCACION_FISICA', t: 'LICENCIATURA EN EDUCACIÓN FÍSICA'},
+      {v: 'LIC_EDUCACION_INFANTIL', t: 'LICENCIATURA EN EDUCACIÓN INFANTIL'},
+      {v: 'PSICOLOGIA', t: 'PSICOLOGÍA'}
     ]
   };
+
 
   function populateProgramaFor(time) {
     if (!programaSelect) return;
