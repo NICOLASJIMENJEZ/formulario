@@ -43,6 +43,8 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
       border-radius:8px;
       font-size:1rem;
     }
+
+    .hidden{ display:none }
   </style>
 
 </head>
@@ -71,6 +73,7 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
             <input type="hidden" name="id_especial" value="<?= $id_especial ?>">
             <input type="hidden" name="es_especial" value="1">
 
+            <!-- TITULAR -->
             <div class="mb-3">
               <label class="form-label">Nombre *</label>
               <input type="text" name="nombre" class="form-control" required>
@@ -81,12 +84,29 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
               <input type="text" name="apellidos" class="form-control" required>
             </div>
 
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label class="form-label">Cédula</label>
-                <input type="text" name="cc" class="form-control">
-              </div>
+            <div class="mb-3">
+              <label class="form-label">Cédula</label>
+              <input type="text" name="cc" class="form-control">
+            </div>
 
+            <!-- DISCAPACIDAD TITULAR -->
+            <div class="mb-3">
+              <label class="form-label">¿Tiene discapacidad?</label>
+              <select class="form-select" id="discapacidad_titular" name="discapacidad">
+                <option value="no">No</option>
+                <option value="si">Sí</option>
+              </select>
+            </div>
+
+            <div class="mb-3 hidden" id="discapacidad_cual_wrap">
+              <label class="form-label">¿Cuál?</label>
+              <input type="text" class="form-control" name="discapacidad_cual">
+            </div>
+
+            <hr>
+
+            <!-- HORA / PROGRAMA -->
+            <div class="row mb-3">
               <div class="col-md-6">
                 <label class="form-label">Hora *</label>
                 <select class="form-select" name="hora" required>
@@ -97,12 +117,88 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
                   <option value="16:30">04:30 PM</option>
                 </select>
               </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Programa / Evento *</label>
+                <input type="text" name="programa" class="form-control" required>
+              </div>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label">Programa / Evento *</label>
-              <input type="text" name="programa" class="form-control" required>
+            <hr>
+
+            <!-- INVITADOS -->
+            <h5 class="mb-3">Invitados del Especial</h5>
+
+            <!-- INVITADO 1 -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado1_nombre" placeholder="Invitado 1 Nombre">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado1_apellidos" placeholder="Invitado 1 Apellidos">
+              </div>
             </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado1_cc" placeholder="Cédula">
+              </div>
+              <div class="col-md-6">
+                <select class="form-select" name="invitado1_discapacidad">
+                  <option value="">¿Discapacidad?</option>
+                  <option value="si">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- INVITADO 2 -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado2_nombre" placeholder="Invitado 2 Nombre">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado2_apellidos" placeholder="Invitado 2 Apellidos">
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado2_cc" placeholder="Cédula">
+              </div>
+              <div class="col-md-6">
+                <select class="form-select" name="invitado2_discapacidad">
+                  <option value="">¿Discapacidad?</option>
+                  <option value="si">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- INVITADO 3 -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado3_nombre" placeholder="Invitado 3 Nombre">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado3_apellidos" placeholder="Invitado 3 Apellidos">
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="invitado3_cc" placeholder="Cédula">
+              </div>
+              <div class="col-md-6">
+                <select class="form-select" name="invitado3_discapacidad">
+                  <option value="">¿Discapacidad?</option>
+                  <option value="si">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+
+            <hr>
 
             <div class="d-grid">
               <button class="btn btn-dark">Guardar Invitado Especial</button>
@@ -121,6 +217,16 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
   </div>
 
 </div>
+
+<script>
+document.getElementById("discapacidad_titular").addEventListener("change", function() {
+    if (this.value === "si") {
+        document.getElementById("discapacidad_cual_wrap").classList.remove("hidden");
+    } else {
+        document.getElementById("discapacidad_cual_wrap").classList.add("hidden");
+    }
+});
+</script>
 
 </body>
 </html>
