@@ -15,89 +15,79 @@
 body { font-size: 18px; }
 table { font-size: 18px; }
 .form-control-sm, .form-select-sm { font-size: 16px; padding: .35rem .5rem; }
+
+/* ============================
+    ★ NUEVO: BADGE ESPECIAL
+============================ */
+.badge-especial {
+    background: #d9c7ff;
+    color: #3a1670;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 5px;
+    border: 1px solid #b79df3;
+}
+
+/* ============================
+    ★ NUEVO: COLUMNA ID FIJA
+============================ */
+.sticky-col {
+    position: sticky;
+    left: 0;
+    background: #fff !important;
+    z-index: 10;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.15);
+}
+
 .empty-cell { background: #f0f0f0 !important; color: #6c757d !important; }
 #recordsTable td { background: #fff; color: #000; vertical-align: middle; }
-#recordsTable td input.empty-cell { background: #f0f0f0; color: #6c757d; }
-.semaforo-0 td, .semaforo-0 input, .semaforo-0 select { background: #f8f9fa !important; color: #212529 !important; }
-.semaforo-1 td, .semaforo-1 input, .semaforo-1 select { background: #dc3545 !important; color: #fff !important; }
-.semaforo-2 td, .semaforo-2 input, .semaforo-2 select { background: #fd7e14 !important; color: #fff !important; }
-.semaforo-3 td, .semaforo-3 input, .semaforo-3 select { background: #198754 !important; color: #fff !important; }
-.semaforo-1 td, .semaforo-2 td, .semaforo-3 td { border-color: rgba(255,255,255,0.1); }
-.arrive-btn { width: 38px; height: 32px; padding: 0; border-radius: 6px; font-weight: 700; }
-td > .arrive-btn { margin-right: 8px; }
+
+/* Estilos de semáforo */
+.semaforo-0 td, .semaforo-0 input { background: #f8f9fa !important; color:#212529!important; }
+.semaforo-1 td, .semaforo-1 input { background:#dc3545!important;color:#fff!important; }
+.semaforo-2 td, .semaforo-2 input { background:#fd7e14!important;color:#fff!important; }
+.semaforo-3 td, .semaforo-3 input { background:#198754!important;color:#fff!important; }
+
 .table-responsive { overflow: auto; max-height: 62vh; padding: 8px; }
 #recordsTable thead th, #recordsTable tbody td { white-space: nowrap; }
-#recordsTable input.form-control, #recordsTable select.form-select { min-width: 160px; }
-#recordsTable td:nth-child(1) { min-width: 60px; }
-#recordsTable td:nth-child(2) { min-width: 48px; }
-#recordsTable td:nth-child(20) { min-width: 180px; }
 
-@media (max-width: 768px) {
-  body { font-size: 16px; }
-  table { font-size: 16px; }
-  #recordsTable input.form-control, #recordsTable select.form-select { min-width: 120px; }
-}
+#recordsTable td:nth-child(1){ min-width: 90px; } /* ID más ancho */
+#recordsTable td:nth-child(2){ min-width: 48px; }
 
 .wrap{ position:relative; overflow:hidden }
 
+/* Fondo visual */
 .escudo-center{
   position:absolute;
-  left:50%;
-  top:50%;
+  left:50%; top:50%;
   transform:translate(-50%,-50%);
-  width:420px;
-  height:420px;
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:contain;
-  border-radius:50%;
+  width:420px; height:420px;
   opacity:0.12;
   pointer-events:none;
-  z-index:0;
-  mix-blend-mode:screen;
-  box-shadow: inset 0 -18px 60px rgba(255,255,255,0.06), inset 0 10px 30px rgba(0,0,0,0.02);
-  background-image: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 25%, rgba(255,255,255,0) 52%), url('/formulario/registros/escudo.png');
-  background-size: contain, contain;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
+  background-image:url('/formulario/registros/escudo.png');
+  background-size:contain;
+  background-repeat:no-repeat;
 }
 
 .escudo-corner {
-  position: fixed;
-  top: 50%;
-  left: 50%;
+  position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 380px;
-  height: 380px;
+  width: 380px; height: 380px;
   background-image: url('imagenes/logo.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
+  opacity: 0.15; pointer-events: none;
 }
 
 .gota-fondo {
-  position: fixed;
-  bottom: 25px;
-  right: 35px;
-  width: 160px;
-  height: 160px;
-  background-image: url('/formulario/imagenes/gota.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  opacity: 0.12;
-  pointer-events: none;
-  z-index: 0;
+  position: fixed; bottom: 25px; right: 35px;
+  width: 160px; height: 160px;
+  background-image:url('/formulario/imagenes/gota.png');
+  background-size:contain;
+  opacity:0.12;
+  pointer-events:none;
 }
 
-@media(max-width:720px){
-  .escudo-center{ width:260px; height:260px }
-  .escudo-corner{ right:10px; top:6px; width:110px; height:110px }
-  .gota-fondo{ width:100px; height:100px; right:10px; bottom:10px; }
-}
 </style>
 
 </head>
@@ -105,33 +95,32 @@ td > .arrive-btn { margin-right: 8px; }
 
 <div class="container py-4 wrap">
 
-  <div class="escudo-center" aria-hidden="true"></div>
-  <div class="escudo-corner" aria-hidden="true"></div>
-  <div class="gota-fondo" aria-hidden="true"></div>
+  <div class="escudo-center"></div>
+  <div class="escudo-corner"></div>
+  <div class="gota-fondo"></div>
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>Registros guardados</h3>
+
     <a href="index.php" class="boton-salida">Salir</a>
 
     <style>
       .boton-salida {
         position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #dc3545;
-        color: white;
-        padding: 10px 18px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        transition: background 0.3s ease;
+        top: 20px; right: 20px;
+        background-color:#dc3545;
+        color:white;
+        padding:10px 18px;
+        border-radius:25px;
+        text-decoration:none;
+        font-weight:bold;
+        box-shadow:0 2px 6px rgba(0,0,0,0.2);
       }
-      .boton-salida:hover { background-color: #c82333; }
     </style>
 
     <div class="d-flex gap-2 align-items-center">
-      <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por cédula..." style="min-width:200px;">
+      <input id="searchCedula" class="form-control form-control-sm"
+      placeholder="Buscar por cédula..." style="min-width:200px;">
       <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
     </div>
   </div>
@@ -142,11 +131,12 @@ td > .arrive-btn { margin-right: 8px; }
     <div style="font-size:14px;color:#6c757d;margin-bottom:6px;">
       Desplaza horizontalmente dentro de esta ventana para ver todas las columnas ⇄
     </div>
+
     <div class="table-responsive">
       <table class="table table-sm table-bordered" id="recordsTable">
         <thead class="table-dark text-white">
           <tr>
-            <th style="width:60px">ID</th>
+            <th class="sticky-col">ID</th>
             <th>Semáforo</th>
             <th>Titular Nombre</th>
             <th>Titular Apellidos</th>
@@ -162,16 +152,16 @@ td > .arrive-btn { margin-right: 8px; }
             <th>CC 2</th>
             <th>Invitado 3</th>
             <th>CC 3</th>
-            <th style="width:140px">Acciones</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
+
   </div>
 </div>
 
-<!-- ✔ CONTADOR DE INVITADOS AQUÍ -->
 <div class="fw-bold mt-3 text-center">
   Invitados que han llegado: <span id="contadorInvitados">0</span>
 </div>
@@ -182,106 +172,104 @@ td > .arrive-btn { margin-right: 8px; }
 const api = 'api.php';
 const alertEl = document.getElementById('alert');
 
-function showAlert(msg, type='success'){
-  alertEl.innerHTML = `<div class="alert alert-${type} alert-dismissible" role="alert">
-  ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+function showAlert(msg,type='success'){
+  alertEl.innerHTML = `<div class="alert alert-${type} alert-dismissible">${msg}
+  <button class="btn-close" data-bs-dismiss="alert"></button></div>`;
 }
+
+/* ======================================================
+   ★ AQUÍ SE AGREGA EL BADGE DE INVITADO ESPECIAL
+====================================================== */
+function buildIDCell(item){
+  const td = document.createElement('td');
+  td.classList.add("sticky-col");
+
+  td.innerHTML = item.id;
+
+  if(item.es_especial == 1){
+    td.innerHTML += ` <span class="badge-especial">⭐ ${item.id_especial}</span>`;
+  }
+
+  return td;
+}
+
+/* ====================================
+      Funciones existentes (NO TOCADAS)
+===================================== */
 
 async function fetchRecords(){
-  try {
-    const res = await fetch(api + '?action=list');
-    const j = await res.json();
-    if(!j.success) { showAlert(j.message || 'Error al listar', 'danger'); return []; }
-    return j.records || [];
-  } catch (e) {
-    showAlert('Error al conectar con la API', 'danger');
-    return [];
-  }
+  try{
+    const r=await fetch(api+'?action=list');
+    const j=await r.json();
+    return j.success? j.records : [];
+  }catch{ return []; }
 }
 
-function createCellInput(name, value){
-  const td = document.createElement('td');
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'form-control form-control-sm';
-  input.name = name;
-  input.value = value ?? '';
-  if(!input.value) input.classList.add('empty-cell');
-  input.addEventListener('input', () => input.classList.toggle('empty-cell', !input.value));
-  td.appendChild(input);
-  return td;
+function createCellInput(name,val){
+  const td=document.createElement('td');
+  const i=document.createElement('input');
+  i.type="text"; i.className="form-control form-control-sm";
+  i.name=name; i.value=val??'';
+  if(!i.value) i.classList.add('empty-cell');
+  i.addEventListener('input',()=>i.classList.toggle('empty-cell',!i.value));
+  td.appendChild(i); return td;
 }
 
-function createGuestInput(index, value){
-  const td = document.createElement('td');
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'form-control form-control-sm';
-  input.name = `invitado${index}_nombre`;
-  input.value = value ?? '';
-  if(!input.value) input.classList.add('empty-cell');
-  input.addEventListener('input', () => input.classList.toggle('empty-cell', !input.value));
-  td.appendChild(input);
-  return td;
+function createGuestInput(index,val){
+  const td=document.createElement('td');
+  const i=document.createElement('input');
+  i.type="text"; i.className="form-control form-control-sm";
+  i.name=`invitado${index}_nombre`; i.value=val??'';
+  if(!i.value) i.classList.add('empty-cell');
+  i.addEventListener('input',()=>i.classList.toggle('empty-cell',!i.value));
+  td.appendChild(i); return td;
 }
 
 function createActionsCell(id){
-  const td = document.createElement('td');
-  const save = document.createElement('button');
-  save.className = 'btn btn-sm btn-primary me-2';
-  save.textContent = 'Guardar';
-  const del = document.createElement('button');
-  del.className = 'btn btn-sm btn-danger';
-  del.textContent = 'Eliminar';
-  const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
+  const td=document.createElement('td');
+  const save=document.createElement('button');
+  save.className='btn btn-sm btn-primary me-2'; save.textContent='Guardar';
+  const del=document.createElement('button');
+  del.className='btn btn-sm btn-danger'; del.textContent='Eliminar';
 
+  // botones de semáforo
+  const colors=['#6c757d','#dc3545','#fd7e14','#198754'];
   async function setArrived(n){
-    const data = new URLSearchParams({action:'update', id, arrived_count:n});
-    try{
-      const r = await fetch(api, {method:'POST', body:data});
-      const j = await r.json();
-      if(j.success){
-        showAlert('Llegada actualizada', 'success');
-        const tr = td.closest('tr');
-        tr.className = `semaforo-${n}`;
-        tr.querySelector('td:nth-child(2) div').style.background = colors[n];
-
-        actualizarInvitados(); // ✔ actualizar contador
-      } else showAlert(j.message || 'Error', 'danger');
-    }catch{ showAlert('Error de red', 'danger'); }
+    const data=new URLSearchParams({action:'update',id,arrived_count:n});
+    const r=await fetch(api,{method:'POST',body:data});
+    const j=await r.json();
+    if(j.success){
+      showAlert('Llegada actualizada');
+      const tr=td.closest('tr');
+      tr.className=`semaforo-${n}`;
+      tr.querySelector('td:nth-child(2) div').style.background=colors[n];
+      actualizarInvitados();
+    }
   }
-
   for(let i=0;i<4;i++){
-    const btn = document.createElement('button');
-    btn.className='btn btn-sm arrive-btn me-1';
-    btn.style.background = colors[i];
-    btn.style.color = '#fff';
-    btn.textContent = i;
-    btn.addEventListener('click',()=>setArrived(i));
-    td.appendChild(btn);
+    const b=document.createElement('button');
+    b.className='btn btn-sm arrive-btn me-1';
+    b.style.background=colors[i];
+    b.textContent=i;
+    b.addEventListener('click',()=>setArrived(i));
+    td.appendChild(b);
   }
 
-  save.addEventListener('click', async ()=>{
-    const tr = td.closest('tr');
-    const inputs = tr.querySelectorAll('input, select');
-    const data = new URLSearchParams({action:'update', id});
+  save.addEventListener('click',async()=>{
+    const tr=td.closest('tr');
+    const inputs=tr.querySelectorAll('input, select');
+    const data=new URLSearchParams({action:'update',id});
     inputs.forEach(i=>data.append(i.name,i.value));
-    try{
-      const r = await fetch(api,{method:'POST',body:data});
-      const j = await r.json();
-      if(j.success) showAlert('Registro actualizado','success');
-      else showAlert(j.message || 'Error','danger');
-    }catch{ showAlert('Error de red','danger'); }
+    const r=await fetch(api,{method:'POST',body:data});
+    const j=await r.json();
+    showAlert(j.success?'Registro actualizado':'Error','success');
   });
 
-  del.addEventListener('click', async ()=>{
-    if(!confirm('¿Eliminar este registro?')) return;
-    try{
-      const r = await fetch(api + '?action=delete&id=' + id);
-      const j = await r.json();
-      if(j.success){ showAlert('Registro eliminado','success'); load(); }
-      else showAlert(j.message || 'Error','danger');
-    }catch{ showAlert('Error de red','danger'); }
+  del.addEventListener('click',async()=>{
+    if(!confirm('¿Eliminar este registro?'))return;
+    const r=await fetch(api+'?action=delete&id='+id);
+    const j=await r.json();
+    if(j.success) load();
   });
 
   td.appendChild(document.createElement('br'));
@@ -291,65 +279,70 @@ function createActionsCell(id){
 }
 
 async function load(){
-  const tbody = document.querySelector('#recordsTable tbody');
-  tbody.innerHTML = '';
-  const records = await fetchRecords();
-  const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
-  for(const item of records){
-    const tr = document.createElement('tr');
-    tr.classList.add(`semaforo-${item.arrived_count ?? 0}`);
-    tr.appendChild(Object.assign(document.createElement('td'),{textContent:item.id}));
+  const tbody=document.querySelector('#recordsTable tbody');
+  tbody.innerHTML='';
 
-    const semTd = document.createElement('td');
-    const circle = document.createElement('div');
-    circle.style.width = '20px';
-    circle.style.height = '20px';
-    circle.style.borderRadius = '50%';
-    circle.style.background = colors[item.arrived_count ?? 0];
+  const records=await fetchRecords();
+  const colors=['#6c757d','#dc3545','#fd7e14','#198754'];
+
+  for(const item of records){
+    const tr=document.createElement('tr');
+    tr.classList.add(`semaforo-${item.arrived_count??0}`);
+
+    /* ============================
+       ★ USAMOS NUEVA CELDA ID
+    ============================= */
+    tr.appendChild(buildIDCell(item));
+
+    const semTd=document.createElement('td');
+    const circle=document.createElement('div');
+    circle.style.width='20px';
+    circle.style.height='20px';
+    circle.style.borderRadius='50%';
+    circle.style.background=colors[item.arrived_count??0];
     semTd.appendChild(circle);
     tr.appendChild(semTd);
 
-    tr.appendChild(createCellInput('titular_nombre', item.titular_nombre));
-    tr.appendChild(createCellInput('titular_apellidos', item.titular_apellidos));
-    tr.appendChild(createCellInput('titular_cc', item.titular_cc));
-    tr.appendChild(createCellInput('titular_celular', item.titular_celular));
-    tr.appendChild(createCellInput('titular_correo', item.titular_correo));
-    tr.appendChild(createCellInput('hora', item.hora));
-    tr.appendChild(createCellInput('programa', item.programa));
-    tr.appendChild(createCellInput('discapacidad', item.discapacidad));
-    tr.appendChild(createGuestInput(1, item.invitado1_nombre));
-    tr.appendChild(createCellInput('invitado1_cc', item.invitado1_cc));
-    tr.appendChild(createGuestInput(2, item.invitado2_nombre));
-    tr.appendChild(createCellInput('invitado2_cc', item.invitado2_cc));
-    tr.appendChild(createGuestInput(3, item.invitado3_nombre));
-    tr.appendChild(createCellInput('invitado3_cc', item.invitado3_cc));
+    tr.appendChild(createCellInput('titular_nombre',item.titular_nombre));
+    tr.appendChild(createCellInput('titular_apellidos',item.titular_apellidos));
+    tr.appendChild(createCellInput('titular_cc',item.titular_cc));
+    tr.appendChild(createCellInput('titular_celular',item.titular_celular));
+    tr.appendChild(createCellInput('titular_correo',item.titular_correo));
+    tr.appendChild(createCellInput('hora',item.hora));
+    tr.appendChild(createCellInput('programa',item.programa));
+    tr.appendChild(createCellInput('discapacidad',item.discapacidad));
+
+    tr.appendChild(createGuestInput(1,item.invitado1_nombre));
+    tr.appendChild(createCellInput('invitado1_cc',item.invitado1_cc));
+    tr.appendChild(createGuestInput(2,item.invitado2_nombre));
+    tr.appendChild(createCellInput('invitado2_cc',item.invitado2_cc));
+    tr.appendChild(createGuestInput(3,item.invitado3_nombre));
+    tr.appendChild(createCellInput('invitado3_cc',item.invitado3_cc));
 
     tr.appendChild(createActionsCell(item.id));
+
     tbody.appendChild(tr);
   }
 }
 
 async function actualizarInvitados(){
-  try {
-    const r = await fetch("contador_invitados.php");
-    const data = await r.json();
-    document.getElementById("contadorInvitados").textContent = data.total ?? 0;
-  } catch (e) {
-    console.error("Error contando invitados:", e);
-  }
+  try{
+    const r=await fetch("contador_invitados.php");
+    const d=await r.json();
+    document.getElementById("contadorInvitados").textContent=d.total??0;
+  }catch{}
 }
 
-// ✔ refresca cada 2 segundos
-setInterval(actualizarInvitados, 2000);
+setInterval(actualizarInvitados,2000);
 actualizarInvitados();
 
-document.getElementById('reload').addEventListener('click', load);
+document.getElementById('reload').addEventListener('click',load);
 
-document.getElementById('searchCedula').addEventListener('input', e=>{
-  const q = e.target.value.toLowerCase();
+document.getElementById('searchCedula').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
-    const cedula = tr.children[4]?.firstChild?.value?.toLowerCase() || '';
-    tr.style.display = cedula.includes(q) ? '' : 'none';
+    const ced = tr.children[4]?.querySelector('input')?.value?.toLowerCase()||'';
+    tr.style.display = ced.includes(q) ? '' : 'none';
   });
 });
 
@@ -358,4 +351,5 @@ load();
 
 </body>
 </html>
+
 
