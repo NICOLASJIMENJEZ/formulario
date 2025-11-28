@@ -95,7 +95,7 @@ if ($dbConnected) {
               <h5 class="mb-3"><b>Consentimiento informado</b></h5>
 
               <p style="text-align: justify;">
-                De acuerdo a lo establecido con la Ley 1581 de 2012, por medio del cual se regula el régimen general de protección de datos personales y el Decreto reglamentario 1377 de 2013, autorizo expresamente a la Universidad CESMAG para que los datos suministrados puedan ser utilizados de conformidad con la reglamentación vigente de la Política de Tratamiento de Datos, los acuerdos reglamentarios y las disposiciones internas de la Universidad CESMAG.
+                De acuerdo a lo establecido con la Ley 1581 de 2012, por medio del cual se regula el régimen general de protección de datos personales y el Decreto reglamentario 1377 de 2012, autorizo expresamente a la Universidad CESMAG para que los datos suministrados puedan ser utilizados de conformidad con la reglamentación vigente de la Política de Tratamiento de Datos, los acuerdos reglamentarios y las disposiciones internas de la Universidad CESMAG.
               </p>
 
               <div class="d-grid">
