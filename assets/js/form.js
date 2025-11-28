@@ -72,8 +72,8 @@
 
   // Program lists for different times
   const programsByTime = {
-    '08:00': [
-      {v: 'Derecho', t: 'Derecho'},
+    '09:30': [
+      {v: 'EAUB', t: 'ESPECICALIZACION EN ARQUITECTURA Y URBANISMO BIOCLIMATICO'},
       {v: 'Administrador_de_Empresas', t: 'Administrador de Empresas'},
       {v: 'Tecnologia_en_Gestion_Financiera', t: 'Tecnología en Gestión Financiera'}
     ],
