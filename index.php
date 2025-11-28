@@ -98,8 +98,8 @@ if ($dbConnected) {
                 <div class="col-md-4 mt-2">
                   <label for="hora" class="form-label">Hora</label>
                   <select class="form-select" id="hora" name="hora">
-                    <option value="08:00">09:30 AM</option>
-                    <option value="10:00">02:00 PM</option>
+                    <option value="09:30">09:30 AM</option>
+                    <option value="02:00">02:00 PM</option>
                   <option value="16:30">04:30 PM</option>
                   </select>
                 </div>
