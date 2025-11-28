@@ -20,8 +20,10 @@ if ($dbConnected) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inscripción Acompañante</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     .wrap{ position:relative; overflow:hidden }
+
     .escudo-center{
       position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
       width:420px; height:420px; opacity:0.12;
@@ -29,15 +31,43 @@ if ($dbConnected) {
       background-image:url('/formulario/registros/escudo.png');
       pointer-events:none; z-index:0;
     }
+
     .escudo-corner{
       position:absolute; right:18px; top:12px; width:140px; height:140px;
       background-image:url('imagenes/logo.png');
       background-size:contain; background-repeat:no-repeat;
       pointer-events:none; z-index:1;
     }
+
+    /* ------------------------ */
+    /*   AJUSTES RESPONSIVOS   */
+    /* ------------------------ */
     @media(max-width:720px){
       .escudo-center{ width:260px; height:260px }
-      .escudo-corner{ width:110px; height:110px; right:10px; top:6px }
+
+      .escudo-corner{
+        width:100px;
+        height:100px;
+        top:2px;         /* Se baja un poco para no tapar */
+        right:4px;
+      }
+
+      h3{
+        padding-top: 90px; /* evita que el escudo tape el título */
+      }
+    }
+
+    @media(max-width:480px){
+      .escudo-corner{
+        width:85px;
+        height:85px;
+        top:0;
+        right:2px;
+      }
+
+      h3{
+        padding-top: 95px; /* más espacio en pantallas muy pequeñas */
+      }
     }
   </style>
 </head>
@@ -62,7 +92,6 @@ if ($dbConnected) {
 
             <!-- CONSENTIMIENTO INFORMADO -->
             <div id="consentimientoBox" class="alert alert-secondary p-4">
-
               <h5 class="mb-3"><b>Consentimiento informado</b></h5>
 
               <p style="text-align: justify;">
@@ -174,7 +203,6 @@ if ($dbConnected) {
   </div>
 
   <script>
-    // Mostrar formulario al aceptar consentimiento
     document.getElementById('btnDeAcuerdo').addEventListener('click', function(){
       document.getElementById('consentimientoBox').style.display = 'none';
       document.getElementById('formularioCompleto').style.display = 'block';
@@ -191,3 +219,4 @@ if ($dbConnected) {
 
 </body>
 </html>
+
