@@ -94,9 +94,43 @@ if ($dbConnected) {
             <div id="consentimientoBox" class="alert alert-secondary p-4">
               <h5 class="mb-3"><b>Consentimiento informado</b></h5>
 
+                        <!-- CONSENTIMIENTO INFORMADO -->
+            <div id="consentimientoBox" class="alert alert-secondary p-4">
+              <h5 class="mb-3"><b>Consentimiento informado</b></h5>
+
               <p style="text-align: justify;">
-                De acuerdo a lo establecido con la Ley 1581 de 2012, por medio del cual se regula el régimen general de protección de datos personales y el Decreto reglamentario 1377 de 2012, autorizo expresamente a la Universidad CESMAG para que los datos suministrados puedan ser utilizados de conformidad con la reglamentación vigente de la Política de Tratamiento de Datos, los acuerdos reglamentarios y las disposiciones internas de la Universidad CESMAG.
+                De acuerdo a lo establecido con la Ley 1581 de 2012, por medio del cual se regula el régimen general de protección de datos personales y el Decreto reglamentario 1377 de 2013, autorizo expresamente a la Universidad CESMAG para que los datos suministrados puedan ser utilizados de conformidad con la reglamentación vigente de la Política de Tratamiento de Datos, los acuerdos reglamentarios y las disposiciones internas de la Universidad CESMAG.
               </p>
+
+              <!-- 🔵 NUEVA INFORMACIÓN IMPORTANTE AGREGADA AQUÍ -->
+              <div class="alert alert-info mt-4" style="text-align: justify;">
+                <b>Información importante para la ceremonia:</b>
+                <br><br>
+
+                <b>1.</b> La ceremonia de grado se llevará a cabo el día <b>martes 11 de diciembre del 2025</b> en el  
+                <b>Auditorio San Francisco</b> de la Universidad CESMAG, ubicado en  
+                <b>carrera 19 #15A-53, Avenida de las Américas</b>.
+                <br><br>
+
+                <b>2.</b> Faltando <b>10 minutos</b> para el inicio de la ceremonia se <b>cerrará el ingreso</b>.  
+                Favor no insistir si llega tarde.
+                <br><br>
+
+                <b>3.</b> Para esta ocasión, y de manera excepcional, se autoriza el ingreso de  
+                <b>máximo 3 acompañantes</b> por cada graduado.
+                <br><br>
+
+                <b>4.</b> <b>Prohibido el ingreso de menores de edad.</b> Favor no insistir.
+              </div>
+              <!-- 🔵 FIN BLOQUE NUEVO -->
+
+              <div class="d-grid mt-4">
+                <button id="btnDeAcuerdo" class="btn btn-dark btn-lg">
+                  De acuerdo
+                </button>
+              </div>
+            </div>
+
 
               <div class="d-grid">
                 <button id="btnDeAcuerdo" class="btn btn-dark btn-lg">
