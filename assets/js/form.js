@@ -9,6 +9,7 @@
   const discapacidad = document.getElementById('discapacidad');
   const discapacidadWrap = document.getElementById('discapacidad_cual_wrap');
   const form = document.getElementById('regForm');
+
   var alertBox = document.getElementById('formAlert');
   if (!alertBox) {
     alertBox = document.createElement('div');
@@ -17,6 +18,7 @@
     alertBox.className = 'mt-3';
     form.parentNode.insertBefore(alertBox, form.nextSibling);
   }
+
   const horaSelect = document.getElementById('hora');
   const programaWrap = document.getElementById('programa_wrap');
   const programaSelect = document.getElementById('programa');
@@ -70,8 +72,9 @@
     discapacidadWrap.style.display = this.checked ? 'block' : 'none';
   });
 
-  // Program lists for different times
-   // Program lists for different times
+  // ======================================================
+  // PROGRAMAS ASIGNADOS POR HORA
+  // ======================================================
   const programsByTime = {
     '09:30': [
       {v: 'ESP_ARQ_URB_BIO', t: 'ESPECIALIZACIÓN DE ARQUITECTURA Y URBANISMO BIOCLIMÁTICO'},
@@ -82,7 +85,6 @@
     ],
 
     '02:00': [
-      // A las 02:30 PM dijiste: SOLO Derecho
       {v: 'DERECHO', t: 'DERECHO'}
     ],
 
@@ -99,17 +101,23 @@
     ]
   };
 
+  // ======================
+  // FIX REAL: COMPARACIÓN LIMPIA
+  // ======================
+  function normalizeHour(str){
+    return str.trim().replace(/\s+/g, '');
+  }
 
   function populateProgramaFor(time) {
-    if (!programaSelect) return;
-    // Clear
-    programaSelect.innerHTML = '';
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = '-- Seleccione un programa --';
-    programaSelect.appendChild(placeholder);
+    const clean = normalizeHour(time);
+    const list = programsByTime[clean] || [];
 
-    const list = programsByTime[time] || [];
+    programaSelect.innerHTML = '';
+    const ph = document.createElement('option');
+    ph.value = '';
+    ph.textContent = '-- Seleccione un programa --';
+    programaSelect.appendChild(ph);
+
     list.forEach(p => {
       const opt = document.createElement('option');
       opt.value = p.v;
@@ -118,88 +126,76 @@
     });
   }
 
-  if (horaSelect) {
-    function updateProgramaVisibility() {
-      const val = horaSelect.value;
-      if (programsByTime[val] && programsByTime[val].length > 0) {
-        if (programaWrap) programaWrap.style.display = 'block';
-        populateProgramaFor(val);
-        if (programaSelect) programaSelect.required = true;
-      } else {
-        if (programaWrap) programaWrap.style.display = 'none';
-        if (programaSelect) {
-          programaSelect.required = false;
-          programaSelect.value = '';
-          programaSelect.innerHTML = '<option value="">-- Seleccione un programa --</option>';
-        }
-      }
+  function updateProgramaVisibility() {
+    const cleanValue = normalizeHour(horaSelect.value);
+    const list = programsByTime[cleanValue];
+
+    if (list && list.length > 0) {
+      programaWrap.style.display = 'block';
+      populateProgramaFor(cleanValue);
+      programaSelect.required = true;
+    } else {
+      programaWrap.style.display = 'none';
+      programaSelect.required = false;
+      programaSelect.innerHTML = '<option value="">-- Seleccione un programa --</option>';
     }
-    horaSelect.addEventListener('change', updateProgramaVisibility);
-    // inicializar
-    updateProgramaVisibility();
   }
 
-  // simple Bootstrap validation and AJAX submit to improve UX
+  if (horaSelect) horaSelect.addEventListener('change', updateProgramaVisibility);
+
+  // Inicializar
+  updateProgramaVisibility();
+
+  // ======================================================
+  // ENVÍO AJAX
+  // ======================================================
   form.addEventListener('submit', function(e){
     e.preventDefault();
-    // Reset alert
+
     alertBox.style.display = 'none';
     alertBox.className = '';
-    // Validate required fields
+
     if(!form.checkValidity()){
       form.classList.add('was-validated');
       return;
     }
 
-  const data = new FormData(form);
-  // marcar petición como AJAX para que el servidor devuelva JSON en lugar de redirecciones HTML
-  data.append('ajax','1');
-    // send via fetch
+    const data = new FormData(form);
+    data.append('ajax','1');
+
     fetch(form.action, {
       method: 'POST',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json'
-      },
+      headers: {'X-Requested-With': 'XMLHttpRequest','Accept':'application/json'},
       body: data
-    }).then(async (r) => {
+    })
+    .then(async(r)=>{
       const text = await r.text();
-      // Try to parse JSON; if fails, show raw response for debugging
-      let parsed;
-      try {
-        parsed = JSON.parse(text);
-      } catch (e) {
-        throw new Error('Respuesta inválida del servidor: ' + text);
-      }
-      return parsed;
-    }).then(resp => {
+      try { return JSON.parse(text); }
+      catch(e){ throw new Error('Respuesta inválida del servidor: ' + text); }
+    })
+    .then(resp=>{
       if(resp.success){
         alertBox.className = 'alert alert-success';
-        alertBox.textContent = resp.message || 'Registro guardado.';
+        alertBox.textContent = resp.message;
         alertBox.style.display = 'block';
         form.reset();
-        // clear dynamic invitados
         container.innerHTML = '';
         invitados = 0;
         removeBtn.disabled = true;
         addBtn.disabled = false;
-        discapacidadWrap.style.display = 'none';
+        discapacidadWrap.style.display='none';
         form.classList.remove('was-validated');
-        // redirigir a index con mensaje después de 2 segundos
-        setTimeout(() => {
-          // Redirigir a index.php relativo a la carpeta actual
-          const params = '?msg=' + encodeURIComponent(resp.message || 'Guardado correctamente') + '&type=success';
-          window.location.href = './index.php' + params;
-        }, 2000);
+        setTimeout(()=>{ window.location.href='./index.php?msg='+encodeURIComponent(resp.message)+'&type=success'; },2000);
       } else {
-        alertBox.className = 'alert alert-danger';
-        alertBox.innerHTML = resp.message || 'Error al guardar. Intente de nuevo.';
-        alertBox.style.display = 'block';
+        alertBox.className='alert alert-danger';
+        alertBox.innerHTML=resp.message;
+        alertBox.style.display='block';
       }
-    }).catch(err => {
-      alertBox.className = 'alert alert-danger';
-      alertBox.textContent = err.message || 'Error de red o servidor.';
-      alertBox.style.display = 'block';
+    })
+    .catch(err=>{
+      alertBox.className='alert alert-danger';
+      alertBox.textContent=err.message;
+      alertBox.style.display='block';
       console.error(err);
     });
   });
