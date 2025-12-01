@@ -66,7 +66,7 @@
                 <div class="card-body">
                     <div class="card-ico"><i class="fa-solid fa-pen-nib"></i></div>
                     <h5>Formulario</h5>
-                    <p>Ir al formulario de inscripción (sin autenticación)</p>
+                    <p>Ir al formulario de inscripción. GRADUADOS 11 de diciembre 2026</p>
                 </div>
             </div>
 
@@ -74,7 +74,8 @@
                 <div class="card-body">
                     <div class="card-ico"><i class="fa-solid fa-pen-nib"></i></div>
                     <h5>Formulario</h5>
-                    <p>Ir al formulario de inscripción invitados especiales (sin autenticación)</p>
+                    <p>Inscripción de invitados especiales
+                    Formulario exclusivo para el registro de invitados especiales)</p>
                 </div>
             </div>
 
@@ -82,7 +83,8 @@
             <div class="card card-choice" role="button" onclick="location.href='registros.php'">
                 <div class="card-body">
                     <div class="card-ico"><i class="fa-solid fa-list-check"></i></div>
-                    <h5>Registros</h5>
+                    <h5>Consulta de inscripciones
+                    Visualiza todos los registros realizados en el sistema, incluyendo asistentes generales e invitados especiales.</h5>
                 
                 </div>
             </div>
@@ -92,7 +94,7 @@
                 <div class="card-body">
                     <div class="card-ico"><i class="fa-solid fa-filter"></i></div>
                     <h5>Registros por programa</h5>
-                    <p>Filtrar registros por programa (se requiere contraseña)</p>
+                    <p>Filtrar registros por programa (DASH BOARD)</p>
                 </div>
             </div>
         </div>
