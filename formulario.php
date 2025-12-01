@@ -84,7 +84,8 @@
                 <div class="card-body">
                     <div class="card-ico"><i class="fa-solid fa-list-check"></i></div>
                     <h5>Consulta de inscripciones
-                    Visualiza todos los registros realizados en el sistema, incluyendo asistentes generales e invitados especiales.</h5>
+                    </h5>
+                    <P>Visualiza todos los registros realizados en el sistema, incluyendo asistentes generales e invitados especiales.</P>
                 
                 </div>
             </div>
