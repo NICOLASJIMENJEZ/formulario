@@ -88,7 +88,7 @@
             </div>
 
             <!-- Registros por programa -->
-            <div class="card card-choice" role="button" onclick="location.href='por_programa.php'">
+            <div class="card card-choice" role="button" onclick="location.href='graduados_contador.php'">
                 <div class="card-body">
                     <div class="card-ico"><i class="fa-solid fa-filter"></i></div>
                     <h5>Registros por programa</h5>
