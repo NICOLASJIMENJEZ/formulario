@@ -62,11 +62,19 @@
 
         <div class="choice">
             <!-- Formulario -->
-            <div class="card card-choice" role="button" onclick="location.href='formulario.php'">
+            <div class="card card-choice" role="button" onclick="location.href='index.php'">
                 <div class="card-body">
                     <div class="card-ico"><i class="fa-solid fa-pen-nib"></i></div>
                     <h5>Formulario</h5>
                     <p>Ir al formulario de inscripción (sin autenticación)</p>
+                </div>
+            </div>
+
+                <div class="card card-choice" role="button" onclick="location.href='invitados_especiales.php'">
+                <div class="card-body">
+                    <div class="card-ico"><i class="fa-solid fa-pen-nib"></i></div>
+                    <h5>Formulario</h5>
+                    <p>Ir al formulario de inscripción invitados especiales (sin autenticación)</p>
                 </div>
             </div>
 
