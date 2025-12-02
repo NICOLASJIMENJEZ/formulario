@@ -25,7 +25,6 @@ require_once __DIR__ . '/db.php';
 
     .controls .form-select, .controls .form-control { min-width: 180px; }
 
-    /* Ocultar columnas */
     th:nth-child(1), td:nth-child(1),
     th:nth-child(2), td:nth-child(2),
     th:nth-child(5), td:nth-child(5) { display: none; }
@@ -60,7 +59,6 @@ require_once __DIR__ . '/db.php';
         <a href="index.php" class="btn btn-danger">Salir</a>
     </div>
 
-    <!-- CONTROLES -->
     <div class="controls">
         <select id="hourFilter" class="form-select form-select-sm">
             <option value="">Todas las horas</option>
@@ -73,8 +71,7 @@ require_once __DIR__ . '/db.php';
             <option value="">Todos los programas</option>
         </select>
 
-        <input id="q" class="form-control form-control-sm"
-               placeholder="Buscar por nombre o cédula...">
+        <input id="q" class="form-control form-control-sm" placeholder="Buscar por nombre o cédula...">
 
         <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
     </div>
@@ -89,7 +86,7 @@ require_once __DIR__ . '/db.php';
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
-                        <th>Semáforo</th>
+                        <th>Acción</th>
                         <th>Titular</th>
                         <th>Cédula</th>
                         <th>Celular</th>
@@ -101,7 +98,7 @@ require_once __DIR__ . '/db.php';
             </table>
         </div>
 
-        <!-- CARDS MÓVIL -->
+        <!-- CARDS -->
         <div id="cardsContainer"></div>
 
     </div>
@@ -137,7 +134,9 @@ async function fetchRecords(params = {}){
     return j.success ? (j.records || []) : [];
 }
 
-/* NUEVO: Cambiar semáforo */
+/* ==========================
+    TOGGLE LLEGADA
+========================== */
 async function toggleArrival(id, el){
     const res = await fetch(api, {
         method: "POST",
@@ -152,11 +151,21 @@ async function toggleArrival(id, el){
         return;
     }
 
-    // Cambiar color visualmente
-    el.classList.remove("semaforo-gray", "semaforo-green");
-    el.classList.add(j.new_value == 1 ? "semaforo-green" : "semaforo-gray");
+    let newVal = j.new_value;
 
-    // Recargar contador y tarjetas
+    /* Bolita */
+    if (el.classList.contains("bolita")) {
+        el.classList.remove("semaforo-gray", "semaforo-green");
+        el.classList.add(newVal == 1 ? "semaforo-green" : "semaforo-gray");
+    }
+
+    /* Botón */
+    if (el.tagName === "BUTTON") {
+        el.classList.remove("btn-success", "btn-secondary");
+        el.classList.add(newVal == 1 ? "btn-success" : "btn-secondary");
+        el.textContent = newVal == 1 ? "Llegó" : "Marcar llegada";
+    }
+
     applyFiltersServer();
 }
 
@@ -175,13 +184,20 @@ function renderTable(records){
 
         tr.innerHTML = `
             <td>${item.id}</td>
+
             <td>
                 <span 
                     class="bolita ${item.arrived_count == 1 ? 'semaforo-green' : 'semaforo-gray'}"
-                    style="cursor:pointer"
+                    style="cursor:pointer; margin-right:6px;"
                     onclick="toggleArrival(${item.id}, this)"
                 ></span>
+
+                <button class="btn btn-sm ${item.arrived_count == 1 ? 'btn-success' : 'btn-secondary'}"
+                        onclick="toggleArrival(${item.id}, this)">
+                    ${item.arrived_count == 1 ? 'Llegó' : 'Marcar llegada'}
+                </button>
             </td>
+
             <td>${item.titular_nombre || ''} ${item.titular_apellidos || ''}</td>
             <td>${item.titular_cc || ''}</td>
             <td>${item.titular_celular || ''}</td>
@@ -204,7 +220,11 @@ function renderCards(records){
                 <p><strong>Cédula:</strong> ${item.titular_cc}</p>
                 <p><strong>Programa:</strong> ${item.programa}</p>
                 <p><strong>Hora:</strong> ${item.hora}</p>
-                <span class="bolita ${item.arrived_count==1?'semaforo-green':'semaforo-gray'}"></span> Llegó
+
+                <button class="btn btn-sm ${item.arrived_count==1?'btn-success':'btn-secondary'}"
+                        onclick="toggleArrival(${item.id}, this)">
+                    ${item.arrived_count==1?'Llegó':'Marcar llegada'}
+                </button>
             </div>
         `;
     });
