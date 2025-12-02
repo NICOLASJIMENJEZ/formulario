@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/db.php'; // Conexión PDO
+require_once __DIR__ . '/db.php'; // debes tener $pdo definido aquí
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -7,13 +7,43 @@ try {
     $action = $_REQUEST['action'] ?? 'list';
 
     /* ================================
+       0. TOGGLE ARRIVAL (marcar/desmarcar llegada)
+       Endpoint: api.php?action=toggle_arrival&id=123  (GET or POST)
+       Devuelve: { success: true, arrived_count: 0|1 }
+       ================================ */
+    if ($action === 'toggle_arrival') {
+        $id = (int)($_REQUEST['id'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID inválido.']);
+            exit;
+        }
+
+        // Alternamos 0 <-> 1 de forma segura en SQL
+        $sql = "UPDATE registros
+                SET arrived_count = CASE WHEN COALESCE(arrived_count,0) = 1 THEN 0 ELSE 1 END
+                WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':id' => $id]);
+
+        // Devolvemos el nuevo valor
+        $stmt2 = $pdo->prepare("SELECT COALESCE(arrived_count,0) + 0 AS arrived_count FROM registros WHERE id = :id");
+        $stmt2->execute([':id' => $id]);
+        $row = $stmt2->fetch(PDO::FETCH_ASSOC);
+        $val = isset($row['arrived_count']) ? (int)$row['arrived_count'] : 0;
+
+        echo json_encode(['success' => true, 'arrived_count' => $val]);
+        exit;
+    }
+
+    /* ================================
        1. LISTAR REGISTROS (CON FILTROS)
        ================================ */
     if ($action === 'list') {
 
-        // Forzamos arrived_count para evitar NULL
+        // Seleccionamos todo y forzamos arrived_count como número (0 o 1)
+        // COALESCE(...)+0 convierte NULL a 0 y devuelve valor numérico
         $sql = "SELECT *,
-                       COALESCE(arrived_count, 0) AS arrived_count
+                       (COALESCE(arrived_count, 0) + 0) AS arrived_count
                 FROM registros
                 WHERE 1=1";
         $params = [];
@@ -33,8 +63,10 @@ try {
             $params[':q'] = $q;
         }
 
-        // Filtro por hora (ARREGLADO)
+        // Filtro por hora
         if (!empty($_GET['hora'])) {
+            // Si en tu DB hora es TIME y mandas "9:30" podrías necesitar normalizar.
+            // Aquí asumimos que guardas horas como strings iguales a las opciones del front.
             $sql .= " AND hora = :hora";
             $params[':hora'] = $_GET['hora'];
         }
@@ -45,6 +77,12 @@ try {
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Aseguramos arrived_count como entero en el resultado (por si acaso)
+        foreach ($rows as &$r) {
+            $r['arrived_count'] = isset($r['arrived_count']) ? (int)$r['arrived_count'] : 0;
+        }
+        unset($r);
+
         echo json_encode(['success' => true, 'records' => $rows]);
         exit;
     }
@@ -53,10 +91,7 @@ try {
        2. LISTAR PROGRAMAS ÚNICOS
        ================================ */
     if ($action === 'programs') {
-        $stmt = $pdo->query("SELECT DISTINCT 
-                                COALESCE(NULLIF(programa,''), '__EMPTY__') AS programa
-                             FROM registros 
-                             ORDER BY programa ASC");
+        $stmt = $pdo->query("SELECT DISTINCT COALESCE(NULLIF(programa,''), '__EMPTY__') AS programa FROM registros ORDER BY programa ASC");
         $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
         echo json_encode(['success' => true, 'programs' => $rows]);
         exit;
@@ -186,3 +221,4 @@ try {
     ]);
 }
 ?>
+
