@@ -126,19 +126,35 @@ async function fetchRecords(params = {}){
 }
 
 /* ==========================
-    TOGGLE VISUAL
+   TOGGLE VISUAL + API
 ========================== */
-function toggleArrivalVisual(id){
-    // Cambiar estado
-    arrivalState[id] = arrivalState[id] === 1 ? 0 : 1;
+async function toggleArrivalVisual(id){
+    try {
+        const form = new FormData();
+        form.append('id', id);
 
-    renderTable(lastRecords);
-    renderCards(lastRecords);
-    updateCounter();
+        const res = await fetch(api + '?action=toggle_arrival', {
+            method: 'POST',
+            body: form
+        });
+
+        const j = await res.json();
+        if(j.success){
+            arrivalState[id] = j.new_value;
+
+            renderTable(lastRecords);
+            renderCards(lastRecords);
+            updateCounter();
+        } else {
+            alert("Error al cambiar semáforo: " + j.message);
+        }
+    } catch(e){
+        console.error("Error semáforo:", e);
+    }
 }
 
 /* ==========================
-    CONTADOR VISUAL
+   CONTADOR VISUAL
 ========================== */
 function updateCounter(){
     const llegados = Object.values(arrivalState).filter(v => v === 1).length;
@@ -152,7 +168,7 @@ function renderTable(records){
 
     records.forEach(item => {
         if(arrivalState[item.id] === undefined){
-            arrivalState[item.id] = 0;
+            arrivalState[item.id] = item.arrived_count || 0;
         }
 
         const tr = document.createElement('tr');
@@ -184,7 +200,7 @@ function renderCards(records){
 
     records.forEach(item => {
         if(arrivalState[item.id] === undefined){
-            arrivalState[item.id] = 0;
+            arrivalState[item.id] = item.arrived_count || 0;
         }
 
         c.innerHTML += `
