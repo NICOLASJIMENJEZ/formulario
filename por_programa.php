@@ -23,8 +23,6 @@ require_once __DIR__ . '/db.php';
         align-items: center; margin-bottom: 15px;
     }
 
-    .controls .form-select, .controls .form-control { min-width: 180px; }
-
     th:nth-child(1), td:nth-child(1),
     th:nth-child(2), td:nth-child(2),
     th:nth-child(5), td:nth-child(5) { display: none; }
@@ -35,6 +33,7 @@ require_once __DIR__ . '/db.php';
     .bolita {
         width: 18px; height: 18px; border-radius: 50%;
         display: inline-block;
+        cursor: pointer;
     }
 
     .contador-box{
@@ -64,7 +63,7 @@ require_once __DIR__ . '/db.php';
             <option value="">Todas las horas</option>
             <option value="9:30">9:30</option>
             <option value="2:00">2:00</option>
-            <option value="4:30">16:30</option>
+            <option value="16:30">16:30</option>
         </select>
 
         <select id="programFilter" class="form-select form-select-sm">
@@ -111,15 +110,7 @@ require_once __DIR__ . '/db.php';
 
 <script>
 const api = 'api1.php';
-const alertEl = document.getElementById('alert');
-
-function showAlert(msg, type='success'){
-    alertEl.innerHTML =
-    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-        ${msg}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>`;
-}
+let arrivalState = {}; // ESTADO VISUAL
 
 async function fetchPrograms(){
     const res = await fetch(api + '?action=programs');
@@ -135,42 +126,22 @@ async function fetchRecords(params = {}){
 }
 
 /* ==========================
-    TOGGLE LLEGADA
+    TOGGLE VISUAL
 ========================== */
-async function toggleArrival(id, el){
-    const res = await fetch(api, {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: `action=toggle_arrival&id=${id}`
-    });
+function toggleArrivalVisual(id){
+    // Cambiar estado
+    arrivalState[id] = arrivalState[id] === 1 ? 0 : 1;
 
-    const j = await res.json();
-
-    if(!j.success){
-        showAlert("Error actualizando llegada", "danger");
-        return;
-    }
-
-    let newVal = j.new_value;
-
-    /* Bolita */
-    if (el.classList.contains("bolita")) {
-        el.classList.remove("semaforo-gray", "semaforo-green");
-        el.classList.add(newVal == 1 ? "semaforo-green" : "semaforo-gray");
-    }
-
-    /* Botón */
-    if (el.tagName === "BUTTON") {
-        el.classList.remove("btn-success", "btn-secondary");
-        el.classList.add(newVal == 1 ? "btn-success" : "btn-secondary");
-        el.textContent = newVal == 1 ? "Llegó" : "Marcar llegada";
-    }
-
-    applyFiltersServer();
+    renderTable(lastRecords);
+    renderCards(lastRecords);
+    updateCounter();
 }
 
-function updateCounter(records){
-    const llegados = records.filter(r => r.arrived_count == 1).length;
+/* ==========================
+    CONTADOR VISUAL
+========================== */
+function updateCounter(){
+    const llegados = Object.values(arrivalState).filter(v => v === 1).length;
     document.getElementById('contadorLlegadas').textContent =
         "Han llegado: " + llegados + " personas";
 }
@@ -180,6 +151,10 @@ function renderTable(records){
     tbody.innerHTML = '';
 
     records.forEach(item => {
+        if(arrivalState[item.id] === undefined){
+            arrivalState[item.id] = 0;
+        }
+
         const tr = document.createElement('tr');
 
         tr.innerHTML = `
@@ -187,15 +162,9 @@ function renderTable(records){
 
             <td>
                 <span 
-                    class="bolita ${item.arrived_count == 1 ? 'semaforo-green' : 'semaforo-gray'}"
-                    style="cursor:pointer; margin-right:6px;"
-                    onclick="toggleArrival(${item.id}, this)"
-                ></span>
-
-                <button class="btn btn-sm ${item.arrived_count == 1 ? 'btn-success' : 'btn-secondary'}"
-                        onclick="toggleArrival(${item.id}, this)">
-                    ${item.arrived_count == 1 ? 'Llegó' : 'Marcar llegada'}
-                </button>
+                    class="bolita ${arrivalState[item.id] == 1 ? 'semaforo-green' : 'semaforo-gray'}"
+                    onclick="toggleArrivalVisual(${item.id})">
+                </span>
             </td>
 
             <td>${item.titular_nombre || ''} ${item.titular_apellidos || ''}</td>
@@ -214,6 +183,10 @@ function renderCards(records){
     c.innerHTML = '';
 
     records.forEach(item => {
+        if(arrivalState[item.id] === undefined){
+            arrivalState[item.id] = 0;
+        }
+
         c.innerHTML += `
             <div class="card p-2 mb-2">
                 <h5>${item.titular_nombre||''} ${item.titular_apellidos||''}</h5>
@@ -221,14 +194,16 @@ function renderCards(records){
                 <p><strong>Programa:</strong> ${item.programa}</p>
                 <p><strong>Hora:</strong> ${item.hora}</p>
 
-                <button class="btn btn-sm ${item.arrived_count==1?'btn-success':'btn-secondary'}"
-                        onclick="toggleArrival(${item.id}, this)">
-                    ${item.arrived_count==1?'Llegó':'Marcar llegada'}
+                <button class="btn btn-sm ${arrivalState[item.id]==1?'btn-success':'btn-secondary'}"
+                        onclick="toggleArrivalVisual(${item.id})">
+                    ${arrivalState[item.id]==1?'Llegó':'Marcar llegada'}
                 </button>
             </div>
         `;
     });
 }
+
+let lastRecords = [];
 
 async function load(){
     const programSel = document.getElementById('programFilter');
@@ -251,10 +226,11 @@ async function applyFiltersServer(){
     if(program) params.programa = program;
     if(hour) params.hora = hour;
 
-    const records = await fetchRecords(params);
-    renderTable(records);
-    renderCards(records);
-    updateCounter(records);
+    lastRecords = await fetchRecords(params);
+
+    renderTable(lastRecords);
+    renderCards(lastRecords);
+    updateCounter();
 }
 
 document.getElementById('reload').addEventListener('click', load);
@@ -270,5 +246,4 @@ load();
 </script>
 </body>
 </html>
-
 
