@@ -110,7 +110,7 @@ require_once __DIR__ . '/db.php';
 </div>
 
 <script>
-const api = 'api.php';
+const api = 'api1.php';
 const alertEl = document.getElementById('alert');
 
 function showAlert(msg, type='success'){
