@@ -32,18 +32,21 @@ if ($action === "list") {
     $sql = "SELECT * FROM registros WHERE 1 ";
     $params = [];
 
-    if (!empty($_GET["q"])) {
-        $sql .= " AND (titular_nombre LIKE :q OR titular_cc LIKE :q) ";
+    // BUSCADOR
+    if (isset($_GET["q"]) && $_GET["q"] !== "") {
+        $sql .= " AND (titular_nombre ILIKE :q OR titular_cc ILIKE :q) ";
         $params[":q"] = "%" . $_GET["q"] . "%";
     }
 
-    if (!empty($_GET["programa"])) {
-        $sql .= " AND programa = :p ";
+    // FILTRO PROGRAMA
+    if (isset($_GET["programa"]) && $_GET["programa"] !== "") {
+        $sql .= " AND (programa = :p)";
         $params[":p"] = $_GET["programa"];
     }
 
-    if (!empty($_GET["hora"])) {
-        $sql .= " AND hora = :h ";
+    // FILTRO HORA
+    if (isset($_GET["hora"]) && $_GET["hora"] !== "") {
+        $sql .= " AND (hora = :h)";
         $params[":h"] = $_GET["hora"];
     }
 
@@ -51,8 +54,8 @@ if ($action === "list") {
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     out(true, "", ["records" => $rows]);
 }
 
