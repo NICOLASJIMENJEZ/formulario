@@ -342,14 +342,20 @@ async function actualizarInvitados(){
 // ✔ refresca cada 2 segundos
 setInterval(actualizarInvitados, 2000);
 actualizarInvitados();
-
-document.getElementById('reload').addEventListener('click', load);
-
 document.getElementById('searchCedula').addEventListener('input', e=>{
   const q = e.target.value.toLowerCase();
+
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
+    const nombre = tr.children[2]?.firstChild?.value?.toLowerCase() || '';
+    const apellidos = tr.children[3]?.firstChild?.value?.toLowerCase() || '';
     const cedula = tr.children[4]?.firstChild?.value?.toLowerCase() || '';
-    tr.style.display = cedula.includes(q) ? '' : 'none';
+
+    // Mostrar si coincide con cualquiera de los 3
+    tr.style.display = (
+      nombre.includes(q) ||
+      apellidos.includes(q) ||
+      cedula.includes(q)
+    ) ? '' : 'none';
   });
 });
 
