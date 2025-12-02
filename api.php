@@ -1,28 +1,46 @@
 <?php
-require_once __DIR__ . '/db.php'; // Conexión PDO corregida
+require_once __DIR__ . '/db.php'; // Conexión PDO
 
 header('Content-Type: application/json; charset=utf-8');
 
 try {
     $action = $_REQUEST['action'] ?? 'list';
 
-    // 1. LISTAR REGISTROS (con filtros opcionales)
+    /* ================================
+       1. LISTAR REGISTROS (CON FILTROS)
+       ================================ */
     if ($action === 'list') {
-        $sql = "SELECT * FROM registros WHERE 1=1";
+
+        // Forzamos arrived_count para evitar NULL
+        $sql = "SELECT *,
+                       COALESCE(arrived_count, 0) AS arrived_count
+                FROM registros
+                WHERE 1=1";
         $params = [];
 
+        // Filtro por programa
         if (!empty($_GET['programa'])) {
             $sql .= " AND programa = :programa";
             $params[':programa'] = $_GET['programa'];
         }
 
+        // Filtro por búsqueda
         if (!empty($_GET['q'])) {
             $q = "%" . $_GET['q'] . "%";
-            $sql .= " AND (titular_nombre LIKE :q OR titular_apellidos LIKE :q OR titular_cc LIKE :q)";
+            $sql .= " AND (titular_nombre LIKE :q 
+                        OR titular_apellidos LIKE :q 
+                        OR titular_cc LIKE :q)";
             $params[':q'] = $q;
         }
 
+        // Filtro por hora (ARREGLADO)
+        if (!empty($_GET['hora'])) {
+            $sql .= " AND hora = :hora";
+            $params[':hora'] = $_GET['hora'];
+        }
+
         $sql .= " ORDER BY id DESC";
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -31,15 +49,22 @@ try {
         exit;
     }
 
-    //  2. LISTAR PROGRAMAS ÚNICOS
+    /* ================================
+       2. LISTAR PROGRAMAS ÚNICOS
+       ================================ */
     if ($action === 'programs') {
-        $stmt = $pdo->query("SELECT DISTINCT COALESCE(NULLIF(programa,''), '__EMPTY__') AS programa FROM registros ORDER BY programa ASC");
+        $stmt = $pdo->query("SELECT DISTINCT 
+                                COALESCE(NULLIF(programa,''), '__EMPTY__') AS programa
+                             FROM registros 
+                             ORDER BY programa ASC");
         $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
         echo json_encode(['success' => true, 'programs' => $rows]);
         exit;
     }
 
-    //  3. CREAR NUEVO REGISTRO
+    /* ================================
+       3. CREAR NUEVO REGISTRO
+       ================================ */
     if ($action === 'create') {
         $required = ['titular_nombre', 'titular_apellidos', 'titular_cc'];
         foreach ($required as $field) {
@@ -54,13 +79,15 @@ try {
             hora, programa, discapacidad, discapacidad_cual,
             invitado1_nombre, invitado1_apellidos, invitado1_cc,
             invitado2_nombre, invitado2_apellidos, invitado2_cc,
-            invitado3_nombre, invitado3_apellidos, invitado3_cc, arrived_count
+            invitado3_nombre, invitado3_apellidos, invitado3_cc,
+            arrived_count
         ) VALUES (
             :titular_nombre, :titular_apellidos, :titular_cc, :titular_celular, :titular_correo,
             :hora, :programa, :discapacidad, :discapacidad_cual,
             :invitado1_nombre, :invitado1_apellidos, :invitado1_cc,
             :invitado2_nombre, :invitado2_apellidos, :invitado2_cc,
-            :invitado3_nombre, :invitado3_apellidos, :invitado3_cc, :arrived_count
+            :invitado3_nombre, :invitado3_apellidos, :invitado3_cc,
+            :arrived_count
         )";
 
         $stmt = $pdo->prepare($sql);
@@ -90,7 +117,9 @@ try {
         exit;
     }
 
-    //  4. ELIMINAR REGISTRO
+    /* ================================
+       4. ELIMINAR REGISTRO
+       ================================ */
     if ($action === 'delete') {
         $id = (int)($_GET['id'] ?? 0);
         if ($id <= 0) {
@@ -104,7 +133,9 @@ try {
         exit;
     }
 
-    //  5. ACTUALIZAR REGISTRO
+    /* ================================
+       5. ACTUALIZAR REGISTRO
+       ================================ */
     if ($action === 'update') {
         $id = (int)($_POST['id'] ?? 0);
         if ($id <= 0) {
@@ -123,6 +154,7 @@ try {
 
         $updates = [];
         $values = [];
+
         foreach ($allowed as $campo) {
             if (isset($_POST[$campo])) {
                 $updates[] = "$campo = ?";
@@ -136,6 +168,7 @@ try {
         }
 
         $values[] = $id;
+
         $sql = "UPDATE registros SET " . implode(', ', $updates) . " WHERE id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($values);
