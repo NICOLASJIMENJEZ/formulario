@@ -179,12 +179,16 @@ function renderTable(records){
     const tbody = document.querySelector('#resultsTable tbody'); 
     tbody.innerHTML = '';
     records.forEach(item => {
-        const s = semaforoFor(item);
         const tr = document.createElement('tr');
+
         tr.innerHTML = `
             <td>${item.id}</td>
             <td>
-                <span class="bolita ${s==1?'semaforo-green':'semaforo-gray'}"></span>
+                <span 
+                    class="bolita ${item.arrived_count == 1 ? 'semaforo-green' : 'semaforo-gray'}"
+                    style="cursor:pointer"
+                    onclick="toggleArrival(${item.id}, this)"
+                ></span>
             </td>
             <td>${item.titular_nombre || ''} ${item.titular_apellidos || ''}</td>
             <td>${item.titular_cc || ''}</td>
@@ -192,9 +196,11 @@ function renderTable(records){
             <td>${item.hora || ''}</td>
             <td>${item.programa || ''}</td>
         `;
+
         tbody.appendChild(tr);
     });
 }
+
 
 function renderCards(records){
     const c = document.getElementById('cardsContainer'); 
