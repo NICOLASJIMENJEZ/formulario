@@ -25,28 +25,29 @@ if ($action === "programs") {
 }
 
 /* ================================
-   2. LISTAR REGISTROS + FILTROS
+   2. LISTAR REGISTROS DE TITULARES
 ================================ */
 if ($action === "list") {
 
-    $sql = "SELECT * FROM registros WHERE 1 ";
+    $sql = "SELECT id, titular_nombre, titular_apellidos, titular_cc, titular_celular, titular_correo, hora, programa, discapacidad, arrived_count
+            FROM registros WHERE 1 ";
     $params = [];
 
     // BUSCADOR
     if (isset($_GET["q"]) && $_GET["q"] !== "") {
-        $sql .= " AND (titular_nombre ILIKE :q OR titular_cc ILIKE :q) ";
+        $sql .= " AND (titular_nombre ILIKE :q OR titular_apellidos ILIKE :q OR titular_cc ILIKE :q) ";
         $params[":q"] = "%" . $_GET["q"] . "%";
     }
 
     // FILTRO PROGRAMA
     if (isset($_GET["programa"]) && $_GET["programa"] !== "") {
-        $sql .= " AND (programa = :p)";
+        $sql .= " AND programa = :p";
         $params[":p"] = $_GET["programa"];
     }
 
     // FILTRO HORA
     if (isset($_GET["hora"]) && $_GET["hora"] !== "") {
-        $sql .= " AND (hora = :h)";
+        $sql .= " AND hora = :h";
         $params[":h"] = $_GET["hora"];
     }
 
@@ -88,8 +89,8 @@ if ($action === "toggle_arrival") {
     out(true, "", ["new_value" => $new_value]);
 }
 
-
 /* ================================
    ACCIÓN NO RECONOCIDA
 ================================ */
 out(false, "Acción inválida");
+
