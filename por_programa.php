@@ -93,7 +93,7 @@ require_once __DIR__ . '/db.php';
             <option value="">Todas las horas</option>
             <option value="9:30">9:30</option>
             <option value="2:00">2:00</option>
-            <option value="4:30">4:30</option>
+            <option value="4:30">16:30</option>
         </select>
 
         <select id="programFilter" class="form-select form-select-sm">
