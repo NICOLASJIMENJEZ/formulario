@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/db.php';
-require_login();
 ?>
 <!doctype html>
 <html lang="es">
