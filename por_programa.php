@@ -91,6 +91,7 @@ require_once __DIR__ . '/db.php';
                         <th>Celular</th>
                         <th>Hora</th>
                         <th>Programa</th>
+                        <th>Semáforo</th> <!-- NUEVA COLUMNA PARA EL BOTÓN -->
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -175,19 +176,18 @@ function renderTable(records){
 
         tr.innerHTML = `
             <td>${item.id}</td>
-
-            <td>
-                <span 
-                    class="bolita ${arrivalState[item.id] == 1 ? 'semaforo-green' : 'semaforo-gray'}"
-                    onclick="toggleArrivalVisual(${item.id})">
-                </span>
-            </td>
-
+            <td></td>
             <td>${item.titular_nombre || ''} ${item.titular_apellidos || ''}</td>
             <td>${item.titular_cc || ''}</td>
             <td>${item.titular_celular || ''}</td>
             <td>${item.hora || ''}</td>
             <td>${item.programa || ''}</td>
+            <td>
+                <button class="btn btn-sm ${arrivalState[item.id]==1?'btn-success':'btn-secondary'}"
+                        onclick="toggleArrivalVisual(${item.id})">
+                    ${arrivalState[item.id]==1?'Llegó':'Marcar llegada'}
+                </button>
+            </td>
         `;
 
         tbody.appendChild(tr);
