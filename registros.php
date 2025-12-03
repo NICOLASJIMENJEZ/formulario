@@ -342,19 +342,34 @@ async function actualizarInvitados(){
 // ✔ refresca cada 2 segundos
 setInterval(actualizarInvitados, 2000);
 actualizarInvitados();
+
 document.getElementById('searchCedula').addEventListener('input', e=>{
   const q = e.target.value.toLowerCase();
 
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
+
     const nombre = tr.children[2]?.firstChild?.value?.toLowerCase() || '';
     const apellidos = tr.children[3]?.firstChild?.value?.toLowerCase() || '';
     const cedula = tr.children[4]?.firstChild?.value?.toLowerCase() || '';
 
-    // Mostrar si coincide con cualquiera de los 3
+    // ✔ INVITADOS AHORA INCLUIDOS
+    const inv1 = tr.children[10]?.firstChild?.value?.toLowerCase() || '';
+    const cc1  = tr.children[11]?.firstChild?.value?.toLowerCase() || '';
+    const inv2 = tr.children[12]?.firstChild?.value?.toLowerCase() || '';
+    const cc2  = tr.children[13]?.firstChild?.value?.toLowerCase() || '';
+    const inv3 = tr.children[14]?.firstChild?.value?.toLowerCase() || '';
+    const cc3  = tr.children[15]?.firstChild?.value?.toLowerCase() || '';
+
     tr.style.display = (
       nombre.includes(q) ||
       apellidos.includes(q) ||
-      cedula.includes(q)
+      cedula.includes(q) ||
+      inv1.includes(q) ||
+      cc1.includes(q) ||
+      inv2.includes(q) ||
+      cc2.includes(q) ||
+      inv3.includes(q) ||
+      cc3.includes(q)
     ) ? '' : 'none';
   });
 });
