@@ -59,27 +59,34 @@ try {
         out(true, "", ['programs' => $programs]);
     }
 
-    /* ==============================
-       3. TOGGLE LLEGADA (SEMAFORO)
-    ============================== */
-    if ($action === 'toggle_arrival') {
-        $id = $_POST['id'] ?? null;
-        if (!$id) out(false, "ID faltante");
+   /* ============================================
+   3. TOGGLE LLEGADA (TITULAR + GRADUADOS)
+============================================ */
+if ($action === 'toggle_arrival') {
 
-        // Obtener valor actual
-        $stmt = $pdo->prepare("SELECT arrived_count FROM registros WHERE id = ?");
-        $stmt->execute([$id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) out(false, "Registro no encontrado");
+    $id = $_POST['id'] ?? null;
+    if (!$id) out(false, "ID faltante");
 
-        $new_value = $row['arrived_count'] == 1 ? 0 : 1;
+    // Obtener titular_cc del registro
+    $stmt = $pdo->prepare("SELECT titular_cc, arrived_count FROM registros WHERE id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Actualizar
-        $upd = $pdo->prepare("UPDATE registros SET arrived_count = ? WHERE id = ?");
-        $upd->execute([$new_value, $id]);
+    if (!$row) out(false, "Registro no encontrado");
 
-        out(true, "", ['new_value' => $new_value]);
-    }
+    $cc = $row["titular_cc"];
+    $new_value = $row['arrived_count'] == 1 ? 0 : 1;
+
+    // Actualizar TODOS los que tengan el mismo titular_cc
+    $upd = $pdo->prepare("
+        UPDATE registros
+        SET arrived_count = ?
+        WHERE titular_cc = ?
+    ");
+    $upd->execute([$new_value, $cc]);
+
+    out(true, "Llegadas actualizadas", ["new_value" => $new_value]);
+}
 
     /* ==============================
        4. ELIMINAR REGISTRO
