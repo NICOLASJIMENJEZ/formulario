@@ -343,22 +343,38 @@ async function actualizarInvitados(){
 setInterval(actualizarInvitados, 2000);
 actualizarInvitados();
 
+
+
+// ----------------------------------------------------
+// ✔ AQUI VIENEN LOS CAMBIOS QUE PEDISTE:
+// ----------------------------------------------------
+
+// 1) NORMALIZADOR
+function normalize(str) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\.\s\-]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+// 2) BUSCADOR CON NORMALIZACIÓN
 document.getElementById('searchCedula').addEventListener('input', e=>{
-  const q = e.target.value.toLowerCase();
+  const q = normalize(e.target.value);
 
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
 
-    const nombre = tr.children[2]?.firstChild?.value?.toLowerCase() || '';
-    const apellidos = tr.children[3]?.firstChild?.value?.toLowerCase() || '';
-    const cedula = tr.children[4]?.firstChild?.value?.toLowerCase() || '';
+    const nombre = normalize(tr.children[2]?.firstChild?.value || '');
+    const apellidos = normalize(tr.children[3]?.firstChild?.value || '');
+    const cedula = normalize(tr.children[4]?.firstChild?.value || '');
 
-    // ✔ INVITADOS AHORA INCLUIDOS
-    const inv1 = tr.children[10]?.firstChild?.value?.toLowerCase() || '';
-    const cc1  = tr.children[11]?.firstChild?.value?.toLowerCase() || '';
-    const inv2 = tr.children[12]?.firstChild?.value?.toLowerCase() || '';
-    const cc2  = tr.children[13]?.firstChild?.value?.toLowerCase() || '';
-    const inv3 = tr.children[14]?.firstChild?.value?.toLowerCase() || '';
-    const cc3  = tr.children[15]?.firstChild?.value?.toLowerCase() || '';
+    const inv1 = normalize(tr.children[10]?.firstChild?.value || '');
+    const cc1  = normalize(tr.children[11]?.firstChild?.value || '');
+    const inv2 = normalize(tr.children[12]?.firstChild?.value || '');
+    const cc2  = normalize(tr.children[13]?.firstChild?.value || '');
+    const inv3 = normalize(tr.children[14]?.firstChild?.value || '');
+    const cc3  = normalize(tr.children[15]?.firstChild?.value || '');
 
     tr.style.display = (
       nombre.includes(q) ||
