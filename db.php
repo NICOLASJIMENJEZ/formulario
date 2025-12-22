@@ -1,8 +1,8 @@
 <?php
-$host = "dpg-d4gbeguuk2gs73chgoug-a.oregon-postgres.render.com";
-$dbname = "base_de_datos_graduandos_qdwy";
-$user = "base_de_datos_graduandos_qdwy_user";
-$pass = "jNjdBda1YMu3XBFVRpmnTFPeZGZHjrj8";
+$host = dpg-d54ojin5r7bs73ejo270-a.oregon-postgres.render.com";
+$dbname = graduados_grf8
+$user = graduados_grf8_user
+$pass = nlCe8T5g1nGqjgl2iuKSysTesfYKs0wb
 $port = "5432";
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
