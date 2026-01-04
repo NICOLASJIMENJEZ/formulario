@@ -38,14 +38,12 @@ $sql = "
     FROM registros
 ";
 
-// Aplicar filtro si existe
 $params = [];
 if ($filtro !== "") {
     $sql .= " WHERE programa = :programa ";
     $params["programa"] = $filtro;
 }
 
-// Orden alfabético
 $sql .= " ORDER BY nombre_completo ASC";
 
 $stmt = $pdo->prepare($sql);
@@ -57,73 +55,131 @@ $titulares = $stmt->fetchAll();
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Titulares</title>
+<title>Listado de Titulares</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
 <style>
-body {
-    font-family: Arial;
-    background:#f4f4f4;
-    padding:20px;
+:root{
+    --blue:#0b3c6f;
+    --red:#c4161c;
+    --bg:#eef4ff;
+    --card:#ffffff;
+    --text:#1f2937;
 }
-.card {
-    max-width:700px;
-    margin:auto;
-    background:#fff;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 10px #0002;
+
+body{
+    background:linear-gradient(135deg,var(--bg),#ffffff);
+    font-family:system-ui,Segoe UI,Roboto,Arial;
+    color:var(--text);
 }
-table {
-    width:100%;
-    border-collapse:collapse;
-    margin-top:15px;
+
+.card{
+    border:none;
+    border-radius:18px;
+    box-shadow:0 12px 30px rgba(0,0,0,.15);
 }
-th, td {
-    padding:10px;
-    border-bottom:1px solid #ddd;
+
+h2{
+    color:var(--blue);
+    font-weight:700;
 }
-th {
-    background:#eee;
-    text-align:left;
+
+.table thead{
+    background:var(--blue);
+    color:#fff;
 }
-select, button {
-    padding:8px;
-    border-radius:6px;
-    border:1px solid #ccc;
+
+.table tbody tr{
+    transition:.2s;
 }
-.header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:10px;
+
+.table tbody tr:hover{
+    background:rgba(11,60,111,.05);
+}
+
+.btn-danger{
+    background:var(--red);
+    border:none;
+}
+
+.fade-up{
+    animation:fadeUp .5s ease both;
+}
+
+@keyframes fadeUp{
+    from{opacity:0; transform:translateY(15px)}
+    to{opacity:1; transform:translateY(0)}
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+    h2{font-size:1.3rem}
+    .table{font-size:.9rem}
+}
+
+/* PDF */
+@media print{
+    body{
+        background:white;
+    }
+    .no-print{
+        display:none !important;
+    }
+    .card{
+        box-shadow:none;
+        border-radius:0;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<div class="container py-4 fade-up">
+
 <div class="card">
+<div class="card-body">
 
-<div class="header">
-    <h2>Listado de Titulares</h2>
+<!-- HEADER -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <h2>
+        <i class="bi bi-people-fill"></i> Listado de Titulares
+    </h2>
 
-    <!-- FILTRO POR PROGRAMA -->
-    <form method="GET">
-        <select name="programa" onchange="this.form.submit()">
-            <option value="">Todos los programas</option>
-            <?php foreach ($programas as $p): ?>
-                <option value="<?= htmlspecialchars($p["programa"]) ?>"
-                    <?= $p["programa"] === $filtro ? "selected" : "" ?>>
-                    <?= htmlspecialchars($p["programa"]) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </form>
+    <div class="d-flex gap-2 no-print">
+
+        <!-- FILTRO -->
+        <form method="GET">
+            <select name="programa" class="form-select" onchange="this.form.submit()">
+                <option value="">Todos los programas</option>
+                <?php foreach ($programas as $p): ?>
+                    <option value="<?= htmlspecialchars($p["programa"]) ?>"
+                        <?= $p["programa"] === $filtro ? "selected" : "" ?>>
+                        <?= htmlspecialchars($p["programa"]) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </form>
+
+        <!-- PDF -->
+        <button onclick="exportPDF()" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+        </button>
+
+        <!-- VOLVER -->
+        <a href="graduados_contador.php" class="btn btn-dark">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+    </div>
 </div>
 
-<table>
+<!-- TABLA -->
+<div class="table-responsive">
+<table class="table table-hover align-middle">
 <thead>
 <tr>
     <th>Nombre completo del graduado</th>
@@ -132,7 +188,7 @@ select, button {
 <tbody>
 <?php if (count($titulares) === 0): ?>
 <tr>
-    <td>No hay registros</td>
+    <td class="text-center text-muted">No hay registros</td>
 </tr>
 <?php else: ?>
 <?php foreach ($titulares as $t): ?>
@@ -143,14 +199,18 @@ select, button {
 <?php endif; ?>
 </tbody>
 </table>
-
-<div style="margin-top:15px;">
-    <a href="graduados_contador.php">
-        <button>⬅ Volver al Dashboard</button>
-    </a>
 </div>
 
 </div>
+</div>
+
+</div>
+
+<script>
+function exportPDF(){
+    window.print();
+}
+</script>
 
 </body>
 </html>
