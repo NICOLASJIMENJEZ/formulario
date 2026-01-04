@@ -33,7 +33,7 @@ body{
 .logo-bg{
     position:fixed;
     inset:0;
-    background:url('/formulario/imagenes/logo.png') no-repeat center;
+    background:url('/imagenes/logo.png') no-repeat center;
     background-size:420px;
     opacity:0.10;
     pointer-events:none;
