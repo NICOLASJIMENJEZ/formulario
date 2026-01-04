@@ -21,7 +21,7 @@ if (file_exists(__DIR__ . "/db.php")) {
     }
 }
 
-// ---------- JSON ----------
+// ---------- JSON (SOLO DATOS, NADA DE HTML) ----------
 if (isset($_GET["json"])) {
     header("Content-Type: application/json");
 
@@ -37,26 +37,13 @@ if (isset($_GET["json"])) {
         // TOTAL GRADUADOS
         $total = $pdo->query("SELECT COUNT(*) FROM registros")->fetchColumn();
 
-        <div class="controls">
-    <button onclick="loadData()">Actualizar</button>
-    <button id="autoBtn" class="secondary">Auto: ON (5s)</button>
-</div>
-
-<!-- ✅ BOTÓN NUEVO -->
-<div style="margin-top:15px; text-align:center;">
-    <a href="titulares.php">
-        <button style="width:100%;">Ver Titulares</button>
-    </a>
-</div>
-
-
         // GRADUADOS POR PROGRAMA
         $por_programa = $pdo->query("
             SELECT programa, COUNT(*) AS total
             FROM registros
             WHERE programa IS NOT NULL AND programa <> ''
             GROUP BY programa
-            ORDER BY total DESC
+            ORDER BY programa ASC
         ")->fetchAll();
 
         // GRADUADOS + INVITADOS POR HORA
@@ -75,7 +62,7 @@ if (isset($_GET["json"])) {
             ORDER BY hora
         ")->fetchAll();
 
-        // ✅ INVITADOS POR PROGRAMA (NUEVO)
+        // INVITADOS POR PROGRAMA
         $invitados_por_programa = $pdo->query("
             SELECT
                 programa,
@@ -87,7 +74,7 @@ if (isset($_GET["json"])) {
             FROM registros
             WHERE programa IS NOT NULL AND programa <> ''
             GROUP BY programa
-            ORDER BY invitados DESC
+            ORDER BY programa ASC
         ")->fetchAll();
 
         echo json_encode([
@@ -154,6 +141,7 @@ button {
     color:white;
     border-radius:6px;
     cursor:pointer;
+    width:100%;
 }
 button.secondary { background:#444; }
 .controls { margin-top:15px; display:flex; gap:10px; }
@@ -167,6 +155,7 @@ button.secondary { background:#444; }
 
 <div class="wrap">
 
+<!-- PANEL IZQUIERDO -->
 <div class="card">
     <h2>Total de Graduados</h2>
     <div id="total" class="big">0</div>
@@ -176,25 +165,39 @@ button.secondary { background:#444; }
         <button onclick="loadData()">Actualizar</button>
         <button id="autoBtn" class="secondary">Auto: ON (5s)</button>
     </div>
+
+    <!-- BOTÓN A OTRA HOJA -->
+    <div style="margin-top:15px;">
+        <a href="titulares.php">
+            <button>Ver Titulares por Programa</button>
+        </a>
+    </div>
 </div>
 
+<!-- PANEL DERECHO -->
 <div class="card">
 
 <h2>Graduados por Programa</h2>
 <table id="tablaProgramas">
-<thead><tr><th>Programa</th><th>Graduados</th></tr></thead>
+<thead>
+<tr><th>Programa</th><th>Graduados</th></tr>
+</thead>
 <tbody></tbody>
 </table>
 
 <h2 style="margin-top:20px;">Graduados e Invitados por Hora</h2>
 <table id="tablaHoras">
-<thead><tr><th>Hora</th><th>Graduados</th><th>Invitados</th></tr></thead>
+<thead>
+<tr><th>Hora</th><th>Graduados</th><th>Invitados</th></tr>
+</thead>
 <tbody></tbody>
 </table>
 
 <h2 style="margin-top:20px;">Invitados por Programa</h2>
 <table id="tablaInvitadosPrograma">
-<thead><tr><th>Programa</th><th>Total Invitados</th></tr></thead>
+<thead>
+<tr><th>Programa</th><th>Total Invitados</th></tr>
+</thead>
 <tbody></tbody>
 </table>
 
