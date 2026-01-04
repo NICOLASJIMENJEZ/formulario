@@ -21,7 +21,7 @@ if (file_exists(__DIR__ . "/db.php")) {
     }
 }
 
-// ---------- JSON (SOLO DATOS, NADA DE HTML) ----------
+// ---------- JSON ----------
 if (isset($_GET["json"])) {
     header("Content-Type: application/json");
 
@@ -34,10 +34,8 @@ if (isset($_GET["json"])) {
     }
 
     try {
-        // TOTAL GRADUADOS
         $total = $pdo->query("SELECT COUNT(*) FROM registros")->fetchColumn();
 
-        // GRADUADOS POR PROGRAMA
         $por_programa = $pdo->query("
             SELECT programa, COUNT(*) AS total
             FROM registros
@@ -46,7 +44,6 @@ if (isset($_GET["json"])) {
             ORDER BY programa ASC
         ")->fetchAll();
 
-        // GRADUADOS + INVITADOS POR HORA
         $por_hora = $pdo->query("
             SELECT
                 to_char(hora,'HH24:MI') AS hora,
@@ -62,7 +59,6 @@ if (isset($_GET["json"])) {
             ORDER BY hora
         ")->fetchAll();
 
-        // INVITADOS POR PROGRAMA
         $invitados_por_programa = $pdo->query("
             SELECT
                 programa,
@@ -103,103 +99,131 @@ if (isset($_GET["json"])) {
 <title>Dashboard Graduados</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- BOOTSTRAP -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ICONOS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
 <style>
-body { font-family: Arial; background:#f4f4f4; padding:20px; }
-.wrap {
-    max-width:1200px;
-    margin:auto;
-    display:grid;
-    grid-template-columns:300px 1fr;
-    gap:20px;
+body {
+    background: linear-gradient(135deg, #e9f5ee, #f8f9fa);
 }
 .card {
-    background:#fff;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 10px #0002;
+    border: none;
+    border-radius: 16px;
 }
-.big {
-    font-size:48px;
-    color:#0a8235;
-    font-weight:bold;
-    text-align:center;
+.card-title {
+    font-weight: 600;
 }
-table {
-    width:100%;
-    margin-top:10px;
-    border-collapse:collapse;
+.kpi {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #198754;
 }
-th, td {
-    padding:8px;
-    border-bottom:1px solid #ddd;
+.table thead {
+    background: #198754;
+    color: white;
 }
-th { background:#eee; }
-button {
-    padding:8px 12px;
-    border:none;
-    background:#0a8235;
-    color:white;
-    border-radius:6px;
-    cursor:pointer;
-    width:100%;
-}
-button.secondary { background:#444; }
-.controls { margin-top:15px; display:flex; gap:10px; }
-@media(max-width:900px){
-    .wrap{grid-template-columns:1fr;}
+.badge-soft {
+    background: rgba(25,135,84,.15);
+    color: #198754;
 }
 </style>
 </head>
 
 <body>
 
-<div class="wrap">
+<div class="container py-4">
+
+<div class="row g-4">
 
 <!-- PANEL IZQUIERDO -->
-<div class="card">
-    <h2>Total de Graduados</h2>
-    <div id="total" class="big">0</div>
-    <p>Última actualización: <span id="last">-</span></p>
+<div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-mortarboard-fill"></i> Total de Graduados
+            </h5>
 
-    <div class="controls">
-        <button onclick="loadData()">Actualizar</button>
-        <button id="autoBtn" class="secondary">Auto: ON (5s)</button>
-    </div>
+            <div id="total" class="kpi">0</div>
 
-    <!-- BOTÓN A OTRA HOJA -->
-    <div style="margin-top:15px;">
-        <a href="titulares.php">
-            <button>Ver Titulares por Programa</button>
-        </a>
+            <p class="text-muted">
+                Última actualización:<br>
+                <strong id="last">-</strong>
+            </p>
+
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-success" onclick="loadData()">
+                    <i class="bi bi-arrow-clockwise"></i> Actualizar
+                </button>
+
+                <button id="autoBtn" class="btn btn-outline-secondary">
+                    Auto: ON (5s)
+                </button>
+
+                <a href="titulares.php" class="btn btn-dark mt-2">
+                    <i class="bi bi-list-ul"></i> Ver Titulares
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- PANEL DERECHO -->
-<div class="card">
+<div class="col-lg-8">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="bi bi-bar-chart-fill"></i> Graduados por Programa
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover mt-3" id="tablaProgramas">
+                    <thead>
+                        <tr><th>Programa</th><th>Total</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-<h2>Graduados por Programa</h2>
-<table id="tablaProgramas">
-<thead>
-<tr><th>Programa</th><th>Graduados</th></tr>
-</thead>
-<tbody></tbody>
-</table>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="bi bi-clock-history"></i> Graduados e Invitados por Hora
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover mt-3" id="tablaHoras">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Graduados</th>
+                            <th>Invitados</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-<h2 style="margin-top:20px;">Graduados e Invitados por Hora</h2>
-<table id="tablaHoras">
-<thead>
-<tr><th>Hora</th><th>Graduados</th><th>Invitados</th></tr>
-</thead>
-<tbody></tbody>
-</table>
-
-<h2 style="margin-top:20px;">Invitados por Programa</h2>
-<table id="tablaInvitadosPrograma">
-<thead>
-<tr><th>Programa</th><th>Total Invitados</th></tr>
-</thead>
-<tbody></tbody>
-</table>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="bi bi-people-fill"></i> Invitados por Programa
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover mt-3" id="tablaInvitadosPrograma">
+                    <thead>
+                        <tr><th>Programa</th><th>Invitados</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 </div>
@@ -220,7 +244,7 @@ function loadData() {
 
             document.querySelector("#tablaProgramas tbody").innerHTML =
                 data.by_program.map(r =>
-                    `<tr><td>${r.programa}</td><td>${r.total}</td></tr>`
+                    `<tr><td>${r.programa}</td><td><span class="badge badge-soft">${r.total}</span></td></tr>`
                 ).join("");
 
             document.querySelector("#tablaHoras tbody").innerHTML =
@@ -252,5 +276,4 @@ startAuto();
 
 </body>
 </html>
-
 
