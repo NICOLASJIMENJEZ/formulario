@@ -1,6 +1,6 @@
 <?php
 // dashboard_unificado.php
-// Dashboard: total graduados, por programa, por hora y por invitados
+// Dashboard: total graduados, por programa, por hora (graduados + invitados) y por invitados
 
 // ---------- CONEXIÓN A LA BASE DE DATOS ----------
 if (file_exists(__DIR__ . "/db.php")) {
@@ -53,9 +53,16 @@ if (isset($_GET["json"])) {
             ORDER BY total DESC
         ")->fetchAll();
 
-        // POR HORA (CORREGIDO)
+        // POR HORA (GRADUADOS + INVITADOS)
         $por_hora = $pdo->query("
-            SELECT to_char(hora,'HH24:MI') AS hora, COUNT(*) AS total
+            SELECT
+                to_char(hora,'HH24:MI') AS hora,
+                COUNT(*) AS graduados,
+                SUM(
+                    (CASE WHEN invitado1_nombre IS NOT NULL AND invitado1_nombre <> '' THEN 1 ELSE 0 END) +
+                    (CASE WHEN invitado2_nombre IS NOT NULL AND invitado2_nombre <> '' THEN 1 ELSE 0 END) +
+                    (CASE WHEN invitado3_nombre IS NOT NULL AND invitado3_nombre <> '' THEN 1 ELSE 0 END)
+                ) AS invitados
             FROM registros
             WHERE hora IS NOT NULL
             GROUP BY to_char(hora,'HH24:MI')
@@ -176,13 +183,17 @@ if (isset($_GET["json"])) {
             </tbody>
         </table>
 
-        <h2 style="margin-top:20px;">Graduados por Hora</h2>
+        <h2 style="margin-top:20px;">Graduados e Invitados por Hora</h2>
         <table id="tablaHoras">
             <thead>
-                <tr><th>Hora</th><th>Total</th></tr>
+                <tr>
+                    <th>Hora</th>
+                    <th>Graduados</th>
+                    <th>Invitados</th>
+                </tr>
             </thead>
             <tbody>
-                <tr><td colspan="2">Cargando...</td></tr>
+                <tr><td colspan="3">Cargando...</td></tr>
             </tbody>
         </table>
 
@@ -226,10 +237,14 @@ function loadData() {
                     `<tr><td>${r.programa}</td><td>${r.total}</td></tr>`
                 ).join("");
 
-            // Horas
+            // Horas (graduados + invitados)
             document.querySelector("#tablaHoras tbody").innerHTML =
                 data.by_hour.map(r =>
-                    `<tr><td>${r.hora}</td><td>${r.total}</td></tr>`
+                    `<tr>
+                        <td>${r.hora}</td>
+                        <td>${r.graduados}</td>
+                        <td>${r.invitados}</td>
+                    </tr>`
                 ).join("");
 
             // Invitados por titular
@@ -263,3 +278,4 @@ startAuto();
 
 </body>
 </html>
+
