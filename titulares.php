@@ -1,6 +1,7 @@
 <?php
 // titulares.php
 
+// ---------- CONEXIÓN ----------
 if (file_exists(__DIR__ . "/db.php")) {
     require_once __DIR__ . "/db.php";
 } else {
@@ -19,7 +20,7 @@ if (file_exists(__DIR__ . "/db.php")) {
     }
 }
 
-// Programas para el filtro
+// ---------- PROGRAMAS PARA EL FILTRO ----------
 $programas = $pdo->query("
     SELECT DISTINCT programa
     FROM registros
@@ -27,18 +28,17 @@ $programas = $pdo->query("
     ORDER BY programa
 ")->fetchAll();
 
-// Filtro seleccionado
+// ---------- FILTRO SELECCIONADO ----------
 $filtro = $_GET["programa"] ?? "";
 
-// Query base
+// ---------- QUERY BASE ----------
 $sql = "
     SELECT
-        CONCAT(titular_nombre, ' ', titular_apellidos) AS nombre,
-        programa
+        CONCAT(titular_nombre, ' ', titular_apellidos) AS nombre_completo
     FROM registros
 ";
 
-// Aplicar filtro
+// Aplicar filtro si existe
 $params = [];
 if ($filtro !== "") {
     $sql .= " WHERE programa = :programa ";
@@ -46,7 +46,7 @@ if ($filtro !== "") {
 }
 
 // Orden alfabético
-$sql .= " ORDER BY nombre ASC";
+$sql .= " ORDER BY nombre_completo ASC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -67,7 +67,7 @@ body {
     padding:20px;
 }
 .card {
-    max-width:800px;
+    max-width:700px;
     margin:auto;
     background:#fff;
     padding:20px;
@@ -85,6 +85,7 @@ th, td {
 }
 th {
     background:#eee;
+    text-align:left;
 }
 select, button {
     padding:8px;
@@ -108,13 +109,14 @@ select, button {
 <div class="header">
     <h2>Listado de Titulares</h2>
 
+    <!-- FILTRO POR PROGRAMA -->
     <form method="GET">
         <select name="programa" onchange="this.form.submit()">
             <option value="">Todos los programas</option>
             <?php foreach ($programas as $p): ?>
-                <option value="<?= $p["programa"] ?>"
+                <option value="<?= htmlspecialchars($p["programa"]) ?>"
                     <?= $p["programa"] === $filtro ? "selected" : "" ?>>
-                    <?= $p["programa"] ?>
+                    <?= htmlspecialchars($p["programa"]) ?>
                 </option>
             <?php endforeach; ?>
         </select>
@@ -124,22 +126,26 @@ select, button {
 <table>
 <thead>
 <tr>
-    <th>Nombre Completo</th>
-    <th>Programa</th>
+    <th>Nombre completo del graduado</th>
 </tr>
 </thead>
 <tbody>
+<?php if (count($titulares) === 0): ?>
+<tr>
+    <td>No hay registros</td>
+</tr>
+<?php else: ?>
 <?php foreach ($titulares as $t): ?>
 <tr>
-    <td><?= htmlspecialchars($t["nombre"]) ?></td>
-    <td><?= htmlspecialchars($t["programa"]) ?></td>
+    <td><?= htmlspecialchars($t["nombre_completo"]) ?></td>
 </tr>
 <?php endforeach; ?>
+<?php endif; ?>
 </tbody>
 </table>
 
 <div style="margin-top:15px;">
-    <a href="dashboard_unificado.php">
+    <a href="graduados_contador.php">
         <button>⬅ Volver al Dashboard</button>
     </a>
 </div>
@@ -148,3 +154,4 @@ select, button {
 
 </body>
 </html>
+
