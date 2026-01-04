@@ -23,35 +23,19 @@ table { font-size: 18px; }
 .semaforo-2 td, .semaforo-2 input, .semaforo-2 select { background: #fd7e14 !important; color: #fff !important; }
 .semaforo-3 td, .semaforo-3 input, .semaforo-3 select { background: #198754 !important; color: #fff !important; }
 .semaforo-1 td, .semaforo-2 td, .semaforo-3 td { border-color: rgba(255,255,255,0.1); }
-
-.arrive-btn { width: 38px; height: 32px; padding: 0; border-radius: 6px; font-weight: 700; flex-shrink: 0; }
-td > .arrive-btn { margin-right: 6px; margin-bottom: 4px; }
-
-.table-responsive { overflow-x: auto; overflow-y: auto; max-height: 62vh; padding: 8px; }
-
+.arrive-btn { width: 38px; height: 32px; padding: 0; border-radius: 6px; font-weight: 700; }
+td > .arrive-btn { margin-right: 8px; }
+.table-responsive { overflow: auto; max-height: 62vh; padding: 8px; }
 #recordsTable thead th, #recordsTable tbody td { white-space: nowrap; }
 #recordsTable input.form-control, #recordsTable select.form-select { min-width: 160px; }
 #recordsTable td:nth-child(1) { min-width: 60px; }
 #recordsTable td:nth-child(2) { min-width: 48px; }
 #recordsTable td:nth-child(20) { min-width: 180px; }
 
-@media (max-width: 1024px){
-  body { font-size: 17px; }
-  table { font-size: 17px; }
-  #recordsTable input.form-control, #recordsTable select.form-select { min-width: 140px; }
-}
-
 @media (max-width: 768px) {
   body { font-size: 16px; }
   table { font-size: 16px; }
   #recordsTable input.form-control, #recordsTable select.form-select { min-width: 120px; }
-  .arrive-btn { width: 32px; height: 28px; font-size: 14px; }
-}
-
-@media(max-width:720px){
-  .escudo-center{ width:260px; height:260px }
-  .escudo-corner{ right:10px; top:6px; width:110px; height:110px }
-  .gota-fondo{ width:100px; height:100px; right:10px; bottom:10px; }
 }
 
 .wrap{ position:relative; overflow:hidden }
@@ -73,6 +57,9 @@ td > .arrive-btn { margin-right: 6px; margin-bottom: 4px; }
   mix-blend-mode:screen;
   box-shadow: inset 0 -18px 60px rgba(255,255,255,0.06), inset 0 10px 30px rgba(0,0,0,0.02);
   background-image: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 25%, rgba(255,255,255,0) 52%), url('/formulario/registros/escudo.png');
+  background-size: contain, contain;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
 }
 
 .escudo-corner {
@@ -106,22 +93,13 @@ td > .arrive-btn { margin-right: 6px; margin-bottom: 4px; }
   z-index: 0;
 }
 
-.boton-salida {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #dc3545;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 25px;
-  text-decoration: none;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  transition: background 0.3s ease;
+@media(max-width:720px){
+  .escudo-center{ width:260px; height:260px }
+  .escudo-corner{ right:10px; top:6px; width:110px; height:110px }
+  .gota-fondo{ width:100px; height:100px; right:10px; bottom:10px; }
 }
-.boton-salida:hover { background-color: #c82333; }
-
 </style>
+
 </head>
 <body class="bg-light">
 
@@ -131,19 +109,36 @@ td > .arrive-btn { margin-right: 6px; margin-bottom: 4px; }
   <div class="escudo-corner" aria-hidden="true"></div>
   <div class="gota-fondo" aria-hidden="true"></div>
 
-  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <h3 class="mb-2 mb-md-0">Registros guardados</h3>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Registros guardados</h3>
     <a href="index.php" class="boton-salida">Salir</a>
 
-    <div class="d-flex gap-2 flex-wrap align-items-center">
-      <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por cédula...">
+    <style>
+      .boton-salida {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        transition: background 0.3s ease;
+      }
+      .boton-salida:hover { background-color: #c82333; }
+    </style>
+
+    <div class="d-flex gap-2 align-items-center">
+      <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por cédula..." style="min-width:200px;">
       <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
     </div>
   </div>
 
   <div id="alert"></div>
 
-  <div class="shadow-sm rounded bg-white p-2">
+  <div class="shadow-sm rounded" style="background:#fff;padding:6px;">
     <div style="font-size:14px;color:#6c757d;margin-bottom:6px;">
       Desplaza horizontalmente dentro de esta ventana para ver todas las columnas ⇄
     </div>
@@ -182,10 +177,8 @@ td > .arrive-btn { margin-right: 6px; margin-bottom: 4px; }
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-// ----------------------------------------------------
-// Código JS original sin cambios de lógica
-// ----------------------------------------------------
 const api = 'api.php';
 const alertEl = document.getElementById('alert');
 
@@ -258,18 +251,15 @@ function createActionsCell(id){
     }catch{ showAlert('Error de red', 'danger'); }
   }
 
-  const btnWrapper = document.createElement('div');
-  btnWrapper.className='d-flex flex-wrap gap-1 mb-1';
   for(let i=0;i<4;i++){
     const btn = document.createElement('button');
-    btn.className='btn btn-sm arrive-btn';
+    btn.className='btn btn-sm arrive-btn me-1';
     btn.style.background = colors[i];
     btn.style.color = '#fff';
     btn.textContent = i;
     btn.addEventListener('click',()=>setArrived(i));
-    btnWrapper.appendChild(btn);
+    td.appendChild(btn);
   }
-  td.appendChild(btnWrapper);
 
   save.addEventListener('click', async ()=>{
     const tr = td.closest('tr');
@@ -294,6 +284,7 @@ function createActionsCell(id){
     }catch{ showAlert('Error de red','danger'); }
   });
 
+  td.appendChild(document.createElement('br'));
   td.appendChild(save);
   td.appendChild(del);
   return td;
@@ -343,33 +334,59 @@ async function actualizarInvitados(){
     const r = await fetch("contador_invitados.php");
     const data = await r.json();
     document.getElementById("contadorInvitados").textContent = data.total ?? 0;
-  } catch (e) { console.error("Error contando invitados:", e); }
+  } catch (e) {
+    console.error("Error contando invitados:", e);
+  }
 }
 
 // ✔ refresca cada 2 segundos
 setInterval(actualizarInvitados, 2000);
 actualizarInvitados();
 
+
+
 // ----------------------------------------------------
-// NORMALIZADOR
+// ✔ AQUI VIENEN LOS CAMBIOS QUE PEDISTE:
+// ----------------------------------------------------
+
+// 1) NORMALIZADOR
 function normalize(str) {
-  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\.\s\-]/g,"").replace(/[^a-z0-9]/g,"");
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\.\s\-]/g, "")
+    .replace(/[^a-z0-9]/g, "");
 }
 
-// BUSCADOR CON NORMALIZACIÓN
+// 2) BUSCADOR CON NORMALIZACIÓN
 document.getElementById('searchCedula').addEventListener('input', e=>{
   const q = normalize(e.target.value);
+
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
+
     const nombre = normalize(tr.children[2]?.firstChild?.value || '');
     const apellidos = normalize(tr.children[3]?.firstChild?.value || '');
     const cedula = normalize(tr.children[4]?.firstChild?.value || '');
+
     const inv1 = normalize(tr.children[10]?.firstChild?.value || '');
     const cc1  = normalize(tr.children[11]?.firstChild?.value || '');
     const inv2 = normalize(tr.children[12]?.firstChild?.value || '');
     const cc2  = normalize(tr.children[13]?.firstChild?.value || '');
     const inv3 = normalize(tr.children[14]?.firstChild?.value || '');
     const cc3  = normalize(tr.children[15]?.firstChild?.value || '');
-    tr.style.display = (nombre.includes(q)||apellidos.includes(q)||cedula.includes(q)||inv1.includes(q)||cc1.includes(q)||inv2.includes(q)||cc2.includes(q)||inv3.includes(q)||cc3.includes(q)) ? '' : 'none';
+
+    tr.style.display = (
+      nombre.includes(q) ||
+      apellidos.includes(q) ||
+      cedula.includes(q) ||
+      inv1.includes(q) ||
+      cc1.includes(q) ||
+      inv2.includes(q) ||
+      cc2.includes(q) ||
+      inv3.includes(q) ||
+      cc3.includes(q)
+    ) ? '' : 'none';
   });
 });
 
@@ -378,4 +395,5 @@ load();
 
 </body>
 </html>
+
 
