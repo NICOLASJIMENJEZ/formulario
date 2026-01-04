@@ -37,6 +37,19 @@ if (isset($_GET["json"])) {
         // TOTAL GRADUADOS
         $total = $pdo->query("SELECT COUNT(*) FROM registros")->fetchColumn();
 
+        <div class="controls">
+    <button onclick="loadData()">Actualizar</button>
+    <button id="autoBtn" class="secondary">Auto: ON (5s)</button>
+</div>
+
+<!-- ✅ BOTÓN NUEVO -->
+<div style="margin-top:15px; text-align:center;">
+    <a href="titulares.php">
+        <button style="width:100%;">Ver Titulares</button>
+    </a>
+</div>
+
+
         // GRADUADOS POR PROGRAMA
         $por_programa = $pdo->query("
             SELECT programa, COUNT(*) AS total
