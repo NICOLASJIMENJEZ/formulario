@@ -1,5 +1,5 @@
 <?php
-$host = dpg-d54ojin5r7bs73ejo270-a.oregon-postgres.render.com";
+$host = dpg-d54ojin5r7bs73ejo270-a;
 $dbname = graduados_grf8
 $user = graduados_grf8_user
 $pass = nlCe8T5g1nGqjgl2iuKSysTesfYKs0wb
