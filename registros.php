@@ -33,8 +33,8 @@ table {
 }
 
 .form-control-sm:focus, .form-select-sm:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 5px rgba(0,123,255,.3);
+    border-color: #0d6efd;
+    box-shadow: 0 0 5px rgba(13,110,253,.3);
 }
 
 .empty-cell { 
@@ -49,23 +49,25 @@ table {
     vertical-align: middle;
 }
 
+/* Semáforo - colores CESMA */
 .semaforo-0 td, .semaforo-0 input, .semaforo-0 select { 
-    background: #f8f9fa !important; 
+    background: #fff !important; 
     color: #212529 !important; 
 }
 .semaforo-1 td, .semaforo-1 input, .semaforo-1 select { 
-    background: linear-gradient(90deg, #dc3545, #e55353) !important; 
+    background: #dc3545 !important; /* rojo CESMA */
     color: #fff !important; 
 }
 .semaforo-2 td, .semaforo-2 input, .semaforo-2 select { 
-    background: linear-gradient(90deg, #fd7e14, #ff9b3e) !important; 
-    color: #fff !important; 
+    background: #ffc107 !important; /* amarillo (para contraste) */
+    color: #212529 !important; 
 }
 .semaforo-3 td, .semaforo-3 input, .semaforo-3 select { 
-    background: linear-gradient(90deg, #198754, #38d39f) !important; 
+    background: #0d6efd !important; /* azul CESMA */
     color: #fff !important; 
 }
 
+/* Botones de llegada */
 .arrive-btn { 
     width: 38px; 
     height: 32px; 
@@ -78,9 +80,7 @@ table {
 
 .arrive-btn:hover { transform: scale(1.05); }
 
-td > .arrive-btn { 
-    margin-right: 6px; 
-}
+td > .arrive-btn { margin-right: 6px; }
 
 .table-responsive { 
     overflow: auto; 
@@ -101,8 +101,6 @@ td > .arrive-btn {
     text-align: center;
 }
 
-#recordsTable td:nth-child(1) { min-width: 60px; }
-#recordsTable td:nth-child(2) { min-width: 48px; }
 #recordsTable td:nth-child(20) { min-width: 180px; }
 
 .boton-salida {
@@ -126,16 +124,31 @@ td > .arrive-btn {
 
 .fw-bold#contadorInvitados {
     font-size: 1.2rem;
-    color: #198754;
+    color: #0d6efd;
 }
 
-@media (max-width: 768px) {
+/* ✨ OCULTAR ID Y SEMÁFORO VISUALMENTE, pero siguen funcionando */
+#recordsTable th:nth-child(1),
+#recordsTable th:nth-child(2),
+#recordsTable td:nth-child(1),
+#recordsTable td:nth-child(2) {
+    display: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) { /* tablets */
     body { font-size: 16px; }
     table { font-size: 16px; }
     #recordsTable input.form-control, #recordsTable select.form-select { min-width: 120px; }
 }
-</style>
 
+@media (max-width: 576px) { /* celulares */
+    body { font-size: 14px; }
+    table { font-size: 14px; }
+    #recordsTable input.form-control, #recordsTable select.form-select { min-width: 100px; }
+    .arrive-btn { width: 30px; height: 28px; font-size: 12px; }
+}
+</style>
 
 </head>
 <body class="bg-light">
@@ -146,29 +159,12 @@ td > .arrive-btn {
   <div class="escudo-corner" aria-hidden="true"></div>
   <div class="gota-fondo" aria-hidden="true"></div>
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
     <h3>Registros guardados</h3>
     <a href="index.php" class="boton-salida">Salir</a>
 
-    <style>
-      .boton-salida {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #dc3545;
-        color: white;
-        padding: 10px 18px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        transition: background 0.3s ease;
-      }
-      .boton-salida:hover { background-color: #c82333; }
-    </style>
-
-    <div class="d-flex gap-2 align-items-center">
-      <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por cédula..." style="min-width:200px;">
+    <div class="d-flex gap-2 align-items-center mt-2 mt-md-0">
+      <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por cédula...">
       <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
     </div>
   </div>
@@ -183,7 +179,7 @@ td > .arrive-btn {
       <table class="table table-sm table-bordered" id="recordsTable">
         <thead class="table-dark text-white">
           <tr>
-            <th style="width:60px">ID</th>
+            <th>ID</th>
             <th>Semáforo</th>
             <th>Titular Nombre</th>
             <th>Titular Apellidos</th>
@@ -199,7 +195,7 @@ td > .arrive-btn {
             <th>CC 2</th>
             <th>Invitado 3</th>
             <th>CC 3</th>
-            <th style="width:140px">Acciones</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -208,7 +204,7 @@ td > .arrive-btn {
   </div>
 </div>
 
-<!-- ✔ CONTADOR DE INVITADOS AQUÍ -->
+<!-- ✔ CONTADOR DE INVITADOS -->
 <div class="fw-bold mt-3 text-center">
   Invitados que han llegado: <span id="contadorInvitados">0</span>
 </div>
@@ -270,7 +266,7 @@ function createActionsCell(id){
   const del = document.createElement('button');
   del.className = 'btn btn-sm btn-danger';
   del.textContent = 'Eliminar';
-  const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
+  const colors = ['#fff','#dc3545','#ffc107','#0d6efd'];
 
   async function setArrived(n){
     const data = new URLSearchParams({action:'update', id, arrived_count:n});
@@ -281,9 +277,8 @@ function createActionsCell(id){
         showAlert('Llegada actualizada', 'success');
         const tr = td.closest('tr');
         tr.className = `semaforo-${n}`;
-        tr.querySelector('td:nth-child(2) div').style.background = colors[n];
-
-        actualizarInvitados(); // ✔ actualizar contador
+        tr.querySelector('td:nth-child(2) div')?.style.background = colors[n];
+        actualizarInvitados();
       } else showAlert(j.message || 'Error', 'danger');
     }catch{ showAlert('Error de red', 'danger'); }
   }
@@ -292,34 +287,15 @@ function createActionsCell(id){
     const btn = document.createElement('button');
     btn.className='btn btn-sm arrive-btn me-1';
     btn.style.background = colors[i];
-    btn.style.color = '#fff';
+    btn.style.color = i===2 ? '#000' : '#fff';
     btn.textContent = i;
     btn.addEventListener('click',()=>setArrived(i));
     td.appendChild(btn);
   }
 
-  save.addEventListener('click', async ()=>{
-    const tr = td.closest('tr');
-    const inputs = tr.querySelectorAll('input, select');
-    const data = new URLSearchParams({action:'update', id});
-    inputs.forEach(i=>data.append(i.name,i.value));
-    try{
-      const r = await fetch(api,{method:'POST',body:data});
-      const j = await r.json();
-      if(j.success) showAlert('Registro actualizado','success');
-      else showAlert(j.message || 'Error','danger');
-    }catch{ showAlert('Error de red','danger'); }
-  });
+  save.addEventListener('click', async ()=>{ const tr = td.closest('tr'); const inputs = tr.querySelectorAll('input, select'); const data = new URLSearchParams({action:'update', id}); inputs.forEach(i=>data.append(i.name,i.value)); try{ const r = await fetch(api,{method:'POST',body:data}); const j = await r.json(); if(j.success) showAlert('Registro actualizado','success'); else showAlert(j.message || 'Error','danger'); }catch{ showAlert('Error de red','danger'); } });
 
-  del.addEventListener('click', async ()=>{
-    if(!confirm('¿Eliminar este registro?')) return;
-    try{
-      const r = await fetch(api + '?action=delete&id=' + id);
-      const j = await r.json();
-      if(j.success){ showAlert('Registro eliminado','success'); load(); }
-      else showAlert(j.message || 'Error','danger');
-    }catch{ showAlert('Error de red','danger'); }
-  });
+  del.addEventListener('click', async ()=>{ if(!confirm('¿Eliminar este registro?')) return; try{ const r = await fetch(api + '?action=delete&id=' + id); const j = await r.json(); if(j.success){ showAlert('Registro eliminado','success'); load(); } else showAlert(j.message || 'Error','danger'); }catch{ showAlert('Error de red','danger'); } });
 
   td.appendChild(document.createElement('br'));
   td.appendChild(save);
@@ -331,7 +307,7 @@ async function load(){
   const tbody = document.querySelector('#recordsTable tbody');
   tbody.innerHTML = '';
   const records = await fetchRecords();
-  const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
+  const colors = ['#fff','#dc3545','#ffc107','#0d6efd'];
   for(const item of records){
     const tr = document.createElement('tr');
     tr.classList.add(`semaforo-${item.arrived_count ?? 0}`);
@@ -371,59 +347,26 @@ async function actualizarInvitados(){
     const r = await fetch("contador_invitados.php");
     const data = await r.json();
     document.getElementById("contadorInvitados").textContent = data.total ?? 0;
-  } catch (e) {
-    console.error("Error contando invitados:", e);
-  }
+  } catch (e) { console.error("Error contando invitados:", e); }
 }
 
-// ✔ refresca cada 2 segundos
+// refresca cada 2 segundos
 setInterval(actualizarInvitados, 2000);
 actualizarInvitados();
 
-
-
-// ----------------------------------------------------
-// ✔ AQUI VIENEN LOS CAMBIOS QUE PEDISTE:
-// ----------------------------------------------------
-
-// 1) NORMALIZADOR
-function normalize(str) {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[\.\s\-]/g, "")
-    .replace(/[^a-z0-9]/g, "");
-}
-
-// 2) BUSCADOR CON NORMALIZACIÓN
 document.getElementById('searchCedula').addEventListener('input', e=>{
-  const q = normalize(e.target.value);
-
+  const q = e.target.value.toLowerCase();
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
-
-    const nombre = normalize(tr.children[2]?.firstChild?.value || '');
-    const apellidos = normalize(tr.children[3]?.firstChild?.value || '');
-    const cedula = normalize(tr.children[4]?.firstChild?.value || '');
-
-    const inv1 = normalize(tr.children[10]?.firstChild?.value || '');
-    const cc1  = normalize(tr.children[11]?.firstChild?.value || '');
-    const inv2 = normalize(tr.children[12]?.firstChild?.value || '');
-    const cc2  = normalize(tr.children[13]?.firstChild?.value || '');
-    const inv3 = normalize(tr.children[14]?.firstChild?.value || '');
-    const cc3  = normalize(tr.children[15]?.firstChild?.value || '');
-
-    tr.style.display = (
-      nombre.includes(q) ||
-      apellidos.includes(q) ||
-      cedula.includes(q) ||
-      inv1.includes(q) ||
-      cc1.includes(q) ||
-      inv2.includes(q) ||
-      cc2.includes(q) ||
-      inv3.includes(q) ||
-      cc3.includes(q)
-    ) ? '' : 'none';
+    const nombre = tr.children[2]?.firstChild?.value?.toLowerCase() || '';
+    const apellidos = tr.children[3]?.firstChild?.value?.toLowerCase() || '';
+    const cedula = tr.children[4]?.firstChild?.value?.toLowerCase() || '';
+    const inv1 = tr.children[10]?.firstChild?.value?.toLowerCase() || '';
+    const cc1 = tr.children[11]?.firstChild?.value?.toLowerCase() || '';
+    const inv2 = tr.children[12]?.firstChild?.value?.toLowerCase() || '';
+    const cc2 = tr.children[13]?.firstChild?.value?.toLowerCase() || '';
+    const inv3 = tr.children[14]?.firstChild?.value?.toLowerCase() || '';
+    const cc3 = tr.children[15]?.firstChild?.value?.toLowerCase() || '';
+    tr.style.display = (nombre.includes(q)||apellidos.includes(q)||cedula.includes(q)||inv1.includes(q)||cc1.includes(q)||inv2.includes(q)||cc2.includes(q)||inv3.includes(q)||cc3.includes(q)) ? '' : 'none';
   });
 });
 
@@ -432,3 +375,4 @@ load();
 
 </body>
 </html>
+
