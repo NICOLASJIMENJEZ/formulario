@@ -39,35 +39,15 @@ if ($dbConnected) {
       pointer-events:none; z-index:1;
     }
 
-    /* ------------------------ */
-    /*   AJUSTES RESPONSIVOS   */
-    /* ------------------------ */
     @media(max-width:720px){
       .escudo-center{ width:260px; height:260px }
-
-      .escudo-corner{
-        width:100px;
-        height:100px;
-        top:2px;         /* Se baja un poco para no tapar */
-        right:4px;
-      }
-
-      h3{
-        padding-top: 90px; /* evita que el escudo tape el título */
-      }
+      .escudo-corner{ width:100px; height:100px; top:2px; right:4px; }
+      h3{ padding-top: 90px; }
     }
 
     @media(max-width:480px){
-      .escudo-corner{
-        width:85px;
-        height:85px;
-        top:0;
-        right:2px;
-      }
-
-      h3{
-        padding-top: 95px; /* más espacio en pantallas muy pequeñas */
-      }
+      .escudo-corner{ width:85px; height:85px; top:0; right:2px; }
+      h3{ padding-top: 95px; }
     }
   </style>
 </head>
@@ -84,42 +64,24 @@ if ($dbConnected) {
         <div class="card shadow-sm border-0">
           <div class="card-body">
 
-            <!-- TÍTULO NUEVO -->
             <h3 class="mb-3 text-center">
               Inscripción acompañante a ceremonia de grado<br>
               <small class="text-muted">11 de diciembre del 2025</small>
             </h3>
 
-
-                        <!-- CONSENTIMIENTO INFORMADO -->
             <div id="consentimientoBox" class="alert alert-secondary p-4">
               <h5 class="mb-3"><b>Consentimiento informado</b></h5>
-
               <p style="text-align: justify;">
-                De acuerdo a lo establecido con la Ley 1581 de 2012, por medio del cual se regula el régimen general de protección de datos personales y el Decreto reglamentario 1377 de 2013, autorizo expresamente a la Universidad CESMAG para que los datos suministrados puedan ser utilizados de conformidad con la reglamentación vigente de la Política de Tratamiento de Datos, los acuerdos reglamentarios y las disposiciones internas de la Universidad CESMAG.
+                De acuerdo a la Ley 1581 de 2012 y Decreto 1377 de 2013, autorizo a la Universidad CESMAG para el tratamiento de mis datos.
               </p>
 
-              <!-- 🔵 NUEVA INFORMACIÓN IMPORTANTE AGREGADA AQUÍ -->
               <div class="alert alert-info mt-4" style="text-align: justify;">
-                <b>Información importante para la ceremonia:</b>
-                <br><br>
-
-                <b>1.</b> La ceremonia de grado se llevará a cabo el día <b>jueves 11 de diciembre del 2025</b> en el  
-                <b>Auditorio San Francisco</b> de la Universidad CESMAG, ubicado en  
-                <b>carrera 19 # 15A-53, Avenida de las Américas</b>.
-                <br><br>
-
-                <b>2.</b> Faltando <b>10 minutos</b> para el inicio de la ceremonia se <b>cerrará el ingreso</b>.  
-                Favor no insistir si llega tarde.
-                <br><br>
-
-                <b>3.</b> Para esta ocasión, y de manera excepcional, se autoriza el ingreso de  
-                <b>máximo 3 acompañantes</b> por cada graduado.
-                <br><br>
-
-                <b>4.</b> <b>Prohibido el ingreso de menores de edad.</b> FAVOR NO INSISTIR.
+                <b>Información importante para la ceremonia:</b><br><br>
+                1. Ceremonia: jueves 11 de diciembre de 2025 en Auditorio San Francisco, Universidad CESMAG.<br>
+                2. Cierre de ingreso: 10 minutos antes del inicio.<br>
+                3. Máximo 3 acompañantes por graduado.<br>
+                4. Prohibido ingreso de menores de edad.
               </div>
-              <!-- 🔵 FIN BLOQUE NUEVO -->
 
               <div class="d-grid mt-4">
                 <button id="btnDeAcuerdo" class="btn btn-dark btn-lg">
@@ -128,17 +90,19 @@ if ($dbConnected) {
               </div>
             </div>
 
-
-             
-
-            <!-- FORMULARIO OCULTO -->
+            <!-- FORMULARIO COMPLETO -->
             <div id="formularioCompleto" style="display:none;">
-
               <?php if (isset($_GET['msg']) && isset($_GET['type'])): ?>
                 <div class="alert alert-<?php echo htmlspecialchars($_GET['type']); ?> alert-dismissible fade show" role="alert">
                   <?php echo htmlspecialchars($_GET['msg']); ?>
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+                <?php if ($_GET['type'] === 'success'): ?>
+                  <script>
+                    // Redirige al index automáticamente 3 segundos después
+                    setTimeout(() => { window.location.href = 'index.php'; }, 3000);
+                  </script>
+                <?php endif; ?>
               <?php endif; ?>
 
               <div class="d-flex justify-content-between align-items-center mb-3">
@@ -163,16 +127,25 @@ if ($dbConnected) {
 
                 <div class="row mb-3">
                   <div class="col-md-4">
+                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
+                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="fecha_expedicion" class="form-label">Fecha de Expedición CC *</label>
+                    <input type="date" class="form-control" id="fecha_expedicion" name="fecha_expedicion" required>
+                  </div>
+                  <div class="col-md-4">
                     <label for="titular_cc" class="form-label">Cédula (CC)</label>
                     <input type="text" class="form-control" id="titular_cc" name="titular_cc">
+                    <small class="text-muted">Solo mayores de 18 años</small>
                   </div>
 
-                  <div class="col-md-4">
+                  <div class="col-md-4 mt-2">
                     <label for="titular_celular" class="form-label">Celular</label>
                     <input type="text" class="form-control" id="titular_celular" name="titular_celular">
                   </div>
 
-                  <div class="col-md-4">
+                  <div class="col-md-4 mt-2">
                     <label for="titular_correo" class="form-label">Correo electrónico</label>
                     <input type="email" class="form-control" id="titular_correo" name="titular_correo">
                   </div>
@@ -181,30 +154,30 @@ if ($dbConnected) {
                     <label for="hora" class="form-label">Hora</label>
                     <select class="form-select" id="hora" name="hora">
                       <option value="09:30">09:30 AM</option>
-                      <option value="02:00">02:00 PM</option>
+                      <option value="14:00">02:00 PM</option>
                       <option value="16:30">04:30 PM</option>
                     </select>
                   </div>
-
-                  <div class="col-12 mt-2" id="programa_wrap" style="display:none;">
-                    <label for="programa" class="form-label">Programa</label>
-                    <select class="form-select" id="programa" name="programa">
-                      <option value="">-- Seleccione un programa --</option>
-                    </select>
-                  </div>
                 </div>
 
                 <hr>
-                <h5>Invitados (opcionales)</h5>
-                <div id="invitadosContainer"></div>
-
-                <div class="d-flex gap-2 mb-3">
-                  <button type="button" id="addInvitado" class="btn btn-outline-secondary btn-sm">Agregar Invitado</button>
-                  <button type="button" id="removeInvitado" class="btn btn-outline-danger btn-sm" disabled>Eliminar Invitado</button>
+                <h5>Invitados (máx. 3)</h5>
+                <div id="invitadosContainer">
+                  <?php for($i=1;$i<=3;$i++): ?>
+                    <div class="row mb-2 invitadoRow">
+                      <div class="col-md-6">
+                        <label for="invitado<?php echo $i; ?>_nombre" class="form-label">Nombre Invitado <?php echo $i; ?></label>
+                        <input type="text" class="form-control" id="invitado<?php echo $i; ?>_nombre" name="invitado<?php echo $i; ?>_nombre">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="invitado<?php echo $i; ?>_cc" class="form-label">Cédula Invitado <?php echo $i; ?></label>
+                        <input type="text" class="form-control invitadoCC" id="invitado<?php echo $i; ?>_cc" name="invitado<?php echo $i; ?>_cc">
+                      </div>
+                    </div>
+                  <?php endfor; ?>
                 </div>
 
                 <hr>
-
                 <div class="mb-3 form-check">
                   <input type="checkbox" class="form-check-input" id="discapacidad" name="discapacidad" value="si">
                   <label class="form-check-label" for="discapacidad">¿Alguna discapacidad?</label>
@@ -229,19 +202,40 @@ if ($dbConnected) {
   </div>
 
   <script>
+    // Mostrar formulario completo al aceptar
     document.getElementById('btnDeAcuerdo').addEventListener('click', function(){
       document.getElementById('consentimientoBox').style.display = 'none';
       document.getElementById('formularioCompleto').style.display = 'block';
     });
 
+    // Mostrar/ocultar campo discapacidad
     document.getElementById('discapacidad').addEventListener('change', function(){
       const wrap = document.getElementById('discapacidad_cual_wrap');
       wrap.style.display = this.checked ? 'block' : 'none';
     });
+
+    // Validación de edad mayor de 18 años para cédula
+    const fechaNacimiento = document.getElementById('fecha_nacimiento');
+    const titularCC = document.getElementById('titular_cc');
+
+    fechaNacimiento.addEventListener('change', function(){
+      const hoy = new Date();
+      const fn = new Date(this.value);
+      const edad = hoy.getFullYear() - fn.getFullYear();
+      const mes = hoy.getMonth() - fn.getMonth();
+      const dia = hoy.getDate() - fn.getDate();
+      const edadReal = (mes < 0 || (mes === 0 && dia < 0)) ? edad-1 : edad;
+      if(edadReal < 18){
+        titularCC.value = '';
+        titularCC.disabled = true;
+        alert('Solo se puede registrar cédula para mayores de 18 años.');
+      } else {
+        titularCC.disabled = false;
+      }
+    });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/form.js"></script>
 
 </body>
 </html>
