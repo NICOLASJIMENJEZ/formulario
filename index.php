@@ -64,34 +64,37 @@ if ($dbConnected) {
         <div class="card shadow-sm border-0">
           <div class="card-body">
 
+            <!-- TÍTULO -->
             <h3 class="mb-3 text-center">
               Inscripción acompañante a ceremonia de grado<br>
               <small class="text-muted">11 de diciembre del 2025</small>
             </h3>
 
+            <!-- CONSENTIMIENTO INFORMADO -->
             <div id="consentimientoBox" class="alert alert-secondary p-4">
               <h5 class="mb-3"><b>Consentimiento informado</b></h5>
+
               <p style="text-align: justify;">
-                De acuerdo a la Ley 1581 de 2012 y Decreto 1377 de 2013, autorizo a la Universidad CESMAG para el tratamiento de mis datos.
+                De acuerdo a la Ley 1581 de 2012 y Decreto 1377 de 2013, autorizo expresamente a la Universidad CESMAG para que mis datos sean utilizados conforme a la reglamentación vigente.
               </p>
 
               <div class="alert alert-info mt-4" style="text-align: justify;">
-                <b>Información importante para la ceremonia:</b><br><br>
-                1. Ceremonia: jueves 11 de diciembre de 2025 en Auditorio San Francisco, Universidad CESMAG.<br>
-                2. Cierre de ingreso: 10 minutos antes del inicio.<br>
-                3. Máximo 3 acompañantes por graduado.<br>
-                4. Prohibido ingreso de menores de edad.
+                <b>Información importante para la ceremonia:</b>
+                <br><br>
+                <b>1.</b> Ceremonia: jueves 11 de diciembre de 2025 en Auditorio San Francisco, Universidad CESMAG.<br><br>
+                <b>2.</b> Cierre de ingreso: 10 minutos antes del inicio.<br><br>
+                <b>3.</b> Máximo 3 acompañantes por graduado.<br><br>
+                <b>4.</b> Prohibido ingreso de menores de edad.
               </div>
 
               <div class="d-grid mt-4">
-                <button id="btnDeAcuerdo" class="btn btn-dark btn-lg">
-                  De acuerdo
-                </button>
+                <button id="btnDeAcuerdo" class="btn btn-dark btn-lg">De acuerdo</button>
               </div>
             </div>
 
             <!-- FORMULARIO COMPLETO -->
             <div id="formularioCompleto" style="display:none;">
+
               <?php if (isset($_GET['msg']) && isset($_GET['type'])): ?>
                 <div class="alert alert-<?php echo htmlspecialchars($_GET['type']); ?> alert-dismissible fade show" role="alert">
                   <?php echo htmlspecialchars($_GET['msg']); ?>
@@ -127,25 +130,16 @@ if ($dbConnected) {
 
                 <div class="row mb-3">
                   <div class="col-md-4">
-                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
-                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
-                  </div>
-                  <div class="col-md-4">
-                    <label for="fecha_expedicion" class="form-label">Fecha de Expedición CC *</label>
-                    <input type="date" class="form-control" id="fecha_expedicion" name="fecha_expedicion" required>
-                  </div>
-                  <div class="col-md-4">
                     <label for="titular_cc" class="form-label">Cédula (CC)</label>
                     <input type="text" class="form-control" id="titular_cc" name="titular_cc">
-                    <small class="text-muted">Solo mayores de 18 años</small>
                   </div>
 
-                  <div class="col-md-4 mt-2">
+                  <div class="col-md-4">
                     <label for="titular_celular" class="form-label">Celular</label>
                     <input type="text" class="form-control" id="titular_celular" name="titular_celular">
                   </div>
 
-                  <div class="col-md-4 mt-2">
+                  <div class="col-md-4">
                     <label for="titular_correo" class="form-label">Correo electrónico</label>
                     <input type="email" class="form-control" id="titular_correo" name="titular_correo">
                   </div>
@@ -154,24 +148,40 @@ if ($dbConnected) {
                     <label for="hora" class="form-label">Hora</label>
                     <select class="form-select" id="hora" name="hora">
                       <option value="09:30">09:30 AM</option>
-                      <option value="14:00">02:00 PM</option>
+                      <option value="02:00">02:00 PM</option>
                       <option value="16:30">04:30 PM</option>
+                    </select>
+                  </div>
+
+                  <div class="col-12 mt-2" id="programa_wrap" style="display:none;">
+                    <label for="programa" class="form-label">Programa</label>
+                    <select class="form-select" id="programa" name="programa">
+                      <option value="">-- Seleccione un programa --</option>
                     </select>
                   </div>
                 </div>
 
                 <hr>
-                <h5>Invitados (máx. 3)</h5>
+                <h5>Invitados (opcionales, máx. 3)</h5>
                 <div id="invitadosContainer">
                   <?php for($i=1;$i<=3;$i++): ?>
                     <div class="row mb-2 invitadoRow">
-                      <div class="col-md-6">
+                      <div class="col-md-4">
                         <label for="invitado<?php echo $i; ?>_nombre" class="form-label">Nombre Invitado <?php echo $i; ?></label>
                         <input type="text" class="form-control" id="invitado<?php echo $i; ?>_nombre" name="invitado<?php echo $i; ?>_nombre">
                       </div>
-                      <div class="col-md-6">
+                      <div class="col-md-2">
+                        <label for="invitado<?php echo $i; ?>_fecha_nacimiento" class="form-label">Fecha de Nac.</label>
+                        <input type="date" class="form-control invitadoFecha" id="invitado<?php echo $i; ?>_fecha_nacimiento" name="invitado<?php echo $i; ?>_fecha_nacimiento">
+                      </div>
+                      <div class="col-md-2">
+                        <label for="invitado<?php echo $i; ?>_fecha_expedicion" class="form-label">Fecha Exp.</label>
+                        <input type="date" class="form-control" id="invitado<?php echo $i; ?>_fecha_expedicion" name="invitado<?php echo $i; ?>_fecha_expedicion">
+                      </div>
+                      <div class="col-md-4">
                         <label for="invitado<?php echo $i; ?>_cc" class="form-label">Cédula Invitado <?php echo $i; ?></label>
                         <input type="text" class="form-control invitadoCC" id="invitado<?php echo $i; ?>_cc" name="invitado<?php echo $i; ?>_cc">
+                        <small class="text-muted">Solo mayores de 18 años</small>
                       </div>
                     </div>
                   <?php endfor; ?>
@@ -214,24 +224,26 @@ if ($dbConnected) {
       wrap.style.display = this.checked ? 'block' : 'none';
     });
 
-    // Validación de edad mayor de 18 años para cédula
-    const fechaNacimiento = document.getElementById('fecha_nacimiento');
-    const titularCC = document.getElementById('titular_cc');
-
-    fechaNacimiento.addEventListener('change', function(){
-      const hoy = new Date();
-      const fn = new Date(this.value);
-      const edad = hoy.getFullYear() - fn.getFullYear();
-      const mes = hoy.getMonth() - fn.getMonth();
-      const dia = hoy.getDate() - fn.getDate();
-      const edadReal = (mes < 0 || (mes === 0 && dia < 0)) ? edad-1 : edad;
-      if(edadReal < 18){
-        titularCC.value = '';
-        titularCC.disabled = true;
-        alert('Solo se puede registrar cédula para mayores de 18 años.');
-      } else {
-        titularCC.disabled = false;
-      }
+    // Validación de edad >18 para los invitados
+    const invitados = document.querySelectorAll('.invitadoRow');
+    invitados.forEach(row => {
+      const fechaNac = row.querySelector('.invitadoFecha');
+      const cedula = row.querySelector('.invitadoCC');
+      fechaNac.addEventListener('change', function(){
+        const hoy = new Date();
+        const fn = new Date(this.value);
+        let edad = hoy.getFullYear() - fn.getFullYear();
+        const m = hoy.getMonth() - fn.getMonth();
+        const d = hoy.getDate() - fn.getDate();
+        if(m<0 || (m===0 && d<0)) edad--;
+        if(edad < 18){
+          cedula.value = '';
+          cedula.disabled = true;
+          alert('El invitado debe ser mayor de 18 años para registrar cédula.');
+        } else {
+          cedula.disabled = false;
+        }
+      });
     });
   </script>
 
@@ -239,4 +251,5 @@ if ($dbConnected) {
 
 </body>
 </html>
+
 
