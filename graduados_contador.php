@@ -1,22 +1,15 @@
 <?php
 // dashboard_unificado.php
-// Dashboard: total graduados, por programa, por hora (graduados + invitados) y por invitados
 
-// ---------- CONEXIÓN A LA BASE DE DATOS ----------
+// ---------- CONEXIÓN ----------
 if (file_exists(__DIR__ . "/db.php")) {
-    require_once __DIR__ . "/db.php"; // Debe crear $pdo
+    require_once __DIR__ . "/db.php";
 } else {
-    $db_host = getenv("DB_HOST");
-    $db_port = getenv("DB_PORT");
-    $db_name = getenv("DB_NAME");
-    $db_user = getenv("DB_USER");
-    $db_pass = getenv("DB_PASS");
-
     try {
         $pdo = new PDO(
-            "pgsql:host=$db_host;port=$db_port;dbname=$db_name",
-            $db_user,
-            $db_pass,
+            "pgsql:host=" . getenv("DB_HOST") . ";port=" . getenv("DB_PORT") . ";dbname=" . getenv("DB_NAME"),
+            getenv("DB_USER"),
+            getenv("DB_PASS"),
             [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
@@ -28,23 +21,23 @@ if (file_exists(__DIR__ . "/db.php")) {
     }
 }
 
-// ---------- SI PIDE JSON ----------
+// ---------- JSON ----------
 if (isset($_GET["json"])) {
     header("Content-Type: application/json");
 
     if (!$pdo) {
         echo json_encode([
             "success" => false,
-            "error" => $db_error ?? "Sin conexión a la base de datos"
+            "error" => $db_error ?? "Sin conexión"
         ]);
         exit;
     }
 
     try {
-        // TOTAL DE GRADUADOS
+        // TOTAL GRADUADOS
         $total = $pdo->query("SELECT COUNT(*) FROM registros")->fetchColumn();
 
-        // POR PROGRAMA
+        // GRADUADOS POR PROGRAMA
         $por_programa = $pdo->query("
             SELECT programa, COUNT(*) AS total
             FROM registros
@@ -53,42 +46,43 @@ if (isset($_GET["json"])) {
             ORDER BY total DESC
         ")->fetchAll();
 
-        // POR HORA (GRADUADOS + INVITADOS)
+        // GRADUADOS + INVITADOS POR HORA
         $por_hora = $pdo->query("
             SELECT
                 to_char(hora,'HH24:MI') AS hora,
                 COUNT(*) AS graduados,
                 SUM(
-                    (CASE WHEN invitado1_nombre IS NOT NULL AND invitado1_nombre <> '' THEN 1 ELSE 0 END) +
-                    (CASE WHEN invitado2_nombre IS NOT NULL AND invitado2_nombre <> '' THEN 1 ELSE 0 END) +
-                    (CASE WHEN invitado3_nombre IS NOT NULL AND invitado3_nombre <> '' THEN 1 ELSE 0 END)
+                    (CASE WHEN invitado1_nombre <> '' THEN 1 ELSE 0 END) +
+                    (CASE WHEN invitado2_nombre <> '' THEN 1 ELSE 0 END) +
+                    (CASE WHEN invitado3_nombre <> '' THEN 1 ELSE 0 END)
                 ) AS invitados
             FROM registros
             WHERE hora IS NOT NULL
             GROUP BY to_char(hora,'HH24:MI')
-            ORDER BY hora ASC
+            ORDER BY hora
         ")->fetchAll();
 
-        // INVITADOS POR TITULAR
-        $por_usuario = $pdo->query("
+        // ✅ INVITADOS POR PROGRAMA (NUEVO)
+        $invitados_por_programa = $pdo->query("
             SELECT
-                CONCAT(titular_nombre, ' ', titular_apellidos) AS titular,
                 programa,
-                (
-                    CASE WHEN invitado1_nombre IS NOT NULL AND invitado1_nombre <> '' THEN 1 ELSE 0 END +
-                    CASE WHEN invitado2_nombre IS NOT NULL AND invitado2_nombre <> '' THEN 1 ELSE 0 END +
-                    CASE WHEN invitado3_nombre IS NOT NULL AND invitado3_nombre <> '' THEN 1 ELSE 0 END
+                SUM(
+                    (CASE WHEN invitado1_nombre <> '' THEN 1 ELSE 0 END) +
+                    (CASE WHEN invitado2_nombre <> '' THEN 1 ELSE 0 END) +
+                    (CASE WHEN invitado3_nombre <> '' THEN 1 ELSE 0 END)
                 ) AS invitados
             FROM registros
-            ORDER BY titular
+            WHERE programa IS NOT NULL AND programa <> ''
+            GROUP BY programa
+            ORDER BY invitados DESC
         ")->fetchAll();
 
         echo json_encode([
             "success" => true,
-            "total" => intval($total),
+            "total" => (int)$total,
             "by_program" => $por_programa,
             "by_hour" => $por_hora,
-            "by_user" => $por_usuario
+            "by_program_guests" => $invitados_por_programa
         ]);
         exit;
 
@@ -105,113 +99,93 @@ if (isset($_GET["json"])) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard Unificado — Graduados</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Dashboard Graduados</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <style>
-        body { font-family: Arial; background:#f4f4f4; padding:20px; }
-        .wrap {
-            max-width:1200px;
-            margin:auto;
-            display:grid;
-            grid-template-columns:300px 1fr;
-            gap:20px;
-        }
-        .card {
-            background:#fff;
-            padding:20px;
-            border-radius:10px;
-            box-shadow:0 0 10px #0002;
-        }
-        .big {
-            font-size:48px;
-            color:#0a8235;
-            font-weight:bold;
-            text-align:center;
-        }
-        table {
-            width:100%;
-            margin-top:10px;
-            border-collapse:collapse;
-        }
-        th, td {
-            padding:8px;
-            border-bottom:1px solid #ddd;
-            text-align:left;
-        }
-        th { background:#eee; }
-        button {
-            padding:8px 12px;
-            border:none;
-            background:#0a8235;
-            color:white;
-            border-radius:6px;
-            cursor:pointer;
-        }
-        button.secondary { background:#444; }
-        .controls { margin-top:15px; display:flex; gap:10px; }
-        @media(max-width:900px){
-            .wrap{grid-template-columns:1fr;}
-        }
-    </style>
+<style>
+body { font-family: Arial; background:#f4f4f4; padding:20px; }
+.wrap {
+    max-width:1200px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:20px;
+}
+.card {
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px #0002;
+}
+.big {
+    font-size:48px;
+    color:#0a8235;
+    font-weight:bold;
+    text-align:center;
+}
+table {
+    width:100%;
+    margin-top:10px;
+    border-collapse:collapse;
+}
+th, td {
+    padding:8px;
+    border-bottom:1px solid #ddd;
+}
+th { background:#eee; }
+button {
+    padding:8px 12px;
+    border:none;
+    background:#0a8235;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+button.secondary { background:#444; }
+.controls { margin-top:15px; display:flex; gap:10px; }
+@media(max-width:900px){
+    .wrap{grid-template-columns:1fr;}
+}
+</style>
 </head>
 
 <body>
 
 <div class="wrap">
 
-    <div class="card">
-        <h2>Total de Graduados</h2>
-        <div id="total" class="big">0</div>
-        <p>Última actualización: <span id="last">-</span></p>
+<div class="card">
+    <h2>Total de Graduados</h2>
+    <div id="total" class="big">0</div>
+    <p>Última actualización: <span id="last">-</span></p>
 
-        <div class="controls">
-            <button onclick="loadData()">Actualizar</button>
-            <button id="autoBtn" class="secondary">Auto: ON (5s)</button>
-        </div>
+    <div class="controls">
+        <button onclick="loadData()">Actualizar</button>
+        <button id="autoBtn" class="secondary">Auto: ON (5s)</button>
     </div>
+</div>
 
-    <div class="card">
-        <h2>Graduados por Programa</h2>
-        <table id="tablaProgramas">
-            <thead>
-                <tr><th>Programa</th><th>Total</th></tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="2">Cargando...</td></tr>
-            </tbody>
-        </table>
+<div class="card">
 
-        <h2 style="margin-top:20px;">Graduados e Invitados por Hora</h2>
-        <table id="tablaHoras">
-            <thead>
-                <tr>
-                    <th>Hora</th>
-                    <th>Graduados</th>
-                    <th>Invitados</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="3">Cargando...</td></tr>
-            </tbody>
-        </table>
+<h2>Graduados por Programa</h2>
+<table id="tablaProgramas">
+<thead><tr><th>Programa</th><th>Graduados</th></tr></thead>
+<tbody></tbody>
+</table>
 
-        <h2 style="margin-top:20px;">Invitados por Titular</h2>
-        <table id="tablaUsuarios">
-            <thead>
-                <tr>
-                    <th>Titular</th>
-                    <th>Programa</th>
-                    <th>Invitados</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="3">Cargando...</td></tr>
-            </tbody>
-        </table>
-    </div>
+<h2 style="margin-top:20px;">Graduados e Invitados por Hora</h2>
+<table id="tablaHoras">
+<thead><tr><th>Hora</th><th>Graduados</th><th>Invitados</th></tr></thead>
+<tbody></tbody>
+</table>
 
+<h2 style="margin-top:20px;">Invitados por Programa</h2>
+<table id="tablaInvitadosPrograma">
+<thead><tr><th>Programa</th><th>Total Invitados</th></tr></thead>
+<tbody></tbody>
+</table>
+
+</div>
 </div>
 
 <script>
@@ -222,39 +196,25 @@ function loadData() {
     fetch("?json=1")
         .then(r => r.json())
         .then(data => {
-            if (!data.success) {
-                alert("Error: " + data.error);
-                return;
-            }
+            if (!data.success) return alert(data.error);
 
             document.getElementById("total").innerText = data.total;
             document.getElementById("last").innerText =
                 new Date().toLocaleTimeString();
 
-            // Programas
             document.querySelector("#tablaProgramas tbody").innerHTML =
                 data.by_program.map(r =>
                     `<tr><td>${r.programa}</td><td>${r.total}</td></tr>`
                 ).join("");
 
-            // Horas (graduados + invitados)
             document.querySelector("#tablaHoras tbody").innerHTML =
                 data.by_hour.map(r =>
-                    `<tr>
-                        <td>${r.hora}</td>
-                        <td>${r.graduados}</td>
-                        <td>${r.invitados}</td>
-                    </tr>`
+                    `<tr><td>${r.hora}</td><td>${r.graduados}</td><td>${r.invitados}</td></tr>`
                 ).join("");
 
-            // Invitados por titular
-            document.querySelector("#tablaUsuarios tbody").innerHTML =
-                data.by_user.map(r =>
-                    `<tr>
-                        <td>${r.titular}</td>
-                        <td>${r.programa}</td>
-                        <td>${r.invitados}</td>
-                    </tr>`
+            document.querySelector("#tablaInvitadosPrograma tbody").innerHTML =
+                data.by_program_guests.map(r =>
+                    `<tr><td>${r.programa}</td><td>${r.invitados}</td></tr>`
                 ).join("");
         });
 }
@@ -263,9 +223,7 @@ document.getElementById("autoBtn").onclick = () => {
     auto = !auto;
     document.getElementById("autoBtn").innerText =
         auto ? "Auto: ON (5s)" : "Auto: OFF";
-
-    if (auto) startAuto();
-    else clearInterval(interval);
+    auto ? startAuto() : clearInterval(interval);
 };
 
 function startAuto() {
@@ -278,4 +236,5 @@ startAuto();
 
 </body>
 </html>
+
 
