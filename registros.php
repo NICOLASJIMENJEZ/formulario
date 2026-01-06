@@ -306,10 +306,6 @@ async function load(){
     tr.appendChild(createCellInput('titular_nombre', item.titular_nombre));
     tr.appendChild(createCellInput('titular_apellidos', item.titular_apellidos));
     tr.appendChild(createCellInput('titular_cc', item.titular_cc));
-    tr.appendChild(createCellInput('titular_celular', item.titular_celular));
-    tr.appendChild(createCellInput('titular_correo', item.titular_correo));
-    tr.appendChild(createCellInput('hora', item.hora));
-    tr.appendChild(createCellInput('programa', item.programa));
     tr.appendChild(createCellInput('discapacidad', item.discapacidad));
     tr.appendChild(createGuestInput(1, item.invitado1_nombre));
     tr.appendChild(createCellInput('invitado1_cc', item.invitado1_cc));
