@@ -173,24 +173,23 @@ async function deleteRow(id){
   }
 }
 
-async function load(){
-  const tbody=document.querySelector('#recordsTable tbody');
-  tbody.innerHTML='';
-  const records=await fetchRecords();
+async function fetchRecords(){
+  try {
+    const res = await fetch(api + '?action=list');
+    const j = await res.json();
 
-  records.forEach(it=>{
-    const tr=document.createElement('tr');
-    tr.dataset.id=it.id;
-    tr.className='semaforo-'+(it.arrived_count||0);
+    if (!j.success) {
+      showAlert(j.message || 'Error al listar', 'danger');
+      return [];
+    }
 
-    tr.appendChild(Object.assign(document.createElement('td'),{textContent:it.id}));
+    return j.records || [];
+  } catch (e) {
+    showAlert('Error al conectar con la API', 'danger');
+    return [];
+  }
+}
 
-    tr.appendChild(Object.assign(document.createElement('td'),{
-      appendChild:stack(
-        input('titular_nombre',it.titular_nombre),
-        input('titular_apellidos',it.titular_apellidos)
-      )
-    }));
 
     tr.appendChild(Object.assign(document.createElement('td'),{
       appendChild:input('titular_cc',it.titular_cc)
