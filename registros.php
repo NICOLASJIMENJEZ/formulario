@@ -146,15 +146,9 @@ td > .arrive-btn { margin-right: 8px; }
       <table class="table table-sm table-bordered" id="recordsTable">
         <thead class="table-dark text-white">
           <tr>
-            <th style="width:60px">ID</th>
-            <th>Semáforo</th>
             <th>Titular Nombre</th>
             <th>Titular Apellidos</th>
             <th>Cédula</th>
-            <th>Celular</th>
-            <th>Correo</th>
-            <th>Hora</th>
-            <th>Programa</th>
             <th>Discapacidad</th>
             <th>Invitado 1</th>
             <th>CC 1</th>
