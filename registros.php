@@ -145,10 +145,16 @@ td > .arrive-btn { margin-right: 8px; }
     <div class="table-responsive">
       <table class="table table-sm table-bordered" id="recordsTable">
         <thead class="table-dark text-white">
-          <tr>
+            <tr>
+            <th style="width:60px">ID</th>
+            <th>Semáforo</th>
             <th>Titular Nombre</th>
             <th>Titular Apellidos</th>
             <th>Cédula</th>
+            <th>Celular</th>
+            <th>Correo</th>
+            <th>Hora</th>
+            <th>Programa</th>
             <th>Discapacidad</th>
             <th>Invitado 1</th>
             <th>CC 1</th>
@@ -158,6 +164,7 @@ td > .arrive-btn { margin-right: 8px; }
             <th>CC 3</th>
             <th style="width:140px">Acciones</th>
           </tr>
+
         </thead>
         <tbody></tbody>
       </table>
@@ -301,11 +308,13 @@ async function load(){
     circle.style.borderRadius = '50%';
     circle.style.background = colors[item.arrived_count ?? 0];
     semTd.appendChild(circle);
-    tr.appendChild(semTd);
-
-    tr.appendChild(createCellInput('titular_nombre', item.titular_nombre));
+ tr.appendChild(createCellInput('titular_nombre', item.titular_nombre));
     tr.appendChild(createCellInput('titular_apellidos', item.titular_apellidos));
     tr.appendChild(createCellInput('titular_cc', item.titular_cc));
+    tr.appendChild(createCellInput('titular_celular', item.titular_celular));
+    tr.appendChild(createCellInput('titular_correo', item.titular_correo));
+    tr.appendChild(createCellInput('hora', item.hora));
+    tr.appendChild(createCellInput('programa', item.programa));
     tr.appendChild(createCellInput('discapacidad', item.discapacidad));
     tr.appendChild(createGuestInput(1, item.invitado1_nombre));
     tr.appendChild(createCellInput('invitado1_cc', item.invitado1_cc));
@@ -314,7 +323,6 @@ async function load(){
     tr.appendChild(createGuestInput(3, item.invitado3_nombre));
     tr.appendChild(createCellInput('invitado3_cc', item.invitado3_cc));
 
-    tr.appendChild(createActionsCell(item.id));
     tbody.appendChild(tr);
   }
 }
