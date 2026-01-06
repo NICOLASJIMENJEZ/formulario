@@ -1,3 +1,4 @@
+<?php ?>
 <!doctype html>
 <html lang="es">
 <head>
@@ -5,141 +6,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Registros - Administración</title>
 
+<link href="/formulario/assets/css/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body { font-size: 17px; background:#f8f9fa }
-table { font-size: 16px }
-.empty-cell { background:#f0f0f0!important; color:#6c757d!important }
+body { font-size: 16px; }
+.table-responsive { max-height: 65vh; overflow:auto; }
 
-.semaforo-0 td { background:#f8f9fa }
-.semaforo-1 td { background:#dc3545; color:#fff }
-.semaforo-2 td { background:#fd7e14; color:#fff }
-.semaforo-3 td { background:#198754; color:#fff }
+td { vertical-align: middle; }
 
-.arrive-btn{
-  width:34px;height:30px;
-  padding:0;border-radius:6px;
-  font-weight:700;margin-right:4px
+.input-stack input {
+  margin-bottom: 4px;
 }
 
-.table-responsive{ max-height:65vh; overflow:auto }
-
-.group-grid{
-  display:grid;
-  grid-template-columns: 2fr 1fr;
-  gap:6px;
+.empty-cell {
+  background:#f0f0f0;
+  color:#6c757d;
 }
 
-.inv-grid{
-  display:grid;
-  grid-template-columns: 2fr 1fr 1fr 2fr;
-  gap:6px;
+.arrive-btn {
+  width: 34px;
+  height: 30px;
+  font-weight: bold;
+  padding:0;
 }
+
+.semaforo-0 td { background:#f8f9fa; }
+.semaforo-1 td { background:#dc3545; color:#fff; }
+.semaforo-2 td { background:#fd7e14; color:#fff; }
+.semaforo-3 td { background:#198754; color:#fff; }
 
 @media(max-width:768px){
-  .group-grid{ grid-template-columns:1fr }
-  .inv-grid{ grid-template-columns:1fr }
+  body { font-size:14px }
+  input { font-size:14px }
 }
 </style>
 </head>
 
-<body>
+<body class="bg-light">
 
-<div class="container py-4">
-
+<div class="container py-3">
 <h4 class="mb-3">Registros guardados</h4>
 
-<div class="mb-2 d-flex gap-2">
-  <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por nombre o cédula">
-  <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
-</div>
-
-<div class="table-responsive">
+<div class="table-responsive shadow-sm bg-white rounded p-2">
 <table class="table table-bordered table-sm" id="recordsTable">
 <thead class="table-dark">
 <tr>
-<th>ID</th>
-<th>Semáforo</th>
-<th>Titular</th>
-<th>Invitado 1</th>
-<th>Invitado 2</th>
-<th>Invitado 3</th>
-<th>Acciones</th>
+  <th>ID</th>
+  <th>Titular<br><small>Nombres / Apellidos</small></th>
+  <th>Cédula</th>
+
+  <th>Invitado 1</th>
+  <th>CC</th>
+  <th>Discapacidad</th>
+
+  <th>Invitado 2</th>
+  <th>CC</th>
+  <th>Discapacidad</th>
+
+  <th>Invitado 3</th>
+  <th>CC</th>
+  <th>Discapacidad</th>
+
+  <th>Semáforo / Acciones</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
 </div>
 
-<div class="fw-bold mt-3 text-center">
+<div class="fw-bold text-center mt-3">
 Invitados que han llegado: <span id="contadorInvitados">0</span>
 </div>
-
 </div>
 
 <script>
-const api='api.php';
-const colors=['#6c757d','#dc3545','#fd7e14','#198754'];
+const api = 'api.php';
 
-function createInput(name,val){
+function input(name,value=''){
   const i=document.createElement('input');
   i.className='form-control form-control-sm';
   i.name=name;
-  i.value=val??'';
-  if(!i.value)i.classList.add('empty-cell');
+  i.value=value;
+  if(!value) i.classList.add('empty-cell');
   i.oninput=()=>i.classList.toggle('empty-cell',!i.value);
   return i;
 }
 
-function invitadoBlock(i,item){
+function stack(...inputs){
   const d=document.createElement('div');
-  d.className='inv-grid';
-
-  d.append(
-    createInput(`invitado${i}_nombre`,item[`invitado${i}_nombre`]),
-    createInput(`invitado${i}_cc`,item[`invitado${i}_cc`]),
-    createInput(`invitado${i}_discapacidad`,item[`invitado${i}_discapacidad`]),
-    createInput(`invitado${i}_descripcion`,item[`invitado${i}_descripcion`])
-  );
+  d.className='input-stack';
+  inputs.forEach(i=>d.appendChild(i));
   return d;
 }
 
-function acciones(id,tr){
+function acciones(id, arrived){
   const td=document.createElement('td');
+  const colors=['#6c757d','#dc3545','#fd7e14','#198754'];
 
   for(let i=0;i<4;i++){
     const b=document.createElement('button');
-    b.className='btn btn-sm arrive-btn';
+    b.className='btn btn-sm arrive-btn me-1';
     b.style.background=colors[i];
     b.style.color='#fff';
     b.textContent=i;
-    b.onclick=()=>setArrived(id,i,tr);
+    b.onclick=()=>setArrived(id,i);
     td.appendChild(b);
   }
 
   td.appendChild(document.createElement('br'));
 
-  const g=document.createElement('button');
-  g.className='btn btn-sm btn-primary mt-1 me-1';
-  g.textContent='Guardar';
-  g.onclick=()=>guardar(id,tr);
+  const save=document.createElement('button');
+  save.className='btn btn-sm btn-primary me-1';
+  save.textContent='Guardar';
+  save.onclick=()=>guardar(id,td);
 
-  const e=document.createElement('button');
-  e.className='btn btn-sm btn-danger mt-1';
-  e.textContent='Eliminar';
-  e.onclick=()=>eliminar(id);
+  const del=document.createElement('button');
+  del.className='btn btn-sm btn-danger';
+  del.textContent='Eliminar';
+  del.onclick=()=>eliminar(id);
 
-  td.append(g,e);
+  td.append(save,del);
   return td;
 }
 
-async function setArrived(id,n,tr){
+async function setArrived(id,n){
   await fetch(api,{method:'POST',body:new URLSearchParams({action:'update',id,arrived_count:n})});
-  tr.className=`semaforo-${n}`;
+  load();
+  actualizarInvitados();
 }
 
-async function guardar(id,tr){
+async function guardar(id,td){
+  const tr=td.parentElement;
   const data=new URLSearchParams({action:'update',id});
   tr.querySelectorAll('input').forEach(i=>data.append(i.name,i.value));
   await fetch(api,{method:'POST',body:data});
@@ -158,48 +156,55 @@ async function load(){
   const tb=document.querySelector('#recordsTable tbody');
   tb.innerHTML='';
 
-  j.records.forEach(item=>{
+  j.records.forEach(it=>{
     const tr=document.createElement('tr');
-    tr.className=`semaforo-${item.arrived_count||0}`;
+    tr.className='semaforo-'+(it.arrived_count||0);
 
-    tr.innerHTML=`<td>${item.id}</td><td></td>`;
+    tr.appendChild(Object.assign(document.createElement('td'),{textContent:it.id}));
 
-    const tit=document.createElement('td');
-    const tg=document.createElement('div');
-    tg.className='group-grid';
-    tg.append(
-      createInput('titular_nombre',item.titular_nombre+' '+item.titular_apellidos),
-      createInput('titular_cc',item.titular_cc)
-    );
-    tit.appendChild(tg);
-    tr.appendChild(tit);
+    tr.appendChild(Object.assign(document.createElement('td'),{
+      appendChild:stack(
+        input('titular_nombre',it.titular_nombre),
+        input('titular_apellidos',it.titular_apellidos)
+      )
+    }));
+
+    tr.appendChild(Object.assign(document.createElement('td'),{
+      appendChild:input('titular_cc',it.titular_cc)
+    }));
 
     for(let i=1;i<=3;i++){
-      const td=document.createElement('td');
-      td.appendChild(invitadoBlock(i,item));
-      tr.appendChild(td);
+      tr.appendChild(Object.assign(document.createElement('td'),{
+        appendChild:stack(
+          input(`invitado${i}_nombre`,it[`invitado${i}_nombre`]),
+          input(`invitado${i}_apellidos`,it[`invitado${i}_apellidos`])
+        )
+      }));
+      tr.appendChild(Object.assign(document.createElement('td'),{
+        appendChild:input(`invitado${i}_cc`,it[`invitado${i}_cc`])
+      }));
+      tr.appendChild(Object.assign(document.createElement('td'),{
+        appendChild:input(`invitado${i}_discapacidad`,it[`invitado${i}_discapacidad`])
+      }));
     }
 
-    tr.appendChild(acciones(item.id,tr));
+    tr.appendChild(acciones(it.id,it.arrived_count));
     tb.appendChild(tr);
   });
 }
 
-function normalize(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+async function actualizarInvitados(){
+  const r=await fetch('contador_invitados.php');
+  const j=await r.json();
+  document.getElementById('contadorInvitados').textContent=j.total||0;
+}
 
-document.getElementById('searchCedula').oninput=e=>{
-  const q=normalize(e.target.value);
-  document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
-    tr.style.display=normalize(tr.innerText).includes(q)?'':'none';
-  });
-};
-
-document.getElementById('reload').onclick=load;
+setInterval(actualizarInvitados,2000);
 load();
+actualizarInvitados();
 </script>
 
 </body>
 </html>
-
 
 
