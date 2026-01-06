@@ -1,397 +1,215 @@
 <?php
-// Página de administración de registros sin autenticación.
-// Se eliminó auth.php y require_login(), ya no pide contraseña.
+require_once __DIR__ . '/db.php';
 ?>
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Registros - Administración</title>
+<title>Administración de Registros</title>
+
 <link href="/formulario/assets/css/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body { font-size: 18px; }
-table { font-size: 18px; }
-.form-control-sm, .form-select-sm { font-size: 16px; padding: .35rem .5rem; }
-.empty-cell { background: #f0f0f0 !important; color: #6c757d !important; }
-#recordsTable td { background: #fff; color: #000; vertical-align: middle; }
-#recordsTable td input.empty-cell { background: #f0f0f0; color: #6c757d; }
-.semaforo-0 td, .semaforo-0 input, .semaforo-0 select { background: #f8f9fa !important; color: #212529 !important; }
-.semaforo-1 td, .semaforo-1 input, .semaforo-1 select { background: #dc3545 !important; color: #fff !important; }
-.semaforo-2 td, .semaforo-2 input, .semaforo-2 select { background: #fd7e14 !important; color: #fff !important; }
-.semaforo-3 td, .semaforo-3 input, .semaforo-3 select { background: #198754 !important; color: #fff !important; }
-.semaforo-1 td, .semaforo-2 td, .semaforo-3 td { border-color: rgba(255,255,255,0.1); }
-.arrive-btn { width: 38px; height: 32px; padding: 0; border-radius: 6px; font-weight: 700; }
-td > .arrive-btn { margin-right: 8px; }
-.table-responsive { overflow: auto; max-height: 62vh; padding: 8px; }
-#recordsTable thead th, #recordsTable tbody td { white-space: nowrap; }
-#recordsTable input.form-control, #recordsTable select.form-select { min-width: 160px; }
-#recordsTable td:nth-child(1) { min-width: 60px; }
-#recordsTable td:nth-child(2) { min-width: 48px; }
-#recordsTable td:nth-child(20) { min-width: 180px; }
+body{ background:#f8f9fa; font-size:16px }
 
-@media (max-width: 768px) {
-  body { font-size: 16px; }
-  table { font-size: 16px; }
-  #recordsTable input.form-control, #recordsTable select.form-select { min-width: 120px; }
+.panel{
+  background:#fff;
+  padding:12px;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-.wrap{ position:relative; overflow:hidden }
-
-.escudo-center{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:420px;
-  height:420px;
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:contain;
-  border-radius:50%;
-  opacity:0.12;
-  pointer-events:none;
-  z-index:0;
-  mix-blend-mode:screen;
-  box-shadow: inset 0 -18px 60px rgba(255,255,255,0.06), inset 0 10px 30px rgba(0,0,0,0.02);
-  background-image: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 25%, rgba(255,255,255,0) 52%), url('/formulario/registros/escudo.png');
-  background-size: contain, contain;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin-bottom:15px;
 }
 
-.escudo-corner {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 380px;
-  height: 380px;
-  background-image: url('imagenes/logo.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
+.table thead th{ white-space:nowrap }
+.table td input{ min-width:150px }
+
+.semaforo-0{ background:#f8f9fa }
+.semaforo-1{ background:#dc3545!important; color:#fff }
+.semaforo-2{ background:#fd7e14!important; color:#fff }
+.semaforo-3{ background:#198754!important; color:#fff }
+
+.arrive-btn{
+  width:30px;
+  height:30px;
+  padding:0;
+  border-radius:6px;
+  font-weight:bold;
 }
 
-.gota-fondo {
-  position: fixed;
-  bottom: 25px;
-  right: 35px;
-  width: 160px;
-  height: 160px;
-  background-image: url('/formulario/imagenes/gota.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  opacity: 0.12;
-  pointer-events: none;
-  z-index: 0;
+.contador-box{
+  margin-top:20px;
+  padding:12px;
+  background:#fff;
+  border-radius:10px;
+  text-align:center;
+  font-weight:bold;
+  box-shadow:0 1px 4px rgba(0,0,0,.1);
 }
 
-@media(max-width:720px){
-  .escudo-center{ width:260px; height:260px }
-  .escudo-corner{ right:10px; top:6px; width:110px; height:110px }
-  .gota-fondo{ width:100px; height:100px; right:10px; bottom:10px; }
+#cardsContainer{ display:none }
+@media(max-width:768px){
+  #tableContainer{ display:none }
+  #cardsContainer{ display:block }
 }
 </style>
-
 </head>
-<body class="bg-light">
 
-<div class="container py-4 wrap">
+<body>
 
-  <div class="escudo-center" aria-hidden="true"></div>
-  <div class="escudo-corner" aria-hidden="true"></div>
-  <div class="gota-fondo" aria-hidden="true"></div>
+<div class="container py-3 wrap">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Registros guardados</h3>
-    <a href="index.php" class="boton-salida">Salir</a>
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="m-0">Administración de Registros</h4>
+    <a href="index.php" class="btn btn-danger">Salir</a>
+  </div>
 
-    <style>
-      .boton-salida {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #dc3545;
-        color: white;
-        padding: 10px 18px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        transition: background 0.3s ease;
-      }
-      .boton-salida:hover { background-color: #c82333; }
-    </style>
-
-    <div class="d-flex gap-2 align-items-center">
-      <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por cédula..." style="min-width:200px;">
-      <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
-    </div>
+  <!-- CONTROLES -->
+  <div class="controls">
+    <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por nombre o cédula">
+    <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
   </div>
 
   <div id="alert"></div>
 
-  <div class="shadow-sm rounded" style="background:#fff;padding:6px;">
-    <div style="font-size:14px;color:#6c757d;margin-bottom:6px;">
-      Desplaza horizontalmente dentro de esta ventana para ver todas las columnas ⇄
-    </div>
-    <div class="table-responsive">
-      <table class="table table-sm table-bordered" id="recordsTable">
-        <thead class="table-dark text-white">
-            <tr>
-            <th style="width:60px">ID</th>
+  <div class="panel">
+
+    <!-- TABLA -->
+    <div id="tableContainer" class="table-responsive">
+      <table class="table table-sm table-bordered align-middle text-center" id="recordsTable">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
             <th>Semáforo</th>
-            <th>Titular Nombre</th>
-            <th>Titular Apellidos</th>
+            <th>Nombre</th>
+            <th>Apellidos</th>
             <th>Cédula</th>
             <th>Celular</th>
             <th>Correo</th>
             <th>Hora</th>
             <th>Programa</th>
-            <th>Discapacidad</th>
-            <th>Invitado 1</th>
-            <th>CC 1</th>
-            <th>Invitado 2</th>
-            <th>CC 2</th>
-            <th>Invitado 3</th>
-            <th>CC 3</th>
-            <th style="width:140px">Acciones</th>
+            <th>Invitados</th>
+            <th>Acciones</th>
           </tr>
-
         </thead>
         <tbody></tbody>
       </table>
     </div>
-  </div>
-</div>
 
-<!-- ✔ CONTADOR DE INVITADOS AQUÍ -->
-<div class="fw-bold mt-3 text-center">
-  Invitados que han llegado: <span id="contadorInvitados">0</span>
+    <!-- CARDS (MÓVIL) -->
+    <div id="cardsContainer"></div>
+
+  </div>
+
+  <div class="contador-box">
+    Invitados que han llegado: <span id="contadorInvitados">0</span>
+  </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 const api = 'api.php';
-const alertEl = document.getElementById('alert');
+let recordsCache = [];
 
-function showAlert(msg, type='success'){
-  alertEl.innerHTML = `<div class="alert alert-${type} alert-dismissible" role="alert">
-  ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+function showAlert(msg,type='success'){
+  alert.innerHTML=`<div class="alert alert-${type} alert-dismissible">
+  ${msg}<button class="btn-close" data-bs-dismiss="alert"></button></div>`;
 }
 
 async function fetchRecords(){
-  try {
-    const res = await fetch(api + '?action=list');
-    const j = await res.json();
-    if(!j.success) { showAlert(j.message || 'Error al listar', 'danger'); return []; }
-    return j.records || [];
-  } catch (e) {
-    showAlert('Error al conectar con la API', 'danger');
-    return [];
-  }
+  const r = await fetch(api+'?action=list');
+  const j = await r.json();
+  return j.success ? j.records : [];
 }
 
-function createCellInput(name, value){
-  const td = document.createElement('td');
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'form-control form-control-sm';
-  input.name = name;
-  input.value = value ?? '';
-  if(!input.value) input.classList.add('empty-cell');
-  input.addEventListener('input', () => input.classList.toggle('empty-cell', !input.value));
-  td.appendChild(input);
-  return td;
+function semaforoBtns(id){
+  const colors=['secondary','danger','warning','success'];
+  return colors.map((c,i)=>
+    `<button class="btn btn-${c} btn-sm arrive-btn me-1"
+      onclick="setArrived(${id},${i})">${i}</button>`).join('');
 }
 
-function createGuestInput(index, value){
-  const td = document.createElement('td');
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'form-control form-control-sm';
-  input.name = `invitado${index}_nombre`;
-  input.value = value ?? '';
-  if(!input.value) input.classList.add('empty-cell');
-  input.addEventListener('input', () => input.classList.toggle('empty-cell', !input.value));
-  td.appendChild(input);
-  return td;
-}
-
-function createActionsCell(id){
-  const td = document.createElement('td');
-  const save = document.createElement('button');
-  save.className = 'btn btn-sm btn-primary me-2';
-  save.textContent = 'Guardar';
-  const del = document.createElement('button');
-  del.className = 'btn btn-sm btn-danger';
-  del.textContent = 'Eliminar';
-  const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
-
-  async function setArrived(n){
-    const data = new URLSearchParams({action:'update', id, arrived_count:n});
-    try{
-      const r = await fetch(api, {method:'POST', body:data});
-      const j = await r.json();
-      if(j.success){
-        showAlert('Llegada actualizada', 'success');
-        const tr = td.closest('tr');
-        tr.className = `semaforo-${n}`;
-        tr.querySelector('td:nth-child(2) div').style.background = colors[n];
-
-        actualizarInvitados(); // ✔ actualizar contador
-      } else showAlert(j.message || 'Error', 'danger');
-    }catch{ showAlert('Error de red', 'danger'); }
-  }
-
-  for(let i=0;i<4;i++){
-    const btn = document.createElement('button');
-    btn.className='btn btn-sm arrive-btn me-1';
-    btn.style.background = colors[i];
-    btn.style.color = '#fff';
-    btn.textContent = i;
-    btn.addEventListener('click',()=>setArrived(i));
-    td.appendChild(btn);
-  }
-
-  save.addEventListener('click', async ()=>{
-    const tr = td.closest('tr');
-    const inputs = tr.querySelectorAll('input, select');
-    const data = new URLSearchParams({action:'update', id});
-    inputs.forEach(i=>data.append(i.name,i.value));
-    try{
-      const r = await fetch(api,{method:'POST',body:data});
-      const j = await r.json();
-      if(j.success) showAlert('Registro actualizado','success');
-      else showAlert(j.message || 'Error','danger');
-    }catch{ showAlert('Error de red','danger'); }
-  });
-
-  del.addEventListener('click', async ()=>{
-    if(!confirm('¿Eliminar este registro?')) return;
-    try{
-      const r = await fetch(api + '?action=delete&id=' + id);
-      const j = await r.json();
-      if(j.success){ showAlert('Registro eliminado','success'); load(); }
-      else showAlert(j.message || 'Error','danger');
-    }catch{ showAlert('Error de red','danger'); }
-  });
-
-  td.appendChild(document.createElement('br'));
-  td.appendChild(save);
-  td.appendChild(del);
-  return td;
+async function setArrived(id,n){
+  const d=new URLSearchParams({action:'update',id,arrived_count:n});
+  const r=await fetch(api,{method:'POST',body:d});
+  const j=await r.json();
+  if(j.success){ load(); actualizarInvitados(); }
 }
 
 async function load(){
-  const tbody = document.querySelector('#recordsTable tbody');
-  tbody.innerHTML = '';
-  const records = await fetchRecords();
-  const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
-  for(const item of records){
-    const tr = document.createElement('tr');
-    tr.classList.add(`semaforo-${item.arrived_count ?? 0}`);
-    tr.appendChild(Object.assign(document.createElement('td'),{textContent:item.id}));
+  const tbody=document.querySelector('#recordsTable tbody');
+  const cards=document.getElementById('cardsContainer');
+  tbody.innerHTML=''; cards.innerHTML='';
+  recordsCache=await fetchRecords();
 
-    const semTd = document.createElement('td');
-    const circle = document.createElement('div');
-    circle.style.width = '20px';
-    circle.style.height = '20px';
-    circle.style.borderRadius = '50%';
-    circle.style.background = colors[item.arrived_count ?? 0];
-    semTd.appendChild(circle);
- tr.appendChild(createCellInput('titular_nombre', item.titular_nombre));
-    tr.appendChild(createCellInput('titular_apellidos', item.titular_apellidos));
-    tr.appendChild(createCellInput('titular_cc', item.titular_cc));
-    tr.appendChild(createCellInput('titular_celular', item.titular_celular));
-    tr.appendChild(createCellInput('titular_correo', item.titular_correo));
-    tr.appendChild(createCellInput('hora', item.hora));
-    tr.appendChild(createCellInput('programa', item.programa));
-    tr.appendChild(createCellInput('discapacidad', item.discapacidad));
-    tr.appendChild(createGuestInput(1, item.invitado1_nombre));
-    tr.appendChild(createCellInput('invitado1_cc', item.invitado1_cc));
-    tr.appendChild(createGuestInput(2, item.invitado2_nombre));
-    tr.appendChild(createCellInput('invitado2_cc', item.invitado2_cc));
-    tr.appendChild(createGuestInput(3, item.invitado3_nombre));
-    tr.appendChild(createCellInput('invitado3_cc', item.invitado3_cc));
-
+  recordsCache.forEach(it=>{
+    const tr=document.createElement('tr');
+    tr.className=`semaforo-${it.arrived_count||0}`;
+    tr.innerHTML=`
+      <td>${it.id}</td>
+      <td>${semaforoBtns(it.id)}</td>
+      <td>${it.titular_nombre||''}</td>
+      <td>${it.titular_apellidos||''}</td>
+      <td>${it.titular_cc||''}</td>
+      <td>${it.titular_celular||''}</td>
+      <td>${it.titular_correo||''}</td>
+      <td>${it.hora||''}</td>
+      <td>${it.programa||''}</td>
+      <td>${[it.invitado1_nombre,it.invitado2_nombre,it.invitado3_nombre].filter(Boolean).length}</td>
+      <td>
+        <button class="btn btn-primary btn-sm" onclick="guardar(${it.id})">Guardar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminar(${it.id})">Eliminar</button>
+      </td>`;
     tbody.appendChild(tr);
-  }
+
+    cards.innerHTML+=`
+      <div class="card p-2 mb-2">
+        <h6>${it.titular_nombre} ${it.titular_apellidos}</h6>
+        <p><strong>Cédula:</strong> ${it.titular_cc}</p>
+        <p><strong>Programa:</strong> ${it.programa}</p>
+        ${semaforoBtns(it.id)}
+      </div>`;
+  });
+}
+
+async function eliminar(id){
+  if(!confirm('¿Eliminar registro?'))return;
+  const r=await fetch(api+'?action=delete&id='+id);
+  const j=await r.json();
+  if(j.success){ showAlert('Eliminado'); load(); }
 }
 
 async function actualizarInvitados(){
-  try {
-    const r = await fetch("contador_invitados.php");
-    const data = await r.json();
-    document.getElementById("contadorInvitados").textContent = data.total ?? 0;
-  } catch (e) {
-    console.error("Error contando invitados:", e);
-  }
+  const r=await fetch('contador_invitados.php');
+  const j=await r.json();
+  contadorInvitados.textContent=j.total||0;
 }
 
-// ✔ refresca cada 2 segundos
-setInterval(actualizarInvitados, 2000);
-actualizarInvitados();
-
-
-
-// ----------------------------------------------------
-// ✔ AQUI VIENEN LOS CAMBIOS QUE PEDISTE:
-// ----------------------------------------------------
-
-// 1) NORMALIZADOR
-function normalize(str) {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[\.\s\-]/g, "")
-    .replace(/[^a-z0-9]/g, "");
-}
-
-// 2) BUSCADOR CON NORMALIZACIÓN
-document.getElementById('searchCedula').addEventListener('input', e=>{
-  const q = normalize(e.target.value);
-
+document.getElementById('reload').onclick=load;
+document.getElementById('searchCedula').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
   document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
-
-    const nombre = normalize(tr.children[2]?.firstChild?.value || '');
-    const apellidos = normalize(tr.children[3]?.firstChild?.value || '');
-    const cedula = normalize(tr.children[4]?.firstChild?.value || '');
-
-    const inv1 = normalize(tr.children[10]?.firstChild?.value || '');
-    const cc1  = normalize(tr.children[11]?.firstChild?.value || '');
-    const inv2 = normalize(tr.children[12]?.firstChild?.value || '');
-    const cc2  = normalize(tr.children[13]?.firstChild?.value || '');
-    const inv3 = normalize(tr.children[14]?.firstChild?.value || '');
-    const cc3  = normalize(tr.children[15]?.firstChild?.value || '');
-
-    tr.style.display = (
-      nombre.includes(q) ||
-      apellidos.includes(q) ||
-      cedula.includes(q) ||
-      inv1.includes(q) ||
-      cc1.includes(q) ||
-      inv2.includes(q) ||
-      cc2.includes(q) ||
-      inv3.includes(q) ||
-      cc3.includes(q)
-    ) ? '' : 'none';
+    tr.style.display=tr.innerText.toLowerCase().includes(q)?'':'none';
   });
 });
 
 load();
+actualizarInvitados();
+setInterval(actualizarInvitados,2000);
 </script>
 
 </body>
 </html>
+
 
 
