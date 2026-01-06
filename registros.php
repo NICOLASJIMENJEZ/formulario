@@ -1,211 +1,201 @@
-<?php
-require_once __DIR__ . '/db.php';
-?>
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Administración de Registros</title>
+<title>Registros - Administración</title>
 
-<link href="/formulario/assets/css/styles.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{ background:#f8f9fa; font-size:16px }
+body { font-size: 17px; background:#f8f9fa }
+table { font-size: 16px }
+.empty-cell { background:#f0f0f0!important; color:#6c757d!important }
 
-.panel{
-  background:#fff;
-  padding:12px;
-  border-radius:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.controls{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  align-items:center;
-  margin-bottom:15px;
-}
-
-.table thead th{ white-space:nowrap }
-.table td input{ min-width:150px }
-
-.semaforo-0{ background:#f8f9fa }
-.semaforo-1{ background:#dc3545!important; color:#fff }
-.semaforo-2{ background:#fd7e14!important; color:#fff }
-.semaforo-3{ background:#198754!important; color:#fff }
+.semaforo-0 td { background:#f8f9fa }
+.semaforo-1 td { background:#dc3545; color:#fff }
+.semaforo-2 td { background:#fd7e14; color:#fff }
+.semaforo-3 td { background:#198754; color:#fff }
 
 .arrive-btn{
-  width:30px;
-  height:30px;
-  padding:0;
-  border-radius:6px;
-  font-weight:bold;
+  width:34px;height:30px;
+  padding:0;border-radius:6px;
+  font-weight:700;margin-right:4px
 }
 
-.contador-box{
-  margin-top:20px;
-  padding:12px;
-  background:#fff;
-  border-radius:10px;
-  text-align:center;
-  font-weight:bold;
-  box-shadow:0 1px 4px rgba(0,0,0,.1);
+.table-responsive{ max-height:65vh; overflow:auto }
+
+.group-grid{
+  display:grid;
+  grid-template-columns: 2fr 1fr;
+  gap:6px;
 }
 
-#cardsContainer{ display:none }
+.inv-grid{
+  display:grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap:6px;
+}
+
 @media(max-width:768px){
-  #tableContainer{ display:none }
-  #cardsContainer{ display:block }
+  .group-grid{ grid-template-columns:1fr }
+  .inv-grid{ grid-template-columns:1fr }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container py-3 wrap">
+<div class="container py-4">
 
-  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h4 class="m-0">Administración de Registros</h4>
-    <a href="index.php" class="btn btn-danger">Salir</a>
-  </div>
+<h4 class="mb-3">Registros guardados</h4>
 
-  <!-- CONTROLES -->
-  <div class="controls">
-    <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por nombre o cédula">
-    <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
-  </div>
+<div class="mb-2 d-flex gap-2">
+  <input id="searchCedula" class="form-control form-control-sm" placeholder="Buscar por nombre o cédula">
+  <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
+</div>
 
-  <div id="alert"></div>
+<div class="table-responsive">
+<table class="table table-bordered table-sm" id="recordsTable">
+<thead class="table-dark">
+<tr>
+<th>ID</th>
+<th>Semáforo</th>
+<th>Titular</th>
+<th>Invitado 1</th>
+<th>Invitado 2</th>
+<th>Invitado 3</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
 
-  <div class="panel">
-
-    <!-- TABLA -->
-    <div id="tableContainer" class="table-responsive">
-      <table class="table table-sm table-bordered align-middle text-center" id="recordsTable">
-        <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Semáforo</th>
-            <th>Nombre</th>
-            <th>Apellidos</th>
-            <th>Cédula</th>
-            <th>Celular</th>
-            <th>Correo</th>
-            <th>Hora</th>
-            <th>Programa</th>
-            <th>Invitados</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <!-- CARDS (MÓVIL) -->
-    <div id="cardsContainer"></div>
-
-  </div>
-
-  <div class="contador-box">
-    Invitados que han llegado: <span id="contadorInvitados">0</span>
-  </div>
+<div class="fw-bold mt-3 text-center">
+Invitados que han llegado: <span id="contadorInvitados">0</span>
+</div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-const api = 'api.php';
-let recordsCache = [];
+const api='api.php';
+const colors=['#6c757d','#dc3545','#fd7e14','#198754'];
 
-function showAlert(msg,type='success'){
-  alert.innerHTML=`<div class="alert alert-${type} alert-dismissible">
-  ${msg}<button class="btn-close" data-bs-dismiss="alert"></button></div>`;
+function createInput(name,val){
+  const i=document.createElement('input');
+  i.className='form-control form-control-sm';
+  i.name=name;
+  i.value=val??'';
+  if(!i.value)i.classList.add('empty-cell');
+  i.oninput=()=>i.classList.toggle('empty-cell',!i.value);
+  return i;
 }
 
-async function fetchRecords(){
-  const r = await fetch(api+'?action=list');
-  const j = await r.json();
-  return j.success ? j.records : [];
+function invitadoBlock(i,item){
+  const d=document.createElement('div');
+  d.className='inv-grid';
+
+  d.append(
+    createInput(`invitado${i}_nombre`,item[`invitado${i}_nombre`]),
+    createInput(`invitado${i}_cc`,item[`invitado${i}_cc`]),
+    createInput(`invitado${i}_discapacidad`,item[`invitado${i}_discapacidad`]),
+    createInput(`invitado${i}_descripcion`,item[`invitado${i}_descripcion`])
+  );
+  return d;
 }
 
-function semaforoBtns(id){
-  const colors=['secondary','danger','warning','success'];
-  return colors.map((c,i)=>
-    `<button class="btn btn-${c} btn-sm arrive-btn me-1"
-      onclick="setArrived(${id},${i})">${i}</button>`).join('');
+function acciones(id,tr){
+  const td=document.createElement('td');
+
+  for(let i=0;i<4;i++){
+    const b=document.createElement('button');
+    b.className='btn btn-sm arrive-btn';
+    b.style.background=colors[i];
+    b.style.color='#fff';
+    b.textContent=i;
+    b.onclick=()=>setArrived(id,i,tr);
+    td.appendChild(b);
+  }
+
+  td.appendChild(document.createElement('br'));
+
+  const g=document.createElement('button');
+  g.className='btn btn-sm btn-primary mt-1 me-1';
+  g.textContent='Guardar';
+  g.onclick=()=>guardar(id,tr);
+
+  const e=document.createElement('button');
+  e.className='btn btn-sm btn-danger mt-1';
+  e.textContent='Eliminar';
+  e.onclick=()=>eliminar(id);
+
+  td.append(g,e);
+  return td;
 }
 
-async function setArrived(id,n){
-  const d=new URLSearchParams({action:'update',id,arrived_count:n});
-  const r=await fetch(api,{method:'POST',body:d});
-  const j=await r.json();
-  if(j.success){ load(); actualizarInvitados(); }
+async function setArrived(id,n,tr){
+  await fetch(api,{method:'POST',body:new URLSearchParams({action:'update',id,arrived_count:n})});
+  tr.className=`semaforo-${n}`;
 }
 
-async function load(){
-  const tbody=document.querySelector('#recordsTable tbody');
-  const cards=document.getElementById('cardsContainer');
-  tbody.innerHTML=''; cards.innerHTML='';
-  recordsCache=await fetchRecords();
-
-  recordsCache.forEach(it=>{
-    const tr=document.createElement('tr');
-    tr.className=`semaforo-${it.arrived_count||0}`;
-    tr.innerHTML=`
-      <td>${it.id}</td>
-      <td>${semaforoBtns(it.id)}</td>
-      <td>${it.titular_nombre||''}</td>
-      <td>${it.titular_apellidos||''}</td>
-      <td>${it.titular_cc||''}</td>
-      <td>${it.titular_celular||''}</td>
-      <td>${it.titular_correo||''}</td>
-      <td>${it.hora||''}</td>
-      <td>${it.programa||''}</td>
-      <td>${[it.invitado1_nombre,it.invitado2_nombre,it.invitado3_nombre].filter(Boolean).length}</td>
-      <td>
-        <button class="btn btn-primary btn-sm" onclick="guardar(${it.id})">Guardar</button>
-        <button class="btn btn-danger btn-sm" onclick="eliminar(${it.id})">Eliminar</button>
-      </td>`;
-    tbody.appendChild(tr);
-
-    cards.innerHTML+=`
-      <div class="card p-2 mb-2">
-        <h6>${it.titular_nombre} ${it.titular_apellidos}</h6>
-        <p><strong>Cédula:</strong> ${it.titular_cc}</p>
-        <p><strong>Programa:</strong> ${it.programa}</p>
-        ${semaforoBtns(it.id)}
-      </div>`;
-  });
+async function guardar(id,tr){
+  const data=new URLSearchParams({action:'update',id});
+  tr.querySelectorAll('input').forEach(i=>data.append(i.name,i.value));
+  await fetch(api,{method:'POST',body:data});
 }
 
 async function eliminar(id){
-  if(!confirm('¿Eliminar registro?'))return;
-  const r=await fetch(api+'?action=delete&id='+id);
-  const j=await r.json();
-  if(j.success){ showAlert('Eliminado'); load(); }
+  if(confirm('¿Eliminar registro?')){
+    await fetch(api+'?action=delete&id='+id);
+    load();
+  }
 }
 
-async function actualizarInvitados(){
-  const r=await fetch('contador_invitados.php');
+async function load(){
+  const r=await fetch(api+'?action=list');
   const j=await r.json();
-  contadorInvitados.textContent=j.total||0;
+  const tb=document.querySelector('#recordsTable tbody');
+  tb.innerHTML='';
+
+  j.records.forEach(item=>{
+    const tr=document.createElement('tr');
+    tr.className=`semaforo-${item.arrived_count||0}`;
+
+    tr.innerHTML=`<td>${item.id}</td><td></td>`;
+
+    const tit=document.createElement('td');
+    const tg=document.createElement('div');
+    tg.className='group-grid';
+    tg.append(
+      createInput('titular_nombre',item.titular_nombre+' '+item.titular_apellidos),
+      createInput('titular_cc',item.titular_cc)
+    );
+    tit.appendChild(tg);
+    tr.appendChild(tit);
+
+    for(let i=1;i<=3;i++){
+      const td=document.createElement('td');
+      td.appendChild(invitadoBlock(i,item));
+      tr.appendChild(td);
+    }
+
+    tr.appendChild(acciones(item.id,tr));
+    tb.appendChild(tr);
+  });
 }
+
+function normalize(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+
+document.getElementById('searchCedula').oninput=e=>{
+  const q=normalize(e.target.value);
+  document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
+    tr.style.display=normalize(tr.innerText).includes(q)?'':'none';
+  });
+};
 
 document.getElementById('reload').onclick=load;
-document.getElementById('searchCedula').addEventListener('input',e=>{
-  const q=e.target.value.toLowerCase();
-  document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{
-    tr.style.display=tr.innerText.toLowerCase().includes(q)?'':'none';
-  });
-});
-
 load();
-actualizarInvitados();
-setInterval(actualizarInvitados,2000);
 </script>
 
 </body>
