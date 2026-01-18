@@ -89,9 +89,141 @@
         border-radius: 20px; text-decoration: none; font-weight: bold;
     }
 
-    /* Responsividad: Ocultar ID en móviles pequeños */
+    /* Vista de Tarjetas para Móvil */
+    .card-view {
+        display: none;
+    }
+    
+    .record-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border-left: 5px solid #6c757d;
+        position: relative;
+    }
+    
+    .record-card.semaforo-1 { border-left-color: #dc3545; background-color: #fff5f5; }
+    .record-card.semaforo-2 { border-left-color: #fd7e14; background-color: #fff9f0; }
+    .record-card.semaforo-3 { border-left-color: #198754; background-color: #f4fff9; }
+    
+    .card-header-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .card-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--primary-dark);
+    }
+    
+    .card-cedula {
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    .card-section {
+        margin-bottom: 12px;
+    }
+    
+    .card-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    
+    .card-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+    
+    .semaforo-controls {
+        display: flex;
+        gap: 8px;
+        margin: 15px 0;
+    }
+    
+    .semaforo-btn {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+    }
+    
+    .semaforo-btn.active-0 { background: #6c757d; color: white; border-color: #6c757d; }
+    .semaforo-btn.active-1 { background: #dc3545; color: white; border-color: #dc3545; }
+    .semaforo-btn.active-2 { background: #fd7e14; color: white; border-color: #fd7e14; }
+    .semaforo-btn.active-3 { background: #198754; color: white; border-color: #198754; }
+    
+    .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .card-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .card-btn-save {
+        background: #3498db;
+        color: white;
+    }
+    
+    .card-btn-delete {
+        background: #e74c3c;
+        color: white;
+    }
+
+    /* Responsividad */
     @media (max-width: 768px) {
         .col-hide-mobile { display: none; }
+        .table-view { display: none; }
+        .card-view { display: block; }
+        
+        .container-fluid {
+            padding: 10px !important;
+        }
+        
+        .d-flex.gap-3 {
+            flex-direction: column;
+            gap: 10px !important;
+        }
+        
+        #searchCedula {
+            width: 100% !important;
+        }
+        
+        .bg-deco {
+            display: none;
+        }
+    }
+    
+    @media (min-width: 769px) {
+        .table-view { display: block; }
+        .card-view { display: none; }
     }
 </style>
 </head>
@@ -114,8 +246,8 @@
 
     <div id="alert"></div>
 
-    <!-- Tabla Principal -->
-    <div class="table-responsive shadow-sm">
+    <!-- Vista de Tabla (Desktop) -->
+    <div class="table-responsive shadow-sm table-view">
         <table class="table table-hover align-middle" id="recordsTable">
             <thead>
                 <tr>
@@ -136,6 +268,11 @@
                 <!-- Cargado por JS -->
             </tbody>
         </table>
+    </div>
+
+    <!-- Vista de Tarjetas (Móvil) -->
+    <div class="card-view" id="cardView">
+        <!-- Cargado por JS -->
     </div>
 
     <!-- Footer Stats -->
@@ -217,6 +354,78 @@ function createActionsCell(id, currentCount){
     return td;
 }
 
+// Crear tarjeta para vista móvil
+function createMobileCard(item){
+    const card = document.createElement('div');
+    card.className = `record-card semaforo-${item.arrived_count ?? 0}`;
+    card.dataset.id = item.id;
+    
+    card.innerHTML = `
+        <div class="card-header-info">
+            <div>
+                <div class="card-name">${item.titular_nombre} ${item.titular_apellidos}</div>
+                <div class="card-cedula">CC: ${item.titular_cc}</div>
+            </div>
+        </div>
+        
+        <div class="card-section">
+            <div class="card-label">Discapacidad</div>
+            <input type="text" class="card-input" name="discapacidad" value="${item.discapacidad || ''}" placeholder="Ninguna">
+        </div>
+        
+        <div class="card-section">
+            <div class="card-label">Invitado 1</div>
+            <input type="text" class="card-input" name="invitado1_nombre" value="${item.invitado1_nombre || ''}" placeholder="Nombre">
+            <input type="text" class="card-input mt-2" name="invitado1_cc" value="${item.invitado1_cc || ''}" placeholder="Cédula">
+        </div>
+        
+        <div class="card-section">
+            <div class="card-label">Invitado 2</div>
+            <input type="text" class="card-input" name="invitado2_nombre" value="${item.invitado2_nombre || ''}" placeholder="Nombre">
+            <input type="text" class="card-input mt-2" name="invitado2_cc" value="${item.invitado2_cc || ''}" placeholder="Cédula">
+        </div>
+        
+        <div class="card-section">
+            <div class="card-label">Invitado 3</div>
+            <input type="text" class="card-input" name="invitado3_nombre" value="${item.invitado3_nombre || ''}" placeholder="Nombre">
+            <input type="text" class="card-input mt-2" name="invitado3_cc" value="${item.invitado3_cc || ''}" placeholder="Cédula">
+        </div>
+        
+        <div class="card-label">Control de Llegada</div>
+        <div class="semaforo-controls">
+            <button class="semaforo-btn ${item.arrived_count == 0 ? 'active-0' : ''}" data-value="0">0</button>
+            <button class="semaforo-btn ${item.arrived_count == 1 ? 'active-1' : ''}" data-value="1">1</button>
+            <button class="semaforo-btn ${item.arrived_count == 2 ? 'active-2' : ''}" data-value="2">2</button>
+            <button class="semaforo-btn ${item.arrived_count == 3 ? 'active-3' : ''}" data-value="3">3</button>
+        </div>
+        
+        <div class="card-actions">
+            <button class="card-btn card-btn-save">💾 Guardar</button>
+            <button class="card-btn card-btn-delete">🗑️ Eliminar</button>
+        </div>
+    `;
+    
+    // Event listeners para semáforo
+    card.querySelectorAll('.semaforo-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const value = parseInt(btn.dataset.value);
+            setArrived(item.id, value);
+        });
+    });
+    
+    // Event listener para guardar
+    card.querySelector('.card-btn-save').addEventListener('click', () => {
+        saveRecordFromCard(item.id, card);
+    });
+    
+    // Event listener para eliminar
+    card.querySelector('.card-btn-delete').addEventListener('click', () => {
+        deleteRecord(item.id);
+    });
+    
+    return card;
+}
+
 async function setArrived(id, n){
     const data = new URLSearchParams({action:'update', id, arrived_count:n});
     const r = await fetch(api, {method:'POST', body:data});
@@ -238,6 +447,16 @@ async function saveRecord(id, btn){
     if(j.success) showAlert('Actualizado correctamente');
 }
 
+async function saveRecordFromCard(id, card){
+    const inputs = card.querySelectorAll('input');
+    const data = new URLSearchParams({action:'update', id});
+    inputs.forEach(i => data.append(i.name, i.value));
+    
+    const r = await fetch(api, {method:'POST', body:data});
+    const j = await r.json();
+    if(j.success) showAlert('✅ Actualizado correctamente');
+}
+
 async function deleteRecord(id){
     if(!confirm('¿Eliminar este registro permanentemente?')) return;
     const r = await fetch(api + '?action=delete&id=' + id);
@@ -247,11 +466,17 @@ async function deleteRecord(id){
 
 async function load(){
     const tbody = document.querySelector('#recordsTable tbody');
+    const cardView = document.getElementById('cardView');
+    
     tbody.innerHTML = '<tr><td colspan="11" class="text-center">Cargando...</td></tr>';
+    cardView.innerHTML = '<div class="text-center p-4">Cargando...</div>';
+    
     const records = await fetchRecords();
     tbody.innerHTML = '';
+    cardView.innerHTML = '';
 
     records.forEach(item => {
+        // Crear fila de tabla (desktop)
         const tr = document.createElement('tr');
         tr.className = `semaforo-${item.arrived_count ?? 0}`;
         
@@ -293,6 +518,9 @@ async function load(){
         tr.appendChild(createActionsCell(item.id, item.arrived_count));
 
         tbody.appendChild(tr);
+        
+        // Crear tarjeta (móvil)
+        cardView.appendChild(createMobileCard(item));
     });
 }
 
@@ -311,9 +539,17 @@ function normalize(str) {
 
 document.getElementById('searchCedula').addEventListener('input', e => {
     const q = normalize(e.target.value);
+    
+    // Filtrar tabla
     document.querySelectorAll('#recordsTable tbody tr').forEach(tr => {
         const text = normalize(tr.innerText) + Array.from(tr.querySelectorAll('input')).map(i => normalize(i.value)).join('');
         tr.style.display = text.includes(q) ? '' : 'none';
+    });
+    
+    // Filtrar tarjetas
+    document.querySelectorAll('.record-card').forEach(card => {
+        const text = normalize(card.innerText) + Array.from(card.querySelectorAll('input')).map(i => normalize(i.value)).join('');
+        card.style.display = text.includes(q) ? '' : 'none';
     });
 });
 
