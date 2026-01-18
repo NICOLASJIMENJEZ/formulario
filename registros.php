@@ -16,7 +16,7 @@
     body { 
         font-family: 'Segoe UI', Roboto, sans-serif; 
         background-color: #f4f7f6;
-        font-size: 14px; 
+        font-size: 16px; 
     }
     
     /* Contenedor de tabla con scroll suave */
@@ -32,19 +32,19 @@
     table { margin-bottom: 0 !important; }
     thead th { 
         background-color: var(--primary-dark) !important; 
-        color: white; 
+        color: white !important; 
         position: sticky; 
         top: 0; 
         z-index: 10;
         font-weight: 500;
         text-transform: uppercase;
-        font-size: 12px;
+        font-size: 14px;
         padding: 12px 8px !important;
     }
 
     /* Inputs compactos y elegantes */
     .form-control-sm {
-        font-size: 13px;
+        font-size: 15px;
         border: 1px solid transparent;
         background: rgba(0,0,0,0.03);
         transition: all 0.2s;
@@ -326,4 +326,3 @@ load();
 </script>
 </body>
 </html>
-
