@@ -189,4 +189,4 @@ try {
 } catch (Throwable $e) {
     out(false, "Error del servidor: " . $e->getMessage());
 }
-?>
+?> 
