@@ -27,15 +27,6 @@ require_once __DIR__ . '/db.php';
     th:nth-child(2), td:nth-child(2),
     th:nth-child(5), td:nth-child(5) { display: none; }
 
-    .semaforo-gray { background:#6c757d; }
-    .semaforo-green { background:#198754; }
-
-    .bolita {
-        width: 18px; height: 18px; border-radius: 50%;
-        display: inline-block;
-        cursor: pointer;
-    }
-
     .contador-box{
         margin-top:20px; padding:12px; background:#fff;
         border-radius:10px; text-align:center; font-weight:bold;
@@ -156,7 +147,7 @@ require_once __DIR__ . '/db.php';
 
         <input id="q" class="form-control form-control-sm" placeholder="Buscar por nombre o cédula...">
 
-        <button id="reload" class="btn btn-sm btn-outline-secondary">Recargar</button>
+        <button id="reload" class="btn btn-sm btn-outline-secondary">🔄 Recargar</button>
     </div>
 
     <div id="alert"></div>
@@ -195,7 +186,7 @@ require_once __DIR__ . '/db.php';
 
 <script>
 const api = 'api1.php';
-let arrivalState = {}; // ESTADO VISUAL LOCAL (no afecta al otro sistema)
+let arrivalState = {}; // ESTADO VISUAL LOCAL
 
 async function fetchPrograms(){
     const res = await fetch(api + '?action=programs');
@@ -212,30 +203,27 @@ async function fetchRecords(params = {}){
 
 /* ==========================
    TOGGLE VISUAL + API
-   NOTA: Este sistema usa 'program_arrival' para no interferir 
-   con 'arrived_count' que usa el otro sistema de invitados
+   USA: toggle_program_arrival (independiente de arrived_count)
 ========================== */
 async function toggleArrivalVisual(id){
     try {
         const form = new FormData();
         form.append('id', id);
 
-        const res = await fetch(api + '?action=toggle_arrival', {
+        const res = await fetch(api + '?action=toggle_program_arrival', {
             method: 'POST',
             body: form
         });
 
         const j = await res.json();
         if(j.success){
-            // Actualizar estado local
             arrivalState[id] = j.new_value;
 
-            // Re-renderizar
             renderTable(lastRecords);
             renderCards(lastRecords);
             updateCounter();
         } else {
-            alert("Error al cambiar estado: " + (j.message || 'Error desconocido'));
+            alert("Error: " + (j.message || 'Error desconocido'));
         }
     } catch(e){
         console.error("Error al marcar llegada:", e);
@@ -257,7 +245,6 @@ function renderTable(records){
     tbody.innerHTML = '';
 
     records.forEach(item => {
-        // Usar program_arrival si existe, sino inicializar en 0
         if(arrivalState[item.id] === undefined){
             arrivalState[item.id] = item.program_arrival || 0;
         }
@@ -290,7 +277,6 @@ function renderCards(records){
     c.innerHTML = '';
 
     records.forEach(item => {
-        // Usar program_arrival si existe, sino inicializar en 0
         if(arrivalState[item.id] === undefined){
             arrivalState[item.id] = item.program_arrival || 0;
         }
