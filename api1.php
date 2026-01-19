@@ -18,8 +18,16 @@ try {
        1. LISTAR REGISTROS
     ============================== */
     if ($action === 'list') {
+        // Primero verificar si la columna program_arrival existe
+        try {
+            $pdo->exec("ALTER TABLE registros ADD COLUMN IF NOT EXISTS program_arrival SMALLINT DEFAULT 0");
+        } catch (Exception $e) {
+            // Columna ya existe, continuar
+        }
+
         $sql = "SELECT id, titular_nombre, titular_apellidos, titular_cc, titular_celular, titular_correo,
-                       hora, programa, discapacidad, arrived_count,
+                       hora, programa, discapacidad, 
+                       COALESCE(arrived_count, 0) as arrived_count,
                        COALESCE(program_arrival, 0) as program_arrival
                 FROM registros
                 WHERE 1=1";
@@ -32,14 +40,14 @@ try {
         }
 
         // Filtro programa
-        if (isset($_GET['programa']) && $_GET['programa'] !== "") {
-            $sql .= " AND (programa = :programa OR programa IS NULL)";
+        if (isset($_GET['programa']) && $_GET['programa'] !== "" && $_GET['programa'] !== '__VACIO__') {
+            $sql .= " AND programa = :programa";
             $params[':programa'] = $_GET['programa'];
         }
 
         // Filtro hora
         if (isset($_GET['hora']) && $_GET['hora'] !== "") {
-            $sql .= " AND (hora = :hora OR hora IS NULL)";
+            $sql .= " AND hora = :hora";
             $params[':hora'] = $_GET['hora'];
         }
 
@@ -70,7 +78,7 @@ try {
         if (!$id) out(false, "ID faltante");
 
         // Obtener titular_cc del registro
-        $stmt = $pdo->prepare("SELECT titular_cc, arrived_count FROM registros WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT titular_cc, COALESCE(arrived_count, 0) as arrived_count FROM registros WHERE id = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -100,30 +108,21 @@ try {
         $id = $_POST['id'] ?? null;
         if (!$id) out(false, "ID faltante");
 
-        // Verificar si la columna program_arrival existe, si no crearla
+        // Verificar/crear columna program_arrival
         try {
-            // Intentar crear la columna si no existe
             $pdo->exec("ALTER TABLE registros ADD COLUMN IF NOT EXISTS program_arrival SMALLINT DEFAULT 0");
         } catch (Exception $e) {
-            // Si falla (sintaxis no soportada), verificar si existe
-            try {
-                $pdo->query("SELECT program_arrival FROM registros LIMIT 1");
-            } catch (Exception $e2) {
-                // No existe, intentar crear sin IF NOT EXISTS
-                try {
-                    $pdo->exec("ALTER TABLE registros ADD COLUMN program_arrival SMALLINT DEFAULT 0");
-                } catch (Exception $e3) {
-                    // Si aún falla, continuar (puede que ya exista)
-                }
-            }
+            // Ya existe, continuar
         }
 
         // Obtener valor actual de program_arrival
-        $stmt = $pdo->prepare("SELECT COALESCE(program_arrival, 0) as program_arrival FROM registros WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, COALESCE(program_arrival, 0) as program_arrival FROM registros WHERE id = ?");
         $stmt->execute([$id]);
-        $current = $stmt->fetchColumn();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($current === false) out(false, "Registro no encontrado");
+        if (!$row) out(false, "Registro no encontrado");
+
+        $current = $row['program_arrival'];
 
         // Alternar: 0 -> 1, 1 -> 0
         $new_value = ($current == 1) ? 0 : 1;
