@@ -42,10 +42,94 @@ require_once __DIR__ . '/db.php';
         box-shadow:0 1px 4px rgba(0,0,0,0.1);
     }
 
+    /* Estilos para tarjetas móviles mejoradas */
+    .mobile-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border-left: 5px solid #6c757d;
+    }
+    
+    .mobile-card.arrived {
+        border-left-color: #198754;
+        background-color: #f4fff9;
+    }
+    
+    .mobile-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .mobile-card-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    
+    .mobile-card-cedula {
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    .mobile-card-info {
+        margin-bottom: 12px;
+    }
+    
+    .mobile-card-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+    
+    .mobile-card-value {
+        font-size: 15px;
+        color: #2c3e50;
+    }
+    
+    .mobile-card-button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+    
+    .mobile-card-button.arrived {
+        background: #198754;
+        color: white;
+    }
+    
+    .mobile-card-button.not-arrived {
+        background: #6c757d;
+        color: white;
+    }
+
     #cardsContainer { display:none; }
+    
     @media (max-width: 768px) {
         #tableContainer { display:none; }
         #cardsContainer { display:block; }
+        
+        .controls {
+            flex-direction: column;
+        }
+        
+        .controls select, .controls input, .controls button {
+            width: 100%;
+        }
     }
 </style>
 </head>
@@ -91,7 +175,7 @@ require_once __DIR__ . '/db.php';
                         <th>Celular</th>
                         <th>Hora</th>
                         <th>Programa</th>
-                        <th>Semáforo</th> <!-- NUEVA COLUMNA PARA EL BOTÓN -->
+                        <th>Llegada</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -111,7 +195,7 @@ require_once __DIR__ . '/db.php';
 
 <script>
 const api = 'api1.php';
-let arrivalState = {}; // ESTADO VISUAL
+let arrivalState = {}; // ESTADO VISUAL LOCAL (no afecta al otro sistema)
 
 async function fetchPrograms(){
     const res = await fetch(api + '?action=programs');
@@ -128,6 +212,8 @@ async function fetchRecords(params = {}){
 
 /* ==========================
    TOGGLE VISUAL + API
+   NOTA: Este sistema usa 'program_arrival' para no interferir 
+   con 'arrived_count' que usa el otro sistema de invitados
 ========================== */
 async function toggleArrivalVisual(id){
     try {
@@ -141,16 +227,19 @@ async function toggleArrivalVisual(id){
 
         const j = await res.json();
         if(j.success){
+            // Actualizar estado local
             arrivalState[id] = j.new_value;
 
+            // Re-renderizar
             renderTable(lastRecords);
             renderCards(lastRecords);
             updateCounter();
         } else {
-            alert("Error al cambiar semáforo: " + j.message);
+            alert("Error al cambiar estado: " + (j.message || 'Error desconocido'));
         }
     } catch(e){
-        console.error("Error semáforo:", e);
+        console.error("Error al marcar llegada:", e);
+        alert("Error de conexión. Intente nuevamente.");
     }
 }
 
@@ -168,11 +257,13 @@ function renderTable(records){
     tbody.innerHTML = '';
 
     records.forEach(item => {
+        // Usar program_arrival si existe, sino inicializar en 0
         if(arrivalState[item.id] === undefined){
-            arrivalState[item.id] = item.arrived_count || 0;
+            arrivalState[item.id] = item.program_arrival || 0;
         }
 
         const tr = document.createElement('tr');
+        const arrived = arrivalState[item.id] === 1;
 
         tr.innerHTML = `
             <td>${item.id}</td>
@@ -183,9 +274,9 @@ function renderTable(records){
             <td>${item.hora || ''}</td>
             <td>${item.programa || ''}</td>
             <td>
-                <button class="btn btn-sm ${arrivalState[item.id]==1?'btn-success':'btn-secondary'}"
+                <button class="btn btn-sm ${arrived ? 'btn-success' : 'btn-secondary'}"
                         onclick="toggleArrivalVisual(${item.id})">
-                    ${arrivalState[item.id]==1?'Llegó':'Marcar llegada'}
+                    ${arrived ? '✓ Llegó' : 'Marcar llegada'}
                 </button>
             </td>
         `;
@@ -199,23 +290,46 @@ function renderCards(records){
     c.innerHTML = '';
 
     records.forEach(item => {
+        // Usar program_arrival si existe, sino inicializar en 0
         if(arrivalState[item.id] === undefined){
-            arrivalState[item.id] = item.arrived_count || 0;
+            arrivalState[item.id] = item.program_arrival || 0;
         }
 
-        c.innerHTML += `
-            <div class="card p-2 mb-2">
-                <h5>${item.titular_nombre||''} ${item.titular_apellidos||''}</h5>
-                <p><strong>Cédula:</strong> ${item.titular_cc}</p>
-                <p><strong>Programa:</strong> ${item.programa}</p>
-                <p><strong>Hora:</strong> ${item.hora}</p>
-
-                <button class="btn btn-sm ${arrivalState[item.id]==1?'btn-success':'btn-secondary'}"
-                        onclick="toggleArrivalVisual(${item.id})">
-                    ${arrivalState[item.id]==1?'Llegó':'Marcar llegada'}
-                </button>
+        const arrived = arrivalState[item.id] === 1;
+        
+        const card = document.createElement('div');
+        card.className = `mobile-card ${arrived ? 'arrived' : ''}`;
+        
+        card.innerHTML = `
+            <div class="mobile-card-header">
+                <div>
+                    <div class="mobile-card-name">${item.titular_nombre || ''} ${item.titular_apellidos || ''}</div>
+                    <div class="mobile-card-cedula">CC: ${item.titular_cc || ''}</div>
+                </div>
             </div>
+            
+            <div class="mobile-card-info">
+                <div class="mobile-card-label">Programa</div>
+                <div class="mobile-card-value">${item.programa || 'No especificado'}</div>
+            </div>
+            
+            <div class="mobile-card-info">
+                <div class="mobile-card-label">Hora</div>
+                <div class="mobile-card-value">${item.hora || 'No especificada'}</div>
+            </div>
+            
+            <div class="mobile-card-info">
+                <div class="mobile-card-label">Celular</div>
+                <div class="mobile-card-value">${item.titular_celular || 'No registrado'}</div>
+            </div>
+            
+            <button class="mobile-card-button ${arrived ? 'arrived' : 'not-arrived'}"
+                    onclick="toggleArrivalVisual(${item.id})">
+                ${arrived ? '✓ Llegó al Evento' : 'Marcar Llegada'}
+            </button>
         `;
+        
+        c.appendChild(card);
     });
 }
 
@@ -258,8 +372,11 @@ document.getElementById('q').addEventListener('input', () => {
     window.__debounce = setTimeout(applyFiltersServer, 300);
 });
 
+// Cargar datos iniciales
 load();
+
+// Auto-refrescar cada 30 segundos
+setInterval(load, 30000);
 </script>
 </body>
 </html>
-
