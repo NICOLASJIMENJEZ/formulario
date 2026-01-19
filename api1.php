@@ -19,7 +19,7 @@ try {
     ============================== */
     if ($action === 'list') {
         $sql = "SELECT id, titular_nombre, titular_apellidos, titular_cc, titular_celular, titular_correo,
-                       hora, programa, discapacidad, arrived_count, 
+                       hora, programa, discapacidad, arrived_count,
                        COALESCE(program_arrival, 0) as program_arrival
                 FROM registros
                 WHERE 1=1";
@@ -100,19 +100,20 @@ try {
         $id = $_POST['id'] ?? null;
         if (!$id) out(false, "ID faltante");
 
-        // Verificar si la columna program_arrival existe
+        // Verificar si la columna program_arrival existe, si no crearla
         try {
+            // Intentar crear la columna si no existe
             $pdo->exec("ALTER TABLE registros ADD COLUMN IF NOT EXISTS program_arrival SMALLINT DEFAULT 0");
         } catch (Exception $e) {
-            // Columna ya existe o sintaxis no soportada, intentar verificar
+            // Si falla (sintaxis no soportada), verificar si existe
             try {
                 $pdo->query("SELECT program_arrival FROM registros LIMIT 1");
             } catch (Exception $e2) {
-                // Intentar crear sin IF NOT EXISTS
+                // No existe, intentar crear sin IF NOT EXISTS
                 try {
                     $pdo->exec("ALTER TABLE registros ADD COLUMN program_arrival SMALLINT DEFAULT 0");
                 } catch (Exception $e3) {
-                    // Ya existe, continuar
+                    // Si aún falla, continuar (puede que ya exista)
                 }
             }
         }
@@ -129,9 +130,13 @@ try {
 
         // Actualizar SOLO este registro individual (NO por titular_cc)
         $upd = $pdo->prepare("UPDATE registros SET program_arrival = ? WHERE id = ?");
-        $upd->execute([$new_value, $id]);
+        $success = $upd->execute([$new_value, $id]);
 
-        out(true, $new_value == 1 ? "Marcado como llegado" : "Desmarcado", ["new_value" => $new_value]);
+        if ($success) {
+            out(true, $new_value == 1 ? "Marcado como llegado" : "Desmarcado", ["new_value" => $new_value]);
+        } else {
+            out(false, "Error al actualizar");
+        }
     }
 
     /* ==============================
