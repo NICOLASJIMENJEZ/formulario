@@ -19,7 +19,8 @@ try {
     ============================== */
     if ($action === 'list') {
         $sql = "SELECT id, titular_nombre, titular_apellidos, titular_cc, titular_celular, titular_correo,
-                       hora, programa, discapacidad, arrived_count
+                       hora, programa, discapacidad, arrived_count, 
+                       COALESCE(program_arrival, 0) as program_arrival
                 FROM registros
                 WHERE 1=1";
         $params = [];
@@ -59,34 +60,79 @@ try {
         out(true, "", ['programs' => $programs]);
     }
 
-   /* ============================================
-   3. TOGGLE LLEGADA (TITULAR + GRADUADOS)
-============================================ */
-if ($action === 'toggle_arrival') {
+    /* ============================================
+       3. TOGGLE LLEGADA (TITULAR + GRADUADOS)
+       Sistema original - actualiza por titular_cc
+    ============================================ */
+    if ($action === 'toggle_arrival') {
 
-    $id = $_POST['id'] ?? null;
-    if (!$id) out(false, "ID faltante");
+        $id = $_POST['id'] ?? null;
+        if (!$id) out(false, "ID faltante");
 
-    // Obtener titular_cc del registro
-    $stmt = $pdo->prepare("SELECT titular_cc, arrived_count FROM registros WHERE id = ?");
-    $stmt->execute([$id]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Obtener titular_cc del registro
+        $stmt = $pdo->prepare("SELECT titular_cc, arrived_count FROM registros WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$row) out(false, "Registro no encontrado");
+        if (!$row) out(false, "Registro no encontrado");
 
-    $cc = $row["titular_cc"];
-    $new_value = $row['arrived_count'] == 1 ? 0 : 1;
+        $cc = $row["titular_cc"];
+        $new_value = $row['arrived_count'] == 1 ? 0 : 1;
 
-    // Actualizar TODOS los que tengan el mismo titular_cc
-    $upd = $pdo->prepare("
-        UPDATE registros
-        SET arrived_count = ?
-        WHERE titular_cc = ?
-    ");
-    $upd->execute([$new_value, $cc]);
+        // Actualizar TODOS los que tengan el mismo titular_cc
+        $upd = $pdo->prepare("
+            UPDATE registros
+            SET arrived_count = ?
+            WHERE titular_cc = ?
+        ");
+        $upd->execute([$new_value, $cc]);
 
-    out(true, "Llegadas actualizadas", ["new_value" => $new_value]);
-}
+        out(true, "Llegadas actualizadas", ["new_value" => $new_value]);
+    }
+
+    /* ============================================
+       3B. TOGGLE PROGRAM ARRIVAL (NUEVO)
+       Sistema independiente para control de programas
+       Solo actualiza el registro individual
+    ============================================ */
+    if ($action === 'toggle_program_arrival') {
+
+        $id = $_POST['id'] ?? null;
+        if (!$id) out(false, "ID faltante");
+
+        // Verificar si la columna program_arrival existe
+        try {
+            $pdo->exec("ALTER TABLE registros ADD COLUMN IF NOT EXISTS program_arrival SMALLINT DEFAULT 0");
+        } catch (Exception $e) {
+            // Columna ya existe o sintaxis no soportada, intentar verificar
+            try {
+                $pdo->query("SELECT program_arrival FROM registros LIMIT 1");
+            } catch (Exception $e2) {
+                // Intentar crear sin IF NOT EXISTS
+                try {
+                    $pdo->exec("ALTER TABLE registros ADD COLUMN program_arrival SMALLINT DEFAULT 0");
+                } catch (Exception $e3) {
+                    // Ya existe, continuar
+                }
+            }
+        }
+
+        // Obtener valor actual de program_arrival
+        $stmt = $pdo->prepare("SELECT COALESCE(program_arrival, 0) as program_arrival FROM registros WHERE id = ?");
+        $stmt->execute([$id]);
+        $current = $stmt->fetchColumn();
+
+        if ($current === false) out(false, "Registro no encontrado");
+
+        // Alternar: 0 -> 1, 1 -> 0
+        $new_value = ($current == 1) ? 0 : 1;
+
+        // Actualizar SOLO este registro individual (NO por titular_cc)
+        $upd = $pdo->prepare("UPDATE registros SET program_arrival = ? WHERE id = ?");
+        $upd->execute([$new_value, $id]);
+
+        out(true, $new_value == 1 ? "Marcado como llegado" : "Desmarcado", ["new_value" => $new_value]);
+    }
 
     /* ==============================
        4. ELIMINAR REGISTRO
@@ -139,4 +185,4 @@ if ($action === 'toggle_arrival') {
 } catch (Throwable $e) {
     out(false, "Error del servidor: " . $e->getMessage());
 }
-
+?>
