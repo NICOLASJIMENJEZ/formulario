@@ -240,7 +240,7 @@
         <div class="d-flex gap-3 align-items-center">
             <input id="searchCedula" class="form-control" placeholder="🔍 Buscar nombre o CC..." style="width:280px; border-radius: 20px;">
             <button id="reload" class="btn btn-outline-primary btn-sm rounded-pill">🔄 Actualizar</button>
-            <a href="index.php" class="boton-salida">Salir</a>
+            <a href="formulario.php" class="boton-salida">Salir</a>
         </div>
     </div>
 
