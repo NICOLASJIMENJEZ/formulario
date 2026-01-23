@@ -5,6 +5,10 @@ require_once __DIR__ . '/db.php';
 $query = $pdo->query("SELECT COUNT(*) AS total FROM registros WHERE es_especial = TRUE");
 $count = $query->fetch(PDO::FETCH_ASSOC)['total'] + 1;
 $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
+
+// Verificar si hay mensaje de éxito o error
+$success = isset($_GET['success']) ? true : false;
+$error = isset($_GET['error']) ? $_GET['error'] : null;
 ?>
 <!doctype html>
 <html lang="es">
@@ -63,6 +67,20 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
 
           <h3 class="mb-3">Registro Invitado Especial</h3>
 
+          <?php if ($success): ?>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>¡Éxito!</strong> El invitado especial ha sido registrado correctamente.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <?php endif; ?>
+
+          <?php if ($error): ?>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error:</strong> <?= htmlspecialchars($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <?php endif; ?>
+
           <div class="alert alert-info">
             <b>ID Especial asignado:</b>
             <span class="badge-especial"><?= $id_especial ?></span>
@@ -85,8 +103,8 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Cédula</label>
-              <input type="text" name="cc" class="form-control">
+              <label class="form-label">Cédula (Opcional - se usará ID especial si no se ingresa)</label>
+              <input type="text" name="cc" class="form-control" placeholder="Dejar vacío para usar ID especial">
             </div>
 
             <!-- DISCAPACIDAD TITULAR -->
@@ -120,14 +138,14 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
 
               <div class="col-md-6">
                 <label class="form-label">Programa / Evento *</label>
-                <input type="text" name="programa" class="form-control" required>
+                <input type="text" name="programa" class="form-control" required placeholder="Ej: Ceremonia Especial">
               </div>
             </div>
 
             <hr>
 
             <!-- INVITADOS -->
-            <h5 class="mb-3">Invitados del Especial</h5>
+            <h5 class="mb-3">Invitados del Especial (Opcional)</h5>
 
             <!-- INVITADO 1 -->
             <div class="row mb-3">
@@ -146,8 +164,8 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
               <div class="col-md-6">
                 <select class="form-select" name="invitado1_discapacidad">
                   <option value="">¿Discapacidad?</option>
-                  <option value="si">Sí</option>
                   <option value="no">No</option>
+                  <option value="si">Sí</option>
                 </select>
               </div>
             </div>
@@ -169,8 +187,8 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
               <div class="col-md-6">
                 <select class="form-select" name="invitado2_discapacidad">
                   <option value="">¿Discapacidad?</option>
-                  <option value="si">Sí</option>
                   <option value="no">No</option>
+                  <option value="si">Sí</option>
                 </select>
               </div>
             </div>
@@ -192,8 +210,8 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
               <div class="col-md-6">
                 <select class="form-select" name="invitado3_discapacidad">
                   <option value="">¿Discapacidad?</option>
-                  <option value="si">Sí</option>
                   <option value="no">No</option>
+                  <option value="si">Sí</option>
                 </select>
               </div>
             </div>
@@ -201,13 +219,15 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
             <hr>
 
             <div class="d-grid">
-              <button class="btn btn-dark">Guardar Invitado Especial</button>
+              <button type="submit" class="btn btn-dark btn-lg">
+                <i class="bi bi-save"></i> Guardar Invitado Especial
+              </button>
             </div>
 
           </form>
 
-          <a href="index.php" class="btn btn-outline-secondary w-100 mt-3">
-            Volver al Inicio
+          <a href="formulario.php" class="btn btn-outline-secondary w-100 mt-3">
+            <i class="bi bi-arrow-left"></i> Volver al Menú Principal
           </a>
 
         </div>
@@ -218,6 +238,7 @@ $id_especial = "ESP-" . str_pad($count, 4, "0", STR_PAD_LEFT);
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.getElementById("discapacidad_titular").addEventListener("change", function() {
     if (this.value === "si") {
@@ -226,8 +247,15 @@ document.getElementById("discapacidad_titular").addEventListener("change", funct
         document.getElementById("discapacidad_cual_wrap").classList.add("hidden");
     }
 });
+
+// Limpiar URL después de mostrar mensaje
+if (window.location.search.includes('success') || window.location.search.includes('error')) {
+    setTimeout(() => {
+        const url = window.location.href.split('?')[0];
+        window.history.replaceState({}, document.title, url);
+    }, 3000);
+}
 </script>
 
 </body>
 </html>
-
