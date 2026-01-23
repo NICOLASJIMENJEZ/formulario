@@ -16,12 +16,10 @@
 <style>
 :root{
     --blue:#2c5282;
-    --blue-dark:#1a365d;
-    --blue-light:#e6f0ff;
-    --red:#c4161c;
+    --blue-dark:#1e3a5f;
+    --red:#d92027;
     --white:#ffffff;
-    --gray:#6b7280;
-    --gray-light:#f7fafc;
+    --gray:#2d3748;
 }
 
 body{
@@ -39,7 +37,7 @@ body{
     inset:0;
     background:url('/imagenes/logo.png') no-repeat center;
     background-size:420px;
-    opacity:0.05;
+    opacity:0.08;
     pointer-events:none;
     z-index:0;
 }
@@ -48,8 +46,8 @@ body{
 .wrap{
     position:relative;
     z-index:1;
-    padding-top: 60px;
-    padding-bottom: 60px;
+    padding-top: 80px;
+    padding-bottom: 80px;
 }
 
 h3{
@@ -57,57 +55,67 @@ h3{
     color:var(--white);
     font-weight:300;
     letter-spacing:0.5px;
-    margin-bottom:50px;
+    margin-bottom:0;
     font-size: 1.8rem;
-    text-transform: uppercase;
+    opacity: 0;
 }
 
 /* GRID */
 .cards-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:24px;
-    max-width: 1200px;
+    grid-template-columns:repeat(5, 1fr);
+    gap:20px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
 /* TARJETAS */
 .card-choice{
     background:var(--white);
-    border-radius:16px;
+    border-radius:20px;
     padding:0;
     text-align:center;
     cursor:pointer;
     border:none;
-    box-shadow:0 8px 24px rgba(0,0,0,.15);
+    box-shadow:0 8px 24px rgba(0,0,0,.2);
     transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
     opacity:0;
-    transform:translateY(30px) scale(0.95);
+    transform:translateY(40px) scale(0.9);
     overflow:hidden;
     position:relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-choice:hover{
-    transform:translateY(-8px) scale(1.02);
-    box-shadow:0 16px 40px rgba(0,0,0,.25);
-}
-
-.card-choice.red-card:hover{
+    transform:translateY(-8px) scale(1.03);
+    box-shadow:0 16px 40px rgba(0,0,0,.3);
     background: var(--red);
 }
 
-.card-choice.red-card:hover .card-ico,
-.card-choice.red-card:hover h5,
-.card-choice.red-card:hover p{
+.card-choice:hover .card-ico-wrapper{
+    background: rgba(255,255,255,.2);
+}
+
+.card-choice:hover .card-ico{
+    color: var(--white);
+}
+
+.card-choice:hover h5,
+.card-choice:hover p{
+    color: var(--white);
+}
+
+.card-choice:hover .card-arrow{
     color: var(--white);
 }
 
 /* ICONOS CIRCULARES */
 .card-ico-wrapper{
-    width: 80px;
-    height: 80px;
-    margin: 30px auto 20px;
-    background: var(--gray-light);
+    width: 90px;
+    height: 90px;
+    margin: 35px auto 20px;
+    background: #e8edf3;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -115,84 +123,48 @@ h3{
     transition: all .3s ease;
 }
 
-.card-choice:hover .card-ico-wrapper{
-    transform: scale(1.1);
-}
-
-.red-card .card-ico-wrapper{
-    background: rgba(196,22,28,.1);
-}
-
 .card-ico{
-    font-size:32px;
+    font-size:38px;
     color:var(--blue-dark);
     transition: all .3s ease;
-}
-
-.red-card .card-ico{
-    color: var(--red);
 }
 
 /* CONTENIDO DE TARJETA */
 .card-content{
-    padding: 0 24px 30px;
+    padding: 0 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-choice h5{
     font-weight:600;
-    color:var(--blue-dark);
+    color:var(--red);
     margin-bottom:12px;
     font-size: 1rem;
     line-height: 1.3;
+    transition: all .3s ease;
 }
 
 .card-choice p{
-    font-size:13px;
+    font-size:12px;
     color:var(--gray);
     margin:0;
     line-height: 1.5;
+    flex: 1;
+    transition: all .3s ease;
 }
 
 /* FLECHA INFERIOR */
 .card-arrow{
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 18px;
-    color: var(--blue);
-    opacity: 0.4;
+    margin: 20px 0;
+    font-size: 20px;
+    color: var(--blue-dark);
     transition: all .3s ease;
 }
 
 .card-choice:hover .card-arrow{
-    opacity: 1;
-    transform: translateX(-50%) translateY(3px);
-}
-
-.red-card .card-arrow{
-    color: var(--red);
-}
-
-/* EFECTO ESPECIAL TARJETA ROJA */
-.red-card{
-    background: var(--white);
-}
-
-.red-card::before{
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--red);
-    opacity: 0;
-    transition: opacity .3s ease;
-}
-
-.red-card:hover::before{
-    opacity: 1;
+    transform: translateY(3px);
 }
 
 /* ANIMACIÓN */
@@ -205,25 +177,36 @@ h3{
 .nav-dots{
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin-top: 40px;
+    gap: 6px;
+    margin-top: 50px;
 }
 
 .dot{
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: rgba(255,255,255,.3);
+    background: rgba(255,255,255,.4);
     transition: all .3s ease;
+    cursor: pointer;
+}
+
+.dot:hover{
+    background: rgba(255,255,255,.7);
 }
 
 .dot.active{
-    background: var(--white);
-    width: 24px;
-    border-radius: 4px;
+    background: var(--red);
+    width: 30px;
+    border-radius: 5px;
 }
 
 /* RESPONSIVE */
+@media(max-width:1200px){
+    .cards-grid{
+        grid-template-columns:repeat(3, 1fr);
+    }
+}
+
 @media(max-width:768px){
     .logo-bg{ background-size:260px; }
     .cards-grid{
@@ -239,6 +222,14 @@ h3{
         padding-top: 40px;
         padding-bottom: 40px;
     }
+    .card-ico-wrapper{
+        width: 70px;
+        height: 70px;
+        margin: 25px auto 15px;
+    }
+    .card-ico{
+        font-size: 28px;
+    }
 }
 
 @media(min-width:769px) and (max-width:1024px){
@@ -253,7 +244,7 @@ h3{
 
 <div class="logo-bg"></div>
 
-<div class="container py-5 wrap">
+<div class="container-fluid py-5 wrap">
 
 <h3>SELECCIONA UNA OPCIÓN</h3>
 
@@ -262,11 +253,11 @@ h3{
     <!-- Formulario graduados -->
     <div class="card-choice" onclick="location.href='index.php'">
         <div class="card-ico-wrapper">
-            <div class="card-ico"><i class="fa-solid fa-house"></i></div>
+            <div class="card-ico"><i class="fa-solid fa-pen-nib"></i></div>
         </div>
         <div class="card-content">
             <h5>Formulario graduados</h5>
-            <p>Explora los espacios experimentales y recursos académicos disponibles</p>
+            <p>Inscripción oficial de graduados<br>11 de diciembre 2026</p>
         </div>
         <div class="card-arrow"><i class="fa-solid fa-chevron-down"></i></div>
     </div>
@@ -274,11 +265,11 @@ h3{
     <!-- Invitados -->
     <div class="card-choice" onclick="location.href='invitados_especiales.php'">
         <div class="card-ico-wrapper">
-            <div class="card-ico"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="card-ico"><i class="fa-solid fa-user-star"></i></div>
         </div>
         <div class="card-content">
-            <h5>Consultas y Solicitudes</h5>
-            <p>Consulta y conoce cómo comunicarte con cada área</p>
+            <h5>Invitados especiales</h5>
+            <p>Registro exclusivo para invitados especiales</p>
         </div>
         <div class="card-arrow"><i class="fa-solid fa-chevron-down"></i></div>
     </div>
@@ -286,23 +277,23 @@ h3{
     <!-- Registros -->
     <div class="card-choice" onclick="location.href='registros.php'">
         <div class="card-ico-wrapper">
-            <div class="card-ico"><i class="fa-solid fa-handshake"></i></div>
+            <div class="card-ico"><i class="fa-solid fa-list-check"></i></div>
         </div>
         <div class="card-content">
-            <h5>Coordinación de eventos y logística</h5>
-            <p>Consulta las guías y lineamientos para la organización de eventos</p>
+            <h5>Consulta de inscripciones</h5>
+            <p>Visualiza todos los registros del sistema</p>
         </div>
         <div class="card-arrow"><i class="fa-solid fa-chevron-down"></i></div>
     </div>
 
-    <!-- Dashboard - ROJA -->
-    <div class="card-choice red-card" onclick="location.href='graduados_contador.php'">
+    <!-- Dashboard -->
+    <div class="card-choice" onclick="location.href='graduados_contador.php'">
         <div class="card-ico-wrapper">
-            <div class="card-ico"><i class="fa-solid fa-book-open"></i></div>
+            <div class="card-ico"><i class="fa-solid fa-chart-column"></i></div>
         </div>
         <div class="card-content">
-            <h5>Portafolio de servicios</h5>
-            <p>Accede a requisitos, guías y manuales institucionales especializados</p>
+            <h5>Dashboard general</h5>
+            <p>Conteo total de graduados e invitados</p>
         </div>
         <div class="card-arrow"><i class="fa-solid fa-chevron-down"></i></div>
     </div>
@@ -310,11 +301,11 @@ h3{
     <!-- Por programa -->
     <div class="card-choice" onclick="location.href='por_programa.php'">
         <div class="card-ico-wrapper">
-            <div class="card-ico"><i class="fa-solid fa-clock"></i></div>
+            <div class="card-ico"><i class="fa-solid fa-filter"></i></div>
         </div>
         <div class="card-content">
-            <h5>Horario de atención</h5>
-            <p>Conoce los horarios de atención en cada campus universitario</p>
+            <h5>Registros por programa</h5>
+            <p>Filtrar y consultar por programa académico</p>
         </div>
         <div class="card-arrow"><i class="fa-solid fa-chevron-down"></i></div>
     </div>
@@ -323,8 +314,8 @@ h3{
 
 <!-- Indicadores de navegación -->
 <div class="nav-dots">
-    <div class="dot active"></div>
     <div class="dot"></div>
+    <div class="dot active"></div>
     <div class="dot"></div>
     <div class="dot"></div>
 </div>
