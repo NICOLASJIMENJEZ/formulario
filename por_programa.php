@@ -130,7 +130,7 @@ require_once __DIR__ . '/db.php';
 
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h4 class="m-0">Registros por Programa</h4>
-        <a href="index.php" class="btn btn-danger">Salir</a>
+        <a href="formulario.php" class="btn btn-danger">Salir</a>
     </div>
 
     <div class="controls">
