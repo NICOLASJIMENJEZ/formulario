@@ -1,8 +1,8 @@
 <?php
-$host = "dpg-d54ojin5r7bs73ejo270-a";
-$dbname = "graduados_grf8";
-$user = "graduados_grf8_user";
-$pass = "nlCe8T5g1nGqjgl2iuKSysTesfYKs0wb";
+$host = "dpg-d5pn3o75r7bs73d5if2g-a";
+$dbname = "base_de_datos_graduandos_0852";
+$user = "base_de_datos_graduandos_0852_user";
+$pass = "Dp3mIyZaPKRlOPKbD42enOaGbccgMBt4";
 $port = "5432";
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
