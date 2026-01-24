@@ -343,32 +343,8 @@ if ($dbConnected) {
             <!-- FORMULARIO COMPLETO -->
             <div id="formularioCompleto" style="display:none;" class="animate-in">
 
-              <?php if (isset($_GET['msg']) && isset($_GET['type'])): ?>
-                <div class="alert alert-<?php echo htmlspecialchars($_GET['type']); ?> alert-dismissible fade show" role="alert">
-                  <?php if ($_GET['type'] === 'success'): ?>
-                    <i class="fas fa-check-circle"></i>
-                  <?php elseif ($_GET['type'] === 'warning'): ?>
-                    <i class="fas fa-exclamation-triangle"></i>
-                  <?php else: ?>
-                    <i class="fas fa-times-circle"></i>
-                  <?php endif; ?>
-                  <strong><?php echo htmlspecialchars($_GET['msg']); ?></strong>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <?php if ($_GET['type'] === 'success'): ?>
-                  <script>
-                    // Limpiar formulario después de éxito
-                    setTimeout(() => {
-                      document.getElementById('regForm').reset();
-                      document.getElementById('programa').disabled = true;
-                      document.getElementById('programa').innerHTML = '<option value="">Primero seleccione una hora</option>';
-                      // Limpiar URL
-                      const url = window.location.href.split('?')[0];
-                      window.history.replaceState({}, document.title, url);
-                    }, 5000);
-                  </script>
-                <?php endif; ?>
-              <?php endif; ?>
+              <!-- Mensaje dinámico -->
+              <div id="mensajeDinamico" style="display:none;"></div>
 
               <form id="regForm" action="register.php" method="post">
                 
@@ -493,7 +469,7 @@ if ($dbConnected) {
                 </div>
 
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-dark btn-lg">
+                  <button type="submit" class="btn btn-dark btn-lg" id="btnSubmit">
                     <i class="fas fa-paper-plane"></i> Enviar Registro
                   </button>
                 </div>
@@ -591,17 +567,93 @@ if ($dbConnected) {
       });
     });
 
-    // Validación del formulario antes de enviar
+    // ENVÍO DEL FORMULARIO POR AJAX
     document.getElementById('regForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      
       const hora = document.getElementById('hora').value;
       const programa = document.getElementById('programa').value;
 
       if (!hora || !programa) {
-        e.preventDefault();
-        alert('⚠️ Por favor seleccione la hora y el programa de ceremonia.');
+        mostrarMensaje('⚠️ Por favor seleccione la hora y el programa de ceremonia.', 'warning');
         return false;
       }
+
+      const formData = new FormData(this);
+      const submitBtn = document.getElementById('btnSubmit');
+      const mensajeDiv = document.getElementById('mensajeDinamico');
+      
+      // Deshabilitar botón
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+      fetch('register.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // ✅ ÉXITO - Mostrar mensaje grande
+          mostrarMensaje(
+            '<div class="text-center"><i class="fas fa-check-circle fa-3x mb-3"></i><h4>¡REGISTRO EXITOSO!</h4><p>' + data.message + '</p></div>',
+            'success'
+          );
+          
+          // Limpiar después de 3 segundos
+          setTimeout(() => {
+            this.reset();
+            document.getElementById('programa').disabled = true;
+            document.getElementById('programa').innerHTML = '<option value="">Primero seleccione una hora</option>';
+            mensajeDiv.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Registro';
+            
+            // Resetear estados
+            document.querySelectorAll('.invitado-cc').forEach(input => {
+              input.disabled = false;
+              input.style.backgroundColor = '';
+              input.placeholder = 'Solo si es mayor de 18';
+            });
+            document.querySelectorAll('.invitado-fecha').forEach(input => {
+              input.style.borderColor = '';
+            });
+            document.querySelectorAll('[class*="edad-error-"]').forEach(error => {
+              error.style.display = 'none';
+            });
+          }, 3000);
+          
+        } else {
+          // ❌ ERROR
+          mostrarMensaje(
+            '<i class="fas fa-exclamation-triangle"></i> <strong>' + data.message + '</strong>',
+            data.type || 'danger'
+          );
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Registro';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        mostrarMensaje(
+          '<i class="fas fa-times-circle"></i> <strong>Error de conexión. Por favor, intenta nuevamente.</strong>',
+          'danger'
+        );
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Registro';
+      });
     });
+
+    // Función para mostrar mensajes
+    function mostrarMensaje(mensaje, tipo) {
+      const mensajeDiv = document.getElementById('mensajeDinamico');
+      mensajeDiv.className = 'alert alert-' + tipo + ' alert-dismissible fade show';
+      mensajeDiv.innerHTML = mensaje + '<button type="button" class="btn-close" onclick="this.parentElement.style.display=\'none\'"></button>';
+      mensajeDiv.style.display = 'block';
+      
+      // Scroll suave al mensaje
+      mensajeDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   </script>
 
 </body>
