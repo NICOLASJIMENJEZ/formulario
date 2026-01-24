@@ -538,14 +538,12 @@ if ($dbConnected) {
       document.getElementById('discapacidad_cual_wrap').style.display = this.checked ? 'block' : 'none';
     });
 
-    // Validación de edad - SOLO MAYORES DE 18 AÑOS
+    // Validación de edad - Permite menores pero bloquea cédula si es menor de 18
     document.querySelectorAll('.invitado-fecha').forEach(input => {
       input.addEventListener('change', function () {
         const numeroInvitado = this.dataset.invitado;
         const cedulaInput = document.getElementById(`invitado${numeroInvitado}_cc`);
         const errorMsg = document.querySelector(`.edad-error-${numeroInvitado}`);
-        const nombreInput = document.querySelector(`input[name="invitado${numeroInvitado}_nombre"]`);
-        const apellidoInput = document.querySelector(`input[name="invitado${numeroInvitado}_apellidos"]`);
         
         if (!this.value) return;
         
@@ -561,35 +559,23 @@ if ($dbConnected) {
         }
 
         if (edad < 18) {
-          // MENOR DE 18: RECHAZAR Y MOSTRAR ERROR
+          // MENOR DE 18: Permitir registro pero NO cédula
           errorMsg.style.display = 'block';
-          this.value = '';
-          this.style.borderColor = '#dc3545';
+          this.style.borderColor = '#ffc107';
           
-          // Limpiar y bloquear todos los campos del invitado
-          nombreInput.value = '';
-          apellidoInput.value = '';
+          // Limpiar y bloquear SOLO el campo de cédula
           cedulaInput.value = '';
-          nombreInput.disabled = true;
-          apellidoInput.disabled = true;
           cedulaInput.disabled = true;
-          
-          // Ocultar error después de 4 segundos
-          setTimeout(() => {
-            errorMsg.style.display = 'none';
-            this.style.borderColor = '';
-            nombreInput.disabled = false;
-            apellidoInput.disabled = false;
-          }, 4000);
+          cedulaInput.placeholder = 'No aplica - Menor de 18';
+          cedulaInput.style.backgroundColor = '#f8f9fa';
           
         } else {
-          // MAYOR DE 18: PERMITIR REGISTRO
+          // MAYOR DE 18: Permitir todo incluida la cédula
           errorMsg.style.display = 'none';
           this.style.borderColor = '#198754';
           cedulaInput.disabled = false;
           cedulaInput.placeholder = 'Número de cédula';
-          nombreInput.disabled = false;
-          apellidoInput.disabled = false;
+          cedulaInput.style.backgroundColor = '';
         }
       });
     });
