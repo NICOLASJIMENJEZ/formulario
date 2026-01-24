@@ -447,6 +447,9 @@ if ($dbConnected) {
                           <label class="form-label">Fecha de nacimiento</label>
                           <input type="date" class="form-control invitado-fecha" name="invitado<?php echo $i; ?>_fecha_nacimiento" data-invitado="<?php echo $i; ?>">
                           <small class="text-muted">Debe ser mayor de 18 años</small>
+                          <div class="edad-error-<?php echo $i; ?> text-danger fw-bold mt-1" style="display:none; font-size:0.85rem;">
+                            <i class="fas fa-exclamation-circle"></i> SOLO MAYORES DE 18 AÑOS
+                          </div>
                         </div>
                         <div class="col-md-4">
                           <label class="form-label">Fecha de expedición CC</label>
@@ -535,11 +538,16 @@ if ($dbConnected) {
       document.getElementById('discapacidad_cual_wrap').style.display = this.checked ? 'block' : 'none';
     });
 
-    // Validación de edad >= 18 años para invitados
+    // Validación de edad - SOLO MAYORES DE 18 AÑOS
     document.querySelectorAll('.invitado-fecha').forEach(input => {
       input.addEventListener('change', function () {
         const numeroInvitado = this.dataset.invitado;
         const cedulaInput = document.getElementById(`invitado${numeroInvitado}_cc`);
+        const errorMsg = document.querySelector(`.edad-error-${numeroInvitado}`);
+        const nombreInput = document.querySelector(`input[name="invitado${numeroInvitado}_nombre"]`);
+        const apellidoInput = document.querySelector(`input[name="invitado${numeroInvitado}_apellidos"]`);
+        
+        if (!this.value) return;
         
         const fechaNac = new Date(this.value);
         const hoy = new Date();
@@ -553,14 +561,35 @@ if ($dbConnected) {
         }
 
         if (edad < 18) {
-          alert('⚠️ El invitado debe ser mayor de 18 años. Por favor, verifique la fecha de nacimiento.');
+          // MENOR DE 18: RECHAZAR Y MOSTRAR ERROR
+          errorMsg.style.display = 'block';
           this.value = '';
+          this.style.borderColor = '#dc3545';
+          
+          // Limpiar y bloquear todos los campos del invitado
+          nombreInput.value = '';
+          apellidoInput.value = '';
           cedulaInput.value = '';
+          nombreInput.disabled = true;
+          apellidoInput.disabled = true;
           cedulaInput.disabled = true;
-          cedulaInput.placeholder = 'Requiere mayor de 18 años';
+          
+          // Ocultar error después de 4 segundos
+          setTimeout(() => {
+            errorMsg.style.display = 'none';
+            this.style.borderColor = '';
+            nombreInput.disabled = false;
+            apellidoInput.disabled = false;
+          }, 4000);
+          
         } else {
+          // MAYOR DE 18: PERMITIR REGISTRO
+          errorMsg.style.display = 'none';
+          this.style.borderColor = '#198754';
           cedulaInput.disabled = false;
           cedulaInput.placeholder = 'Número de cédula';
+          nombreInput.disabled = false;
+          apellidoInput.disabled = false;
         }
       });
     });
@@ -580,4 +609,3 @@ if ($dbConnected) {
 
 </body>
 </html>
-
