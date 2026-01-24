@@ -345,13 +345,27 @@ if ($dbConnected) {
 
               <?php if (isset($_GET['msg']) && isset($_GET['type'])): ?>
                 <div class="alert alert-<?php echo htmlspecialchars($_GET['type']); ?> alert-dismissible fade show" role="alert">
-                  <i class="fas fa-<?php echo $_GET['type'] === 'success' ? 'check-circle' : 'exclamation-triangle'; ?>"></i>
-                  <?php echo htmlspecialchars($_GET['msg']); ?>
+                  <?php if ($_GET['type'] === 'success'): ?>
+                    <i class="fas fa-check-circle"></i>
+                  <?php elseif ($_GET['type'] === 'warning'): ?>
+                    <i class="fas fa-exclamation-triangle"></i>
+                  <?php else: ?>
+                    <i class="fas fa-times-circle"></i>
+                  <?php endif; ?>
+                  <strong><?php echo htmlspecialchars($_GET['msg']); ?></strong>
                   <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 <?php if ($_GET['type'] === 'success'): ?>
                   <script>
-                    setTimeout(() => { window.location.href = 'formulario.php'; }, 3000);
+                    // Limpiar formulario después de éxito
+                    setTimeout(() => {
+                      document.getElementById('regForm').reset();
+                      document.getElementById('programa').disabled = true;
+                      document.getElementById('programa').innerHTML = '<option value="">Primero seleccione una hora</option>';
+                      // Limpiar URL
+                      const url = window.location.href.split('?')[0];
+                      window.history.replaceState({}, document.title, url);
+                    }, 5000);
                   </script>
                 <?php endif; ?>
               <?php endif; ?>
@@ -478,13 +492,10 @@ if ($dbConnected) {
                   <textarea class="form-control" id="discapacidad_cual" name="discapacidad_cual" rows="2" placeholder="Describa brevemente la discapacidad"></textarea>
                 </div>
 
-                <div class="d-grid gap-2">
+                <div class="d-grid">
                   <button type="submit" class="btn btn-dark btn-lg">
                     <i class="fas fa-paper-plane"></i> Enviar Registro
                   </button>
-                  <a href="formulario.php" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Volver al menú
-                  </a>
                 </div>
 
               </form>
