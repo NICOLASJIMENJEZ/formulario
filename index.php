@@ -684,4 +684,4 @@ if ($dbConnected) {
   </script>
 
 </body>
-</html>
+</html> 
