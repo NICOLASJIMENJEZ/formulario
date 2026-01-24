@@ -372,6 +372,9 @@ if ($dbConnected) {
 
               <form id="regForm" action="register.php" method="post">
                 
+                <!-- Mensaje de éxito/error dinámico -->
+                <div id="mensajeDinamico" style="display:none;"></div>
+                
                 <h5><i class="fas fa-user-graduate"></i> Datos del Graduado</h5>
 
                 <div class="row mb-3">
@@ -593,15 +596,91 @@ if ($dbConnected) {
 
     // Validación del formulario antes de enviar
     document.getElementById('regForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // Prevenir envío normal
+      
       const hora = document.getElementById('hora').value;
       const programa = document.getElementById('programa').value;
 
       if (!hora || !programa) {
-        e.preventDefault();
-        alert('⚠️ Por favor seleccione la hora y el programa de ceremonia.');
+        mostrarMensaje('⚠️ Por favor seleccione la hora y el programa de ceremonia.', 'warning');
         return false;
       }
+
+      // Enviar formulario por AJAX
+      const formData = new FormData(this);
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const mensajeDiv = document.getElementById('mensajeDinamico');
+      
+      // Deshabilitar botón
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+      fetch('register.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // ÉXITO
+          mostrarMensaje(
+            '<i class="fas fa-check-circle"></i> <strong>¡REGISTRO EXITOSO!</strong><br>Tu inscripción ha sido guardada correctamente.',
+            'success'
+          );
+          
+          // Reiniciar formulario después de 3 segundos
+          setTimeout(() => {
+            this.reset();
+            document.getElementById('programa').disabled = true;
+            document.getElementById('programa').innerHTML = '<option value="">Primero seleccione una hora</option>';
+            mensajeDiv.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Registro';
+            
+            // Resetear estados de campos de invitados
+            document.querySelectorAll('.invitado-cc').forEach(input => {
+              input.disabled = false;
+              input.style.backgroundColor = '';
+              input.placeholder = 'Solo si es mayor de 18';
+            });
+            document.querySelectorAll('.invitado-fecha').forEach(input => {
+              input.style.borderColor = '';
+            });
+            document.querySelectorAll('[class*="edad-error-"]').forEach(error => {
+              error.style.display = 'none';
+            });
+          }, 3000);
+          
+        } else {
+          // ERROR
+          mostrarMensaje(
+            '<i class="fas fa-exclamation-triangle"></i> <strong>' + data.message + '</strong>',
+            data.type || 'danger'
+          );
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Registro';
+        }
+      })
+      .catch(error => {
+        mostrarMensaje(
+          '<i class="fas fa-times-circle"></i> <strong>Error de conexión. Por favor, intenta nuevamente.</strong>',
+          'danger'
+        );
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Registro';
+      });
     });
+
+    // Función para mostrar mensajes
+    function mostrarMensaje(mensaje, tipo) {
+      const mensajeDiv = document.getElementById('mensajeDinamico');
+      mensajeDiv.className = 'alert alert-' + tipo + ' alert-dismissible fade show';
+      mensajeDiv.innerHTML = mensaje + '<button type="button" class="btn-close" onclick="this.parentElement.style.display=\'none\'"></button>';
+      mensajeDiv.style.display = 'block';
+      
+      // Scroll suave al mensaje
+      mensajeDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   </script>
 
 </body>
