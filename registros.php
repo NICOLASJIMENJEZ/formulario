@@ -1,5 +1,5 @@
 <?php
-// Admin con campos apilados visibles y letra de 16px
+// Admin con campos apilados y columnas de cédula independientes (Estilo Titular)
 ?>
 <!doctype html>
 <html lang="es">
@@ -33,25 +33,23 @@
         position: sticky; 
         top: 0; 
         z-index: 10;
-        font-size: 14px;
+        font-size: 13px;
         padding: 15px 8px !important;
         text-align: center;
         white-space: nowrap;
     }
 
-    /* AJUSTE CLAVE: Contenedor con más espacio vertical */
     .stack-container {
         display: flex;
         flex-direction: column;
-        gap: 5px; /* Espacio entre los dos cuadros */
-        min-width: 180px;
-        padding: 8px 0; /* Margen interno para que no se corte el texto */
+        gap: 4px;
+        min-width: 170px;
+        padding: 5px 0;
     }
 
-    /* AJUSTE CLAVE: Altura del input para que se vea el texto completo */
     .form-control-sm {
         font-size: 16px !important; 
-        height: 38px !important; /* Altura suficiente para letra de 16px */
+        height: 38px !important; 
         border: 1px solid transparent;
         background: #f1f3f4;
         transition: all 0.2s;
@@ -84,15 +82,15 @@
 </head>
 <body>
 
-<div class="container-fluid px-4 py-4">
+<div class="container-fluid px-3 py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="mb-0 text-dark fw-bold">Gestión de Acceso</h3>
-            <span class="text-muted">Panel de Control de Invitados</span>
+            <span class="text-muted">Control de Invitados</span>
         </div>
         
         <div class="d-flex gap-3 align-items-center">
-            <input id="searchCedula" class="form-control form-control-lg" placeholder="🔍 Buscar por nombre o CC..." style="width:350px; border-radius: 30px; font-size: 16px;">
+            <input id="searchCedula" class="form-control form-control-lg" placeholder="🔍 Buscar..." style="width:300px; border-radius: 30px; font-size: 16px;">
             <button id="reload" class="btn btn-primary rounded-pill px-4">🔄 Actualizar</button>
             <a href="formulario.php" class="boton-salida">Salir</a>
         </div>
@@ -103,12 +101,15 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Titular (Nombre / Apellido)</th>
+                    <th>Titular (Nombre / Ape)</th>
                     <th>Cédula</th>
-                    <th>Discapacidad</th>
-                    <th>Invitado 1 / CC</th>
-                    <th>Invitado 2 / CC</th>
-                    <th>Invitado 3 / CC</th>
+                    <th>Discap.</th>
+                    <th>Invitado 1</th>
+                    <th>CC 1</th>
+                    <th>Invitado 2</th>
+                    <th>CC 2</th>
+                    <th>Invitado 3</th>
+                    <th>CC 3</th>
                     <th class="text-center">Acciones</th>
                 </tr>
             </thead>
@@ -128,7 +129,7 @@
 <script>
 const api = 'api.php';
 
-// Esta función crea los dos cuadros (Nombre y Apellido/CC) uno sobre otro
+// Función para campos de Nombre y Apellido apilados (Usado para Titular e Invitados)
 function createStackedInput(name1, val1, name2, val2, p1, p2) {
     const td = document.createElement('td');
     const container = document.createElement('div');
@@ -155,12 +156,15 @@ function createStackedInput(name1, val1, name2, val2, p1, p2) {
     return td;
 }
 
-function createSimpleInput(name, value) {
+// Función para campos simples (Cédulas y Discapacidad)
+function createSimpleInput(name, value, placeholder) {
     const td = document.createElement('td');
     const input = document.createElement('input');
     input.className = `form-control form-control-sm ${!value ? 'empty-cell' : ''}`;
     input.name = name;
     input.value = value ?? '';
+    input.placeholder = placeholder || '';
+    input.style.minWidth = "130px";
     input.addEventListener('input', () => input.classList.toggle('empty-cell', !input.value));
     td.appendChild(input);
     return td;
@@ -187,8 +191,8 @@ function createActions(id, current) {
     const actions = document.createElement('div');
     actions.className = 'd-flex gap-2 justify-content-center';
     actions.innerHTML = `
-        <button class="btn btn-save" onclick="saveRow(${id}, this)" title="Guardar">💾</button>
-        <button class="btn btn-delete" onclick="deleteRow(${id})" title="Eliminar">🗑️</button>
+        <button class="btn btn-save" onclick="saveRow(${id}, this)">💾</button>
+        <button class="btn btn-delete" onclick="deleteRow(${id})">🗑️</button>
     `;
     td.append(group, actions);
     return td;
@@ -196,7 +200,7 @@ function createActions(id, current) {
 
 async function load() {
     const tbody = document.querySelector('#recordsTable tbody');
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5">Cargando registros...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center py-5">Cargando...</td></tr>';
     
     try {
         const res = await fetch(api + '?action=list');
@@ -216,20 +220,27 @@ async function load() {
             // Titular apilado (Nombre / Apellido)
             tr.appendChild(createStackedInput('titular_nombre', item.titular_nombre, 'titular_apellidos', item.titular_apellidos, 'Nombre', 'Apellido'));
             
-            // CC y Discapacidad
-            tr.appendChild(createSimpleInput('titular_cc', item.titular_cc));
-            tr.appendChild(createSimpleInput('discapacidad', item.discapacidad));
+            // Cédula Titular y Discapacidad
+            tr.appendChild(createSimpleInput('titular_cc', item.titular_cc, 'Cédula'));
+            tr.appendChild(createSimpleInput('discapacidad', item.discapacidad, 'Si/No'));
 
-            // Invitados apilados (Nombre / CC)
-            tr.appendChild(createStackedInput('invitado1_nombre', item.invitado1_nombre, 'invitado1_cc', item.invitado1_cc, 'Invitado 1', 'Cédula'));
-            tr.appendChild(createStackedInput('invitado2_nombre', item.invitado2_nombre, 'invitado2_cc', item.invitado2_cc, 'Invitado 2', 'Cédula'));
-            tr.appendChild(createStackedInput('invitado3_nombre', item.invitado3_nombre, 'invitado3_cc', item.invitado3_cc, 'Invitado 3', 'Cédula'));
+            // Invitado 1: Nombre Apilado y CC al lado
+            tr.appendChild(createStackedInput('invitado1_nombre', item.invitado1_nombre, '', '', 'Nombre', 'Apellido'));
+            tr.appendChild(createSimpleInput('invitado1_cc', item.invitado1_cc, 'CC 1'));
+
+            // Invitado 2: Nombre Apilado y CC al lado
+            tr.appendChild(createStackedInput('invitado2_nombre', item.invitado2_nombre, '', '', 'Nombre', 'Apellido'));
+            tr.appendChild(createSimpleInput('invitado2_cc', item.invitado2_cc, 'CC 2'));
+
+            // Invitado 3: Nombre Apilado y CC al lado
+            tr.appendChild(createStackedInput('invitado3_nombre', item.invitado3_nombre, '', '', 'Nombre', 'Apellido'));
+            tr.appendChild(createSimpleInput('invitado3_cc', item.invitado3_cc, 'CC 3'));
 
             tr.appendChild(createActions(item.id, item.arrived_count));
             tbody.appendChild(tr);
         });
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al conectar con la base de datos.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">Error de carga</td></tr>';
     }
 }
 
@@ -241,9 +252,8 @@ async function saveRow(id, btn) {
     const res = await fetch(api, {method: 'POST', body: params});
     const result = await res.json();
     if(result.success) {
-        const oldIcon = btn.innerHTML;
         btn.innerHTML = '✅';
-        setTimeout(() => btn.innerHTML = oldIcon, 2000);
+        setTimeout(() => btn.innerHTML = '💾', 2000);
     }
 }
 
@@ -255,7 +265,7 @@ async function setArrived(id, val) {
 }
 
 async function deleteRow(id) {
-    if(!confirm('¿Seguro que deseas eliminar este registro?')) return;
+    if(!confirm('¿Eliminar registro?')) return;
     await fetch(api + `?action=delete&id=${id}`);
     load();
 }
