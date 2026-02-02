@@ -1,6 +1,3 @@
-<?php
-// Admin con campos apilados y columnas de cédula independientes (Estilo Titular)
-?>
 <!doctype html>
 <html lang="es">
 <head>
@@ -64,7 +61,6 @@
 
     .empty-cell { background: #fff3cd !important; }
 
-    /* Semáforos */
     tr.semaforo-0 { border-left: 6px solid #6c757d; }
     tr.semaforo-1 { border-left: 6px solid #dc3545; background-color: #fff8f8; }
     tr.semaforo-2 { border-left: 6px solid #fd7e14; background-color: #fffbf5; }
@@ -104,11 +100,11 @@
                     <th>Titular (Nombre / Ape)</th>
                     <th>Cédula</th>
                     <th>Discap.</th>
-                    <th>Invitado 1</th>
+                    <th>Invitado 1 (Nombre / Ape)</th>
                     <th>CC 1</th>
-                    <th>Invitado 2</th>
+                    <th>Invitado 2 (Nombre / Ape)</th>
                     <th>CC 2</th>
-                    <th>Invitado 3</th>
+                    <th>Invitado 3 (Nombre / Ape)</th>
                     <th>CC 3</th>
                     <th class="text-center">Acciones</th>
                 </tr>
@@ -129,7 +125,6 @@
 <script>
 const api = 'api.php';
 
-// Función para campos de Nombre y Apellido apilados (Usado para Titular e Invitados)
 function createStackedInput(name1, val1, name2, val2, p1, p2) {
     const td = document.createElement('td');
     const container = document.createElement('div');
@@ -156,7 +151,6 @@ function createStackedInput(name1, val1, name2, val2, p1, p2) {
     return td;
 }
 
-// Función para campos simples (Cédulas y Discapacidad)
 function createSimpleInput(name, value, placeholder) {
     const td = document.createElement('td');
     const input = document.createElement('input');
@@ -217,23 +211,21 @@ async function load() {
             tdId.className = 'text-center fw-bold text-muted';
             tr.appendChild(tdId);
 
-            // Titular apilado (Nombre / Apellido)
+            // Titular (Nombre / Apellido)
             tr.appendChild(createStackedInput('titular_nombre', item.titular_nombre, 'titular_apellidos', item.titular_apellidos, 'Nombre', 'Apellido'));
-            
-            // Cédula Titular y Discapacidad
             tr.appendChild(createSimpleInput('titular_cc', item.titular_cc, 'Cédula'));
             tr.appendChild(createSimpleInput('discapacidad', item.discapacidad, 'Si/No'));
 
-            // Invitado 1: Nombre Apilado y CC al lado
-            tr.appendChild(createStackedInput('invitado1_nombre', item.invitado1_nombre, '', '', 'Nombre', 'Apellido'));
+            // Invitado 1 (Nombre / Apellido) - AQUÍ SE CORRIGIERON LOS NAMES
+            tr.appendChild(createStackedInput('invitado1_nombre', item.invitado1_nombre, 'invitado1_apellido', item.invitado1_apellido, 'Nombre', 'Apellido'));
             tr.appendChild(createSimpleInput('invitado1_cc', item.invitado1_cc, 'CC 1'));
 
-            // Invitado 2: Nombre Apilado y CC al lado
-            tr.appendChild(createStackedInput('invitado2_nombre', item.invitado2_nombre, '', '', 'Nombre', 'Apellido'));
+            // Invitado 2 (Nombre / Apellido)
+            tr.appendChild(createStackedInput('invitado2_nombre', item.invitado2_nombre, 'invitado2_apellido', item.invitado2_apellido, 'Nombre', 'Apellido'));
             tr.appendChild(createSimpleInput('invitado2_cc', item.invitado2_cc, 'CC 2'));
 
-            // Invitado 3: Nombre Apilado y CC al lado
-            tr.appendChild(createStackedInput('invitado3_nombre', item.invitado3_nombre, '', '', 'Nombre', 'Apellido'));
+            // Invitado 3 (Nombre / Apellido)
+            tr.appendChild(createStackedInput('invitado3_nombre', item.invitado3_nombre, 'invitado3_apellido', item.invitado3_apellido, 'Nombre', 'Apellido'));
             tr.appendChild(createSimpleInput('invitado3_cc', item.invitado3_cc, 'CC 3'));
 
             tr.appendChild(createActions(item.id, item.arrived_count));
@@ -248,7 +240,10 @@ async function saveRow(id, btn) {
     const tr = btn.closest('tr');
     const inputs = tr.querySelectorAll('input');
     const params = new URLSearchParams({action: 'update', id: id});
-    inputs.forEach(i => params.append(i.name, i.value));
+    inputs.forEach(i => {
+        if(i.name) params.append(i.name, i.value);
+    });
+    
     const res = await fetch(api, {method: 'POST', body: params});
     const result = await res.json();
     if(result.success) {
