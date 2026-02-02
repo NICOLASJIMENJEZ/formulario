@@ -308,7 +308,7 @@ if ($dbConnected) {
             <h3 class="text-center mb-4">
               <i class="fas fa-graduation-cap text-primary"></i><br>
               Inscripción Ceremonia de Grado<br>
-              <small>11 de diciembre del 2025</small>
+              <small>13 de Febrero 2026</small>
             </h3>
 
             <!-- CONSENTIMIENTO INFORMADO -->
@@ -326,7 +326,7 @@ if ($dbConnected) {
                   <h6 class="text-white mb-3">
                     <i class="fas fa-info-circle"></i> Información Importante
                   </h6>
-                  <p class="mb-2"><strong>1.</strong> Ceremonia: jueves 11 de diciembre de 2025 en Auditorio San Francisco, Universidad CESMAG.</p>
+                  <p class="mb-2"><strong>1.</strong> Ceremonia: Viernes 13 de Febrero de 2026 en Auditorio San Francisco, Universidad CESMAG.</p>
                   <p class="mb-2"><strong>2.</strong> Cierre de ingreso: 10 minutos antes del inicio.</p>
                   <p class="mb-2"><strong>3.</strong> Máximo 3 acompañantes por graduado.</p>
                   <p class="mb-0"><strong>4.</strong> <span class="text-warning fw-bold">Prohibido ingreso de menores de edad (solo mayores de 18 años).</span></p>
