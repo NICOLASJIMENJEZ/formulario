@@ -1,5 +1,5 @@
 <?php
-// Página de administración de registros optimizada con campos apilados
+// Página de administración de registros optimizada con campos apilados para Titular e Invitados
 ?>
 <!doctype html>
 <html lang="es">
@@ -16,7 +16,7 @@
     body { 
         font-family: 'Segoe UI', Roboto, sans-serif; 
         background-color: #f4f7f6;
-        font-size: 15px; 
+        font-size: 14px; 
     }
     
     .table-responsive { 
@@ -36,31 +36,35 @@
         z-index: 10;
         font-weight: 500;
         text-transform: uppercase;
-        font-size: 13px;
+        font-size: 12px;
         padding: 12px 8px !important;
         text-align: center;
     }
 
-    /* Estilo para los inputs apilados */
+    /* Contenedor para inputs apilados (Estilo Titular e Invitados) */
     .stack-container {
         display: flex;
         flex-direction: column;
-        gap: 3px;
-        min-width: 140px;
+        gap: 4px;
+        min-width: 150px;
+        padding: 4px 0;
     }
 
     .form-control-sm {
         font-size: 13px;
         border: 1px solid transparent;
-        background: rgba(0,0,0,0.04);
+        background: #f8f9fa;
         transition: all 0.2s;
-        padding: 2px 6px;
+        padding: 4px 8px;
+        border-radius: 4px;
     }
+
     .form-control-sm:focus {
         background: #fff;
         border-color: var(--accent);
         box-shadow: 0 0 5px rgba(52,152,219,0.3);
     }
+
     .empty-cell { background: #fff3cd !important; }
 
     /* Semáforos de fila */
@@ -77,21 +81,13 @@
     .btn-save { background: #3498db; color: white; border: none; }
     .btn-delete { background: #e74c3c; color: white; border: none; }
 
-    .bg-deco {
-        position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-        opacity: 0.05; z-index: -1; width: 400px;
-    }
-
     .boton-salida {
         background: #e74c3c; color: white; padding: 6px 15px;
         border-radius: 20px; text-decoration: none; font-weight: bold;
     }
 
-    /* Vista móvil */
-    .card-view { display: none; }
     @media (max-width: 992px) {
         .table-view { display: none; }
-        .card-view { display: block; }
     }
 </style>
 </head>
@@ -106,7 +102,7 @@
         
         <div class="d-flex gap-3 align-items-center">
             <input id="searchCedula" class="form-control" placeholder="🔍 Buscar..." style="width:250px; border-radius: 20px;">
-            <button id="reload" class="btn btn-outline-primary btn-sm rounded-pill">🔄 Refrescar</button>
+            <button id="reload" class="btn btn-outline-primary btn-sm rounded-pill">🔄 Actualizar</button>
             <a href="formulario.php" class="boton-salida">Salir</a>
         </div>
     </div>
@@ -118,20 +114,18 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Titular (Nombre / Ape)</th>
+                    <th>Titular (Nombre / Apellido)</th>
                     <th>Cédula</th>
                     <th>Discap.</th>
-                    <th style="border-left: 2px solid #ddd">Invitado 1 / CC</th>
-                    <th style="border-left: 2px solid #ddd">Invitado 2 / CC</th>
-                    <th style="border-left: 2px solid #ddd">Invitado 3 / CC</th>
+                    <th>Invitado 1 (Nombre / CC)</th>
+                    <th>Invitado 2 (Nombre / CC)</th>
+                    <th>Invitado 3 (Nombre / CC)</th>
                     <th class="text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
-
-    <div class="card-view" id="cardView"></div>
 
     <div class="d-flex justify-content-center align-items-center mt-3 p-3 bg-white rounded shadow-sm">
         <div class="h5 mb-0">
@@ -143,6 +137,7 @@
 <script>
 const api = 'api.php';
 
+// Función unificada para crear los cuadros apilados (Igual al Titular)
 function createStackedInput(name1, val1, name2, val2, placeholder1, placeholder2) {
     const td = document.createElement('td');
     const container = document.createElement('div');
@@ -160,7 +155,6 @@ function createStackedInput(name1, val1, name2, val2, placeholder1, placeholder2
     in2.value = val2 ?? '';
     in2.placeholder = placeholder2;
 
-    // Listener para color de celda vacía
     [in1, in2].forEach(el => {
         el.addEventListener('input', () => el.classList.toggle('empty-cell', !el.value));
     });
@@ -186,7 +180,7 @@ function createActions(id, current) {
     td.className = 'text-center';
     
     const group = document.createElement('div');
-    group.className = 'btn-group btn-group-arrive mb-1';
+    group.className = 'btn-group btn-group-arrive mb-2';
     const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
     
     for(let i=0; i<4; i++){
@@ -205,7 +199,6 @@ function createActions(id, current) {
         <button class="btn btn-sm btn-save" onclick="saveRow(${id}, this)">💾</button>
         <button class="btn btn-sm btn-delete" onclick="deleteRow(${id})">🗑️</button>
     `;
-
     td.append(group, actions);
     return td;
 }
@@ -226,41 +219,41 @@ async function load() {
             // ID
             const tdId = document.createElement('td');
             tdId.textContent = item.id;
-            tdId.className = 'text-muted small';
+            tdId.className = 'text-muted fw-bold text-center';
             tr.appendChild(tdId);
 
-            // Titular (Nombre y Apellido apilados)
+            // Titular (Apilado)
             tr.appendChild(createStackedInput(
                 'titular_nombre', item.titular_nombre, 
                 'titular_apellidos', item.titular_apellidos,
                 'Nombre', 'Apellido'
             ));
 
-            // Cédula Titular
+            // Cédula Titular (Simple)
             tr.appendChild(createSimpleInput('titular_cc', item.titular_cc));
 
-            // Discapacidad
+            // Discapacidad (Simple)
             tr.appendChild(createSimpleInput('discapacidad', item.discapacidad));
 
-            // Invitado 1 (Nombre y CC apilados)
+            // Invitado 1 (Apilado como el titular)
             tr.appendChild(createStackedInput(
                 'invitado1_nombre', item.invitado1_nombre, 
                 'invitado1_cc', item.invitado1_cc,
-                'Invitado 1', 'Cédula'
+                'Nombre Invitado 1', 'Cédula'
             ));
 
-            // Invitado 2 (Nombre y CC apilados)
+            // Invitado 2 (Apilado como el titular)
             tr.appendChild(createStackedInput(
                 'invitado2_nombre', item.invitado2_nombre, 
                 'invitado2_cc', item.invitado2_cc,
-                'Invitado 2', 'Cédula'
+                'Nombre Invitado 2', 'Cédula'
             ));
 
-            // Invitado 3 (Nombre y CC apilados)
+            // Invitado 3 (Apilado como el titular)
             tr.appendChild(createStackedInput(
                 'invitado3_nombre', item.invitado3_nombre, 
                 'invitado3_cc', item.invitado3_cc,
-                'Invitado 3', 'Cédula'
+                'Nombre Invitado 3', 'Cédula'
             ));
 
             // Acciones
@@ -269,7 +262,7 @@ async function load() {
             tbody.appendChild(tr);
         });
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-danger">Error al cargar datos</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error de conexión</td></tr>';
     }
 }
 
@@ -295,15 +288,17 @@ async function setArrived(id, val) {
 }
 
 async function deleteRow(id) {
-    if(!confirm('¿Eliminar?')) return;
+    if(!confirm('¿Eliminar este registro permanentemente?')) return;
     await fetch(api + `?action=delete&id=${id}`);
     load();
 }
 
 async function updateCounter() {
-    const r = await fetch("contador_invitados.php");
-    const d = await r.json();
-    document.getElementById("contadorInvitados").textContent = d.total ?? 0;
+    try {
+        const r = await fetch("contador_invitados.php");
+        const d = await r.json();
+        document.getElementById("contadorInvitados").textContent = d.total ?? 0;
+    } catch(e) {}
 }
 
 document.getElementById('searchCedula').addEventListener('input', e => {
@@ -320,5 +315,4 @@ updateCounter();
 load();
 </script>
 </body>
-</html> 
-   
+</html>
