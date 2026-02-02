@@ -308,7 +308,7 @@ if ($dbConnected) {
             <h3 class="text-center mb-4">
               <i class="fas fa-graduation-cap text-primary"></i><br>
               Inscripción Ceremonia de Grado<br>
-              <small>11 de diciembre del 2025</small>
+              <small>13 de Febrero</small>
             </h3>
 
             <!-- CONSENTIMIENTO INFORMADO -->
