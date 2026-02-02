@@ -1,5 +1,5 @@
 <?php
-// Página de administración de registros optimizada
+// Admin con campos apilados visibles y letra de 16px
 ?>
 <!doctype html>
 <html lang="es">
@@ -16,121 +16,111 @@
     body { 
         font-family: 'Segoe UI', Roboto, sans-serif; 
         background-color: #f4f7f6;
-        font-size: 16px; /* Tamaño de letra original conservado */
+        font-size: 16px; 
     }
     
     .table-responsive { 
-        max-height: 75vh; 
+        max-height: 80vh; 
         overflow: auto; 
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         border-radius: 8px;
         background: #fff;
     }
 
-    table { margin-bottom: 0 !important; }
     thead th { 
         background-color: var(--primary-dark) !important; 
         color: white !important; 
         position: sticky; 
         top: 0; 
         z-index: 10;
-        font-weight: 500;
-        text-transform: uppercase;
         font-size: 14px;
-        padding: 12px 8px !important;
+        padding: 15px 8px !important;
         text-align: center;
+        white-space: nowrap;
     }
 
-    /* Contenedor para inputs apilados */
+    /* AJUSTE CLAVE: Contenedor con más espacio vertical */
     .stack-container {
         display: flex;
         flex-direction: column;
-        gap: 3px;
-        min-width: 160px;
+        gap: 5px; /* Espacio entre los dos cuadros */
+        min-width: 180px;
+        padding: 8px 0; /* Margen interno para que no se corte el texto */
     }
 
+    /* AJUSTE CLAVE: Altura del input para que se vea el texto completo */
     .form-control-sm {
-        font-size: 16px; /* Tamaño de letra original conservado en inputs */
+        font-size: 16px !important; 
+        height: 38px !important; /* Altura suficiente para letra de 16px */
         border: 1px solid transparent;
-        background: rgba(0,0,0,0.03);
+        background: #f1f3f4;
         transition: all 0.2s;
-        padding: 2px 5px;
+        padding: 5px 10px;
     }
+
     .form-control-sm:focus {
         background: #fff;
         border-color: var(--accent);
         box-shadow: 0 0 5px rgba(52,152,219,0.3);
     }
+
     .empty-cell { background: #fff3cd !important; }
 
-    /* Semáforos de fila */
-    tr.semaforo-0 { border-left: 5px solid #6c757d; }
-    tr.semaforo-1 { border-left: 5px solid #dc3545; background-color: #fff5f5; }
-    tr.semaforo-2 { border-left: 5px solid #fd7e14; background-color: #fff9f0; }
-    tr.semaforo-3 { border-left: 5px solid #198754; background-color: #f4fff9; }
+    /* Semáforos */
+    tr.semaforo-0 { border-left: 6px solid #6c757d; }
+    tr.semaforo-1 { border-left: 6px solid #dc3545; background-color: #fff8f8; }
+    tr.semaforo-2 { border-left: 6px solid #fd7e14; background-color: #fffbf5; }
+    tr.semaforo-3 { border-left: 6px solid #198754; background-color: #f6fff9; }
 
-    .btn-group-arrive .btn {
-        padding: 2px 8px;
-        font-weight: bold;
-        font-size: 12px;
-    }
-    .btn-save { background: #3498db; color: white; border: none; }
-    .btn-delete { background: #e74c3c; color: white; border: none; }
-
-    .bg-deco {
-        position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-        opacity: 0.05; z-index: -1; width: 400px;
-    }
+    .btn-group-arrive .btn { padding: 4px 10px; font-weight: bold; font-size: 14px; }
+    .btn-save { background: #3498db; color: white; border: none; padding: 8px 12px; }
+    .btn-delete { background: #e74c3c; color: white; border: none; padding: 8px 12px; }
 
     .boton-salida {
-        background: #e74c3c; color: white; padding: 6px 15px;
-        border-radius: 20px; text-decoration: none; font-weight: bold;
-    }
-
-    @media (max-width: 992px) {
-        .table-view { display: none; }
+        background: #e74c3c; color: white; padding: 8px 20px;
+        border-radius: 25px; text-decoration: none; font-weight: bold;
     }
 </style>
 </head>
 <body>
 
-<div class="container-fluid px-4 py-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-0 text-dark fw-bold">Gestión de Invitados</h4>
-            <span class="badge bg-secondary">Admin Panel</span>
+            <h3 class="mb-0 text-dark fw-bold">Gestión de Acceso</h3>
+            <span class="text-muted">Panel de Control de Invitados</span>
         </div>
         
         <div class="d-flex gap-3 align-items-center">
-            <input id="searchCedula" class="form-control" placeholder="🔍 Buscar..." style="width:280px; border-radius: 20px;">
-            <button id="reload" class="btn btn-outline-primary btn-sm rounded-pill">🔄 Actualizar</button>
+            <input id="searchCedula" class="form-control form-control-lg" placeholder="🔍 Buscar por nombre o CC..." style="width:350px; border-radius: 30px; font-size: 16px;">
+            <button id="reload" class="btn btn-primary rounded-pill px-4">🔄 Actualizar</button>
             <a href="formulario.php" class="boton-salida">Salir</a>
         </div>
     </div>
 
-    <div id="alert"></div>
-
-    <div class="table-responsive shadow-sm table-view">
+    <div class="table-responsive shadow-sm">
         <table class="table table-hover align-middle" id="recordsTable">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Titular (Nombre / Ape)</th>
+                    <th>Titular (Nombre / Apellido)</th>
                     <th>Cédula</th>
                     <th>Discapacidad</th>
                     <th>Invitado 1 / CC</th>
                     <th>Invitado 2 / CC</th>
                     <th>Invitado 3 / CC</th>
-                    <th class="text-center">Semáforo / Acciones</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <div class="d-flex justify-content-center align-items-center mt-3 p-3 bg-white rounded shadow-sm">
-        <div class="h5 mb-0" style="font-size: 18px;">
-            ✅ Total Invitados en Sitio: <span id="contadorInvitados" class="badge bg-success fs-5">0</span>
+    <div class="text-center mt-4">
+        <div class="d-inline-block p-3 bg-white rounded-pill shadow-sm border">
+            <h4 class="mb-0 px-3">
+                ✅ Total en Sitio: <span id="contadorInvitados" class="badge bg-success">0</span>
+            </h4>
         </div>
     </div>
 </div>
@@ -138,6 +128,7 @@
 <script>
 const api = 'api.php';
 
+// Esta función crea los dos cuadros (Nombre y Apellido/CC) uno sobre otro
 function createStackedInput(name1, val1, name2, val2, p1, p2) {
     const td = document.createElement('td');
     const container = document.createElement('div');
@@ -178,6 +169,7 @@ function createSimpleInput(name, value) {
 function createActions(id, current) {
     const td = document.createElement('td');
     td.className = 'text-center';
+    
     const group = document.createElement('div');
     group.className = 'btn-group btn-group-arrive mb-2';
     const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
@@ -193,10 +185,10 @@ function createActions(id, current) {
     }
     
     const actions = document.createElement('div');
-    actions.className = 'd-flex gap-1 justify-content-center';
+    actions.className = 'd-flex gap-2 justify-content-center';
     actions.innerHTML = `
-        <button class="btn btn-sm btn-save" onclick="saveRow(${id}, this)">💾</button>
-        <button class="btn btn-sm btn-delete" onclick="deleteRow(${id})">🗑️</button>
+        <button class="btn btn-save" onclick="saveRow(${id}, this)" title="Guardar">💾</button>
+        <button class="btn btn-delete" onclick="deleteRow(${id})" title="Eliminar">🗑️</button>
     `;
     td.append(group, actions);
     return td;
@@ -204,7 +196,7 @@ function createActions(id, current) {
 
 async function load() {
     const tbody = document.querySelector('#recordsTable tbody');
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">Cargando...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5">Cargando registros...</td></tr>';
     
     try {
         const res = await fetch(api + '?action=list');
@@ -215,28 +207,29 @@ async function load() {
             const tr = document.createElement('tr');
             tr.className = `semaforo-${item.arrived_count ?? 0}`;
             
+            // ID
             const tdId = document.createElement('td');
             tdId.textContent = item.id;
-            tdId.className = 'text-muted text-center';
+            tdId.className = 'text-center fw-bold text-muted';
             tr.appendChild(tdId);
 
-            // Titular apilado
+            // Titular apilado (Nombre / Apellido)
             tr.appendChild(createStackedInput('titular_nombre', item.titular_nombre, 'titular_apellidos', item.titular_apellidos, 'Nombre', 'Apellido'));
             
-            // Cédula y Discapacidad simples
+            // CC y Discapacidad
             tr.appendChild(createSimpleInput('titular_cc', item.titular_cc));
             tr.appendChild(createSimpleInput('discapacidad', item.discapacidad));
 
-            // Invitados apilados (Nombre arriba, Cédula abajo)
-            tr.appendChild(createStackedInput('invitado1_nombre', item.invitado1_nombre, 'invitado1_cc', item.invitado1_cc, 'Invitado 1', 'CC 1'));
-            tr.appendChild(createStackedInput('invitado2_nombre', item.invitado2_nombre, 'invitado2_cc', item.invitado2_cc, 'Invitado 2', 'CC 2'));
-            tr.appendChild(createStackedInput('invitado3_nombre', item.invitado3_nombre, 'invitado3_cc', item.invitado3_cc, 'Invitado 3', 'CC 3'));
+            // Invitados apilados (Nombre / CC)
+            tr.appendChild(createStackedInput('invitado1_nombre', item.invitado1_nombre, 'invitado1_cc', item.invitado1_cc, 'Invitado 1', 'Cédula'));
+            tr.appendChild(createStackedInput('invitado2_nombre', item.invitado2_nombre, 'invitado2_cc', item.invitado2_cc, 'Invitado 2', 'Cédula'));
+            tr.appendChild(createStackedInput('invitado3_nombre', item.invitado3_nombre, 'invitado3_cc', item.invitado3_cc, 'Invitado 3', 'Cédula'));
 
             tr.appendChild(createActions(item.id, item.arrived_count));
             tbody.appendChild(tr);
         });
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error de carga</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al conectar con la base de datos.</td></tr>';
     }
 }
 
@@ -248,8 +241,9 @@ async function saveRow(id, btn) {
     const res = await fetch(api, {method: 'POST', body: params});
     const result = await res.json();
     if(result.success) {
+        const oldIcon = btn.innerHTML;
         btn.innerHTML = '✅';
-        setTimeout(() => btn.innerHTML = '💾', 2000);
+        setTimeout(() => btn.innerHTML = oldIcon, 2000);
     }
 }
 
@@ -261,7 +255,7 @@ async function setArrived(id, val) {
 }
 
 async function deleteRow(id) {
-    if(!confirm('¿Eliminar?')) return;
+    if(!confirm('¿Seguro que deseas eliminar este registro?')) return;
     await fetch(api + `?action=delete&id=${id}`);
     load();
 }
@@ -283,7 +277,6 @@ document.getElementById('searchCedula').addEventListener('input', e => {
 });
 
 document.getElementById('reload').onclick = load;
-setInterval(updateCounter, 5000);
 updateCounter();
 load();
 </script>
