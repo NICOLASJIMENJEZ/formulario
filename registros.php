@@ -1,5 +1,5 @@
 <?php
-// Página de administración de registros optimizada
+// Página de administración de registros optimizada con campos apilados
 ?>
 <!doctype html>
 <html lang="es">
@@ -16,7 +16,7 @@
     body { 
         font-family: 'Segoe UI', Roboto, sans-serif; 
         background-color: #f4f7f6;
-        font-size: 16px; 
+        font-size: 15px; 
     }
     
     .table-responsive { 
@@ -36,16 +36,25 @@
         z-index: 10;
         font-weight: 500;
         text-transform: uppercase;
-        font-size: 14px;
+        font-size: 13px;
         padding: 12px 8px !important;
+        text-align: center;
+    }
+
+    /* Estilo para los inputs apilados */
+    .stack-container {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 140px;
     }
 
     .form-control-sm {
-        font-size: 15px;
+        font-size: 13px;
         border: 1px solid transparent;
-        background: rgba(0,0,0,0.03);
+        background: rgba(0,0,0,0.04);
         transition: all 0.2s;
-        padding: 2px 5px;
+        padding: 2px 6px;
     }
     .form-control-sm:focus {
         background: #fff;
@@ -54,6 +63,7 @@
     }
     .empty-cell { background: #fff3cd !important; }
 
+    /* Semáforos de fila */
     tr.semaforo-0 { border-left: 5px solid #6c757d; }
     tr.semaforo-1 { border-left: 5px solid #dc3545; background-color: #fff5f5; }
     tr.semaforo-2 { border-left: 5px solid #fd7e14; background-color: #fff9f0; }
@@ -62,7 +72,7 @@
     .btn-group-arrive .btn {
         padding: 2px 8px;
         font-weight: bold;
-        font-size: 12px;
+        font-size: 11px;
     }
     .btn-save { background: #3498db; color: white; border: none; }
     .btn-delete { background: #e74c3c; color: white; border: none; }
@@ -77,55 +87,11 @@
         border-radius: 20px; text-decoration: none; font-weight: bold;
     }
 
+    /* Vista móvil */
     .card-view { display: none; }
-    
-    .record-card {
-        background: white; border-radius: 12px; padding: 20px;
-        margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        border-left: 5px solid #6c757d; position: relative;
-    }
-    
-    .record-card.semaforo-1 { border-left-color: #dc3545; background-color: #fff5f5; }
-    .record-card.semaforo-2 { border-left-color: #fd7e14; background-color: #fff9f0; }
-    .record-card.semaforo-3 { border-left-color: #198754; background-color: #f4fff9; }
-    
-    .card-header-info {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e9ecef;
-    }
-    
-    .card-name { font-size: 18px; font-weight: bold; color: var(--primary-dark); }
-    .card-cedula { font-size: 14px; color: #6c757d; }
-    .card-label { font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; margin-bottom: 5px; }
-    .card-input { width: 100%; padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 6px; font-size: 15px; }
-    
-    .semaforo-controls { display: flex; gap: 8px; margin: 15px 0; }
-    .semaforo-btn {
-        flex: 1; padding: 12px; border: 2px solid #dee2e6; border-radius: 8px;
-        font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.2s; background: white;
-    }
-    
-    .semaforo-btn.active-0 { background: #6c757d; color: white; border-color: #6c757d; }
-    .semaforo-btn.active-1 { background: #dc3545; color: white; border-color: #dc3545; }
-    .semaforo-btn.active-2 { background: #fd7e14; color: white; border-color: #fd7e14; }
-    .semaforo-btn.active-3 { background: #198754; color: white; border-color: #198754; }
-    
-    .card-actions { display: flex; gap: 10px; margin-top: 15px; }
-    .card-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .card-btn-save { background: #3498db; color: white; }
-    .card-btn-delete { background: #e74c3c; color: white; }
-
-    @media (max-width: 768px) {
-        .col-hide-mobile { display: none; }
+    @media (max-width: 992px) {
         .table-view { display: none; }
         .card-view { display: block; }
-        #searchCedula { width: 100% !important; }
-        .bg-deco { display: none; }
-    }
-    
-    @media (min-width: 769px) {
-        .table-view { display: block; }
-        .card-view { display: none; }
     }
 </style>
 </head>
@@ -134,13 +100,13 @@
 <div class="container-fluid px-4 py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="mb-0 text-dark fw-bold">Gestión de Invitados</h4>
-            <span class="badge bg-secondary">Admin Panel</span>
+            <h4 class="mb-0 text-dark fw-bold">Gestión de Acceso</h4>
+            <span class="badge bg-secondary">Panel Administrativo</span>
         </div>
         
         <div class="d-flex gap-3 align-items-center">
-            <input id="searchCedula" class="form-control" placeholder="🔍 Buscar nombre o CC..." style="width:280px; border-radius: 20px;">
-            <button id="reload" class="btn btn-outline-primary btn-sm rounded-pill">🔄 Actualizar</button>
+            <input id="searchCedula" class="form-control" placeholder="🔍 Buscar..." style="width:250px; border-radius: 20px;">
+            <button id="reload" class="btn btn-outline-primary btn-sm rounded-pill">🔄 Refrescar</button>
             <a href="formulario.php" class="boton-salida">Salir</a>
         </div>
     </div>
@@ -151,17 +117,14 @@
         <table class="table table-hover align-middle" id="recordsTable">
             <thead>
                 <tr>
-                    <th class="col-hide-mobile">ID</th>
-                    <th>Titular (Nombre y Apellido)</th>
+                    <th>ID</th>
+                    <th>Titular (Nombre / Ape)</th>
                     <th>Cédula</th>
-                    <th>Discapacidad</th>
-                    <th style="border-left: 2px solid #ddd">Invitado 1</th>
-                    <th>CC 1</th>
-                    <th style="border-left: 2px solid #ddd">Invitado 2</th>
-                    <th>CC 2</th>
-                    <th style="border-left: 2px solid #ddd">Invitado 3</th>
-                    <th>CC 3</th>
-                    <th class="text-center">Semáforo / Acciones</th>
+                    <th>Discap.</th>
+                    <th style="border-left: 2px solid #ddd">Invitado 1 / CC</th>
+                    <th style="border-left: 2px solid #ddd">Invitado 2 / CC</th>
+                    <th style="border-left: 2px solid #ddd">Invitado 3 / CC</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -172,199 +135,190 @@
 
     <div class="d-flex justify-content-center align-items-center mt-3 p-3 bg-white rounded shadow-sm">
         <div class="h5 mb-0">
-            ✅ Total Invitados en Sitio: <span id="contadorInvitados" class="badge bg-success fs-5">0</span>
+            ✅ Total en Sitio: <span id="contadorInvitados" class="badge bg-success fs-5">0</span>
         </div>
     </div>
 </div>
 
 <script>
 const api = 'api.php';
-const alertEl = document.getElementById('alert');
 
-function showAlert(msg, type='success'){
-    alertEl.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-    ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-    setTimeout(() => alertEl.innerHTML = '', 3000);
+function createStackedInput(name1, val1, name2, val2, placeholder1, placeholder2) {
+    const td = document.createElement('td');
+    const container = document.createElement('div');
+    container.className = 'stack-container';
+
+    const in1 = document.createElement('input');
+    in1.className = `form-control form-control-sm ${!val1 ? 'empty-cell' : ''}`;
+    in1.name = name1;
+    in1.value = val1 ?? '';
+    in1.placeholder = placeholder1;
+
+    const in2 = document.createElement('input');
+    in2.className = `form-control form-control-sm ${!val2 ? 'empty-cell' : ''}`;
+    in2.name = name2;
+    in2.value = val2 ?? '';
+    in2.placeholder = placeholder2;
+
+    // Listener para color de celda vacía
+    [in1, in2].forEach(el => {
+        el.addEventListener('input', () => el.classList.toggle('empty-cell', !el.value));
+    });
+
+    container.append(in1, in2);
+    td.appendChild(container);
+    return td;
 }
 
-async function fetchRecords(){
-    try {
-        const res = await fetch(api + '?action=list');
-        const j = await res.json();
-        return j.success ? j.records : [];
-    } catch (e) { return []; }
-}
-
-function createInput(name, value){
+function createSimpleInput(name, value) {
     const td = document.createElement('td');
     const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'form-control form-control-sm';
+    input.className = `form-control form-control-sm ${!value ? 'empty-cell' : ''}`;
     input.name = name;
     input.value = value ?? '';
-    if(!input.value) input.classList.add('empty-cell');
     input.addEventListener('input', () => input.classList.toggle('empty-cell', !input.value));
     td.appendChild(input);
     return td;
 }
 
-function createActionsCell(id, currentCount){
+function createActions(id, current) {
     const td = document.createElement('td');
     td.className = 'text-center';
-    const groupArrive = document.createElement('div');
-    groupArrive.className = 'btn-group btn-group-arrive mb-2';
+    
+    const group = document.createElement('div');
+    group.className = 'btn-group btn-group-arrive mb-1';
     const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
     
     for(let i=0; i<4; i++){
         const btn = document.createElement('button');
         btn.className = 'btn btn-outline-secondary';
-        btn.style.backgroundColor = (currentCount == i) ? colors[i] : 'transparent';
-        btn.style.color = (currentCount == i) ? '#fff' : '#000';
+        btn.style.backgroundColor = (current == i) ? colors[i] : 'transparent';
+        btn.style.color = (current == i) ? '#fff' : '#000';
         btn.textContent = i;
         btn.onclick = () => setArrived(id, i);
-        groupArrive.appendChild(btn);
+        group.appendChild(btn);
     }
     
-    const groupActions = document.createElement('div');
-    groupActions.className = 'd-flex gap-1 justify-content-center';
-    const save = document.createElement('button');
-    save.className = 'btn btn-sm btn-save'; save.innerHTML = '💾';
-    save.onclick = () => saveRecord(id, save);
-    const del = document.createElement('button');
-    del.className = 'btn btn-sm btn-delete'; del.innerHTML = '🗑️';
-    del.onclick = () => deleteRecord(id);
+    const actions = document.createElement('div');
+    actions.className = 'd-flex gap-1 justify-content-center';
+    actions.innerHTML = `
+        <button class="btn btn-sm btn-save" onclick="saveRow(${id}, this)">💾</button>
+        <button class="btn btn-sm btn-delete" onclick="deleteRow(${id})">🗑️</button>
+    `;
 
-    groupActions.append(save, del);
-    td.append(groupArrive, groupActions);
+    td.append(group, actions);
     return td;
 }
 
-function createMobileCard(item){
-    const card = document.createElement('div');
-    card.className = `record-card semaforo-${item.arrived_count ?? 0}`;
-    card.innerHTML = `
-        <div class="card-header-info">
-            <div>
-                <div class="card-name">${item.titular_nombre} ${item.titular_apellidos}</div>
-                <div class="card-cedula">CC: ${item.titular_cc}</div>
-            </div>
-        </div>
-        <div class="card-section">
-            <div class="card-label">Discapacidad</div>
-            <input type="text" class="card-input" name="discapacidad" value="${item.discapacidad || ''}">
-        </div>
-        <div class="card-section">
-            <div class="card-label">Invitado 1</div>
-            <input type="text" class="card-input mb-1" name="invitado1_nombre" value="${item.invitado1_nombre || ''}">
-            <input type="text" class="card-input" name="invitado1_cc" value="${item.invitado1_cc || ''}">
-        </div>
-        <div class="card-actions">
-            <button class="card-btn card-btn-save" onclick="saveRecordFromCard(${item.id}, this.closest('.record-card'))">💾 Guardar</button>
-            <button class="card-btn card-btn-delete" onclick="deleteRecord(${item.id})">🗑️ Eliminar</button>
-        </div>
-    `;
-    return card;
+async function load() {
+    const tbody = document.querySelector('#recordsTable tbody');
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">Cargando...</td></tr>';
+    
+    try {
+        const res = await fetch(api + '?action=list');
+        const data = await res.json();
+        tbody.innerHTML = '';
+
+        data.records.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = `semaforo-${item.arrived_count ?? 0}`;
+            
+            // ID
+            const tdId = document.createElement('td');
+            tdId.textContent = item.id;
+            tdId.className = 'text-muted small';
+            tr.appendChild(tdId);
+
+            // Titular (Nombre y Apellido apilados)
+            tr.appendChild(createStackedInput(
+                'titular_nombre', item.titular_nombre, 
+                'titular_apellidos', item.titular_apellidos,
+                'Nombre', 'Apellido'
+            ));
+
+            // Cédula Titular
+            tr.appendChild(createSimpleInput('titular_cc', item.titular_cc));
+
+            // Discapacidad
+            tr.appendChild(createSimpleInput('discapacidad', item.discapacidad));
+
+            // Invitado 1 (Nombre y CC apilados)
+            tr.appendChild(createStackedInput(
+                'invitado1_nombre', item.invitado1_nombre, 
+                'invitado1_cc', item.invitado1_cc,
+                'Invitado 1', 'Cédula'
+            ));
+
+            // Invitado 2 (Nombre y CC apilados)
+            tr.appendChild(createStackedInput(
+                'invitado2_nombre', item.invitado2_nombre, 
+                'invitado2_cc', item.invitado2_cc,
+                'Invitado 2', 'Cédula'
+            ));
+
+            // Invitado 3 (Nombre y CC apilados)
+            tr.appendChild(createStackedInput(
+                'invitado3_nombre', item.invitado3_nombre, 
+                'invitado3_cc', item.invitado3_cc,
+                'Invitado 3', 'Cédula'
+            ));
+
+            // Acciones
+            tr.appendChild(createActions(item.id, item.arrived_count));
+
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-danger">Error al cargar datos</td></tr>';
+    }
 }
 
-async function setArrived(id, n){
-    const data = new URLSearchParams({action:'update', id, arrived_count:n});
-    const r = await fetch(api, {method:'POST', body:data});
-    const j = await r.json();
-    if(j.success) { load(); actualizarInvitados(); }
-}
-
-async function saveRecord(id, btn){
+async function saveRow(id, btn) {
     const tr = btn.closest('tr');
     const inputs = tr.querySelectorAll('input');
-    const data = new URLSearchParams({action:'update', id});
-    inputs.forEach(i => data.append(i.name, i.value));
-    const r = await fetch(api, {method:'POST', body:data});
-    const j = await r.json();
-    if(j.success) showAlert('Actualizado correctamente');
-}
-
-async function deleteRecord(id){
-    if(!confirm('¿Eliminar este registro?')) return;
-    const r = await fetch(api + '?action=delete&id=' + id);
-    const j = await r.json();
-    if(j.success) load();
-}
-
-async function load(){
-    const tbody = document.querySelector('#recordsTable tbody');
-    const cardView = document.getElementById('cardView');
-    tbody.innerHTML = '<tr><td colspan="11" class="text-center">Cargando...</td></tr>';
+    const params = new URLSearchParams({action: 'update', id: id});
+    inputs.forEach(i => params.append(i.name, i.value));
     
-    const records = await fetchRecords();
-    tbody.innerHTML = '';
-    cardView.innerHTML = '';
-
-    records.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = `semaforo-${item.arrived_count ?? 0}`;
-        
-        // ID
-        const tdId = document.createElement('td');
-        tdId.className = 'col-hide-mobile text-muted';
-        tdId.textContent = item.id;
-        tr.appendChild(tdId);
-
-        // TITULAR: NOMBRE Y APELLIDO ABAJO (MODIFICADO)
-        const tdTitular = document.createElement('td');
-        const divTitular = document.createElement('div');
-        divTitular.className = 'd-flex flex-column gap-1'; // flex-column hace que se pongan uno abajo del otro
-        
-        const inNom = document.createElement('input');
-        inNom.className = 'form-control form-control-sm';
-        inNom.name = 'titular_nombre';
-        inNom.value = item.titular_nombre;
-        inNom.placeholder = "Nombre";
-        
-        const inApe = document.createElement('input');
-        inApe.className = 'form-control form-control-sm';
-        inApe.name = 'titular_apellidos';
-        inApe.value = item.titular_apellidos;
-        inApe.placeholder = "Apellido";
-        
-        divTitular.append(inNom, inApe);
-        tdTitular.appendChild(divTitular);
-        tr.appendChild(tdTitular);
-
-        tr.appendChild(createInput('titular_cc', item.titular_cc));
-        tr.appendChild(createInput('discapacidad', item.discapacidad));
-        tr.appendChild(createInput('invitado1_nombre', item.invitado1_nombre));
-        tr.appendChild(createInput('invitado1_cc', item.invitado1_cc));
-        tr.appendChild(createInput('invitado2_nombre', item.invitado2_nombre));
-        tr.appendChild(createInput('invitado2_cc', item.invitado2_cc));
-        tr.appendChild(createInput('invitado3_nombre', item.invitado3_nombre));
-        tr.appendChild(createInput('invitado3_cc', item.invitado3_cc));
-        tr.appendChild(createActionsCell(item.id, item.arrived_count));
-
-        tbody.appendChild(tr);
-        cardView.appendChild(createMobileCard(item));
-    });
+    const res = await fetch(api, {method: 'POST', body: params});
+    const result = await res.json();
+    if(result.success) {
+        btn.innerHTML = '✅';
+        setTimeout(() => btn.innerHTML = '💾', 2000);
+    }
 }
 
-async function actualizarInvitados(){
-    try {
-        const r = await fetch("contador_invitados.php");
-        const data = await r.json();
-        document.getElementById("contadorInvitados").textContent = data.total ?? 0;
-    } catch (e) {}
+async function setArrived(id, val) {
+    const params = new URLSearchParams({action: 'update', id: id, arrived_count: val});
+    await fetch(api, {method: 'POST', body: params});
+    load();
+    updateCounter();
+}
+
+async function deleteRow(id) {
+    if(!confirm('¿Eliminar?')) return;
+    await fetch(api + `?action=delete&id=${id}`);
+    load();
+}
+
+async function updateCounter() {
+    const r = await fetch("contador_invitados.php");
+    const d = await r.json();
+    document.getElementById("contadorInvitados").textContent = d.total ?? 0;
 }
 
 document.getElementById('searchCedula').addEventListener('input', e => {
     const q = e.target.value.toLowerCase();
     document.querySelectorAll('#recordsTable tbody tr').forEach(tr => {
-        const text = tr.innerText.toLowerCase() + Array.from(tr.querySelectorAll('input')).map(i => i.value.toLowerCase()).join('');
-        tr.style.display = text.includes(q) ? '' : 'none';
+        const content = tr.innerText.toLowerCase() + Array.from(tr.querySelectorAll('input')).map(i => i.value.toLowerCase()).join(' ');
+        tr.style.display = content.includes(q) ? '' : 'none';
     });
 });
 
 document.getElementById('reload').onclick = load;
-setInterval(actualizarInvitados, 5000);
-actualizarInvitados();
+setInterval(updateCounter, 5000);
+updateCounter();
 load();
 </script>
 </body>
 </html>
+   
