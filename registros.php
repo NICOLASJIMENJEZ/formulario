@@ -1,5 +1,5 @@
 <?php
-// Página de administración de registros optimizada con campos apilados para Titular e Invitados
+// Página de administración de registros optimizada
 ?>
 <!doctype html>
 <html lang="es">
@@ -16,7 +16,7 @@
     body { 
         font-family: 'Segoe UI', Roboto, sans-serif; 
         background-color: #f4f7f6;
-        font-size: 14px; 
+        font-size: 16px; /* Tamaño de letra original conservado */
     }
     
     .table-responsive { 
@@ -36,35 +36,31 @@
         z-index: 10;
         font-weight: 500;
         text-transform: uppercase;
-        font-size: 12px;
+        font-size: 14px;
         padding: 12px 8px !important;
         text-align: center;
     }
 
-    /* Contenedor para inputs apilados (Estilo Titular e Invitados) */
+    /* Contenedor para inputs apilados */
     .stack-container {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        min-width: 150px;
-        padding: 4px 0;
+        gap: 3px;
+        min-width: 160px;
     }
 
     .form-control-sm {
-        font-size: 13px;
+        font-size: 16px; /* Tamaño de letra original conservado en inputs */
         border: 1px solid transparent;
-        background: #f8f9fa;
+        background: rgba(0,0,0,0.03);
         transition: all 0.2s;
-        padding: 4px 8px;
-        border-radius: 4px;
+        padding: 2px 5px;
     }
-
     .form-control-sm:focus {
         background: #fff;
         border-color: var(--accent);
         box-shadow: 0 0 5px rgba(52,152,219,0.3);
     }
-
     .empty-cell { background: #fff3cd !important; }
 
     /* Semáforos de fila */
@@ -76,10 +72,15 @@
     .btn-group-arrive .btn {
         padding: 2px 8px;
         font-weight: bold;
-        font-size: 11px;
+        font-size: 12px;
     }
     .btn-save { background: #3498db; color: white; border: none; }
     .btn-delete { background: #e74c3c; color: white; border: none; }
+
+    .bg-deco {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+        opacity: 0.05; z-index: -1; width: 400px;
+    }
 
     .boton-salida {
         background: #e74c3c; color: white; padding: 6px 15px;
@@ -96,12 +97,12 @@
 <div class="container-fluid px-4 py-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="mb-0 text-dark fw-bold">Gestión de Acceso</h4>
-            <span class="badge bg-secondary">Panel Administrativo</span>
+            <h4 class="mb-0 text-dark fw-bold">Gestión de Invitados</h4>
+            <span class="badge bg-secondary">Admin Panel</span>
         </div>
         
         <div class="d-flex gap-3 align-items-center">
-            <input id="searchCedula" class="form-control" placeholder="🔍 Buscar..." style="width:250px; border-radius: 20px;">
+            <input id="searchCedula" class="form-control" placeholder="🔍 Buscar..." style="width:280px; border-radius: 20px;">
             <button id="reload" class="btn btn-outline-primary btn-sm rounded-pill">🔄 Actualizar</button>
             <a href="formulario.php" class="boton-salida">Salir</a>
         </div>
@@ -114,13 +115,13 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Titular (Nombre / Apellido)</th>
+                    <th>Titular (Nombre / Ape)</th>
                     <th>Cédula</th>
-                    <th>Discap.</th>
-                    <th>Invitado 1 (Nombre / CC)</th>
-                    <th>Invitado 2 (Nombre / CC)</th>
-                    <th>Invitado 3 (Nombre / CC)</th>
-                    <th class="text-center">Acciones</th>
+                    <th>Discapacidad</th>
+                    <th>Invitado 1 / CC</th>
+                    <th>Invitado 2 / CC</th>
+                    <th>Invitado 3 / CC</th>
+                    <th class="text-center">Semáforo / Acciones</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -128,8 +129,8 @@
     </div>
 
     <div class="d-flex justify-content-center align-items-center mt-3 p-3 bg-white rounded shadow-sm">
-        <div class="h5 mb-0">
-            ✅ Total en Sitio: <span id="contadorInvitados" class="badge bg-success fs-5">0</span>
+        <div class="h5 mb-0" style="font-size: 18px;">
+            ✅ Total Invitados en Sitio: <span id="contadorInvitados" class="badge bg-success fs-5">0</span>
         </div>
     </div>
 </div>
@@ -137,8 +138,7 @@
 <script>
 const api = 'api.php';
 
-// Función unificada para crear los cuadros apilados (Igual al Titular)
-function createStackedInput(name1, val1, name2, val2, placeholder1, placeholder2) {
+function createStackedInput(name1, val1, name2, val2, p1, p2) {
     const td = document.createElement('td');
     const container = document.createElement('div');
     container.className = 'stack-container';
@@ -147,13 +147,13 @@ function createStackedInput(name1, val1, name2, val2, placeholder1, placeholder2
     in1.className = `form-control form-control-sm ${!val1 ? 'empty-cell' : ''}`;
     in1.name = name1;
     in1.value = val1 ?? '';
-    in1.placeholder = placeholder1;
+    in1.placeholder = p1;
 
     const in2 = document.createElement('input');
     in2.className = `form-control form-control-sm ${!val2 ? 'empty-cell' : ''}`;
     in2.name = name2;
     in2.value = val2 ?? '';
-    in2.placeholder = placeholder2;
+    in2.placeholder = p2;
 
     [in1, in2].forEach(el => {
         el.addEventListener('input', () => el.classList.toggle('empty-cell', !el.value));
@@ -178,7 +178,6 @@ function createSimpleInput(name, value) {
 function createActions(id, current) {
     const td = document.createElement('td');
     td.className = 'text-center';
-    
     const group = document.createElement('div');
     group.className = 'btn-group btn-group-arrive mb-2';
     const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
@@ -216,53 +215,28 @@ async function load() {
             const tr = document.createElement('tr');
             tr.className = `semaforo-${item.arrived_count ?? 0}`;
             
-            // ID
             const tdId = document.createElement('td');
             tdId.textContent = item.id;
-            tdId.className = 'text-muted fw-bold text-center';
+            tdId.className = 'text-muted text-center';
             tr.appendChild(tdId);
 
-            // Titular (Apilado)
-            tr.appendChild(createStackedInput(
-                'titular_nombre', item.titular_nombre, 
-                'titular_apellidos', item.titular_apellidos,
-                'Nombre', 'Apellido'
-            ));
-
-            // Cédula Titular (Simple)
+            // Titular apilado
+            tr.appendChild(createStackedInput('titular_nombre', item.titular_nombre, 'titular_apellidos', item.titular_apellidos, 'Nombre', 'Apellido'));
+            
+            // Cédula y Discapacidad simples
             tr.appendChild(createSimpleInput('titular_cc', item.titular_cc));
-
-            // Discapacidad (Simple)
             tr.appendChild(createSimpleInput('discapacidad', item.discapacidad));
 
-            // Invitado 1 (Apilado como el titular)
-            tr.appendChild(createStackedInput(
-                'invitado1_nombre', item.invitado1_nombre, 
-                'invitado1_cc', item.invitado1_cc,
-                'Nombre Invitado 1', 'Cédula'
-            ));
+            // Invitados apilados (Nombre arriba, Cédula abajo)
+            tr.appendChild(createStackedInput('invitado1_nombre', item.invitado1_nombre, 'invitado1_cc', item.invitado1_cc, 'Invitado 1', 'CC 1'));
+            tr.appendChild(createStackedInput('invitado2_nombre', item.invitado2_nombre, 'invitado2_cc', item.invitado2_cc, 'Invitado 2', 'CC 2'));
+            tr.appendChild(createStackedInput('invitado3_nombre', item.invitado3_nombre, 'invitado3_cc', item.invitado3_cc, 'Invitado 3', 'CC 3'));
 
-            // Invitado 2 (Apilado como el titular)
-            tr.appendChild(createStackedInput(
-                'invitado2_nombre', item.invitado2_nombre, 
-                'invitado2_cc', item.invitado2_cc,
-                'Nombre Invitado 2', 'Cédula'
-            ));
-
-            // Invitado 3 (Apilado como el titular)
-            tr.appendChild(createStackedInput(
-                'invitado3_nombre', item.invitado3_nombre, 
-                'invitado3_cc', item.invitado3_cc,
-                'Nombre Invitado 3', 'Cédula'
-            ));
-
-            // Acciones
             tr.appendChild(createActions(item.id, item.arrived_count));
-
             tbody.appendChild(tr);
         });
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error de conexión</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error de carga</td></tr>';
     }
 }
 
@@ -271,7 +245,6 @@ async function saveRow(id, btn) {
     const inputs = tr.querySelectorAll('input');
     const params = new URLSearchParams({action: 'update', id: id});
     inputs.forEach(i => params.append(i.name, i.value));
-    
     const res = await fetch(api, {method: 'POST', body: params});
     const result = await res.json();
     if(result.success) {
@@ -288,7 +261,7 @@ async function setArrived(id, val) {
 }
 
 async function deleteRow(id) {
-    if(!confirm('¿Eliminar este registro permanentemente?')) return;
+    if(!confirm('¿Eliminar?')) return;
     await fetch(api + `?action=delete&id=${id}`);
     load();
 }
