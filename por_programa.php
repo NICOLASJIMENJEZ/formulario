@@ -136,9 +136,9 @@ require_once __DIR__ . '/db.php';
     <div class="controls">
         <select id="hourFilter" class="form-select form-select-sm">
             <option value="">Todas las horas</option>
-            <option value="9:30">9:30</option>
-            <option value="2:00">2:00</option>
-            <option value="16:30">16:30</option>
+            <option value="09:00">09:00 AM</option>
+            <option value="14:00">02:00 PM</option>
+            <option value="16:30">04:30 PM</option>
         </select>
 
         <select id="programFilter" class="form-select form-select-sm">
