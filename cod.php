@@ -87,12 +87,7 @@ $dbConnected = true; // Solo para mantener el indicador visual si lo deseas
               <div class="badge bg-primary fs-6 mt-2">
                 <i class="fas fa-phone-alt"></i> Extensión: 1312
               </div>
-            </div>
-
-            <a href="https://www.unicesmag.edu.co" class="btn-contact">
-              <i class="fas fa-home"></i> Volver al Inicio
-            </a>
-          </div>
+        
         </div>
 
       </div>
