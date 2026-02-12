@@ -128,6 +128,15 @@
 <script>
 const api = 'api.php';
 
+// Función para normalizar texto: quita tildes y puntos
+function normalizeText(text) {
+    if (!text) return '';
+    return text.toString()
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita tildes
+        .replace(/[.\-\s]/g, ''); // Quita puntos, guiones y espacios
+}
+
 // Esta función crea los dos cuadros (Nombre y Apellido/CC) uno sobre otro
 function createStackedInput(name1, val1, name2, val2, p1, p2) {
     const td = document.createElement('td');
@@ -268,11 +277,24 @@ async function updateCounter() {
     } catch(e) {}
 }
 
+// BÚSQUEDA MEJORADA: Normaliza tanto la búsqueda como el contenido
 document.getElementById('searchCedula').addEventListener('input', e => {
-    const q = e.target.value.toLowerCase();
+    const q = normalizeText(e.target.value);
+    
     document.querySelectorAll('#recordsTable tbody tr').forEach(tr => {
-        const content = tr.innerText.toLowerCase() + Array.from(tr.querySelectorAll('input')).map(i => i.value.toLowerCase()).join(' ');
-        tr.style.display = content.includes(q) ? '' : 'none';
+        // Texto visible en la fila
+        const visibleText = normalizeText(tr.innerText);
+        
+        // Valores de los inputs
+        const inputValues = Array.from(tr.querySelectorAll('input'))
+            .map(i => normalizeText(i.value))
+            .join('');
+        
+        // Combinar todo el contenido
+        const allContent = visibleText + inputValues;
+        
+        // Mostrar/ocultar según coincidencia
+        tr.style.display = allContent.includes(q) ? '' : 'none';
     });
 });
 
