@@ -154,7 +154,6 @@ require_once __DIR__ . '/db.php';
 
     <div class="panel shadow-sm">
 
-        <!-- TABLA -->
         <div id="tableContainer" class="table-responsive">
             <table id="resultsTable" class="table table-striped table-hover align-middle text-center">
                 <thead class="table-dark">
@@ -173,7 +172,6 @@ require_once __DIR__ . '/db.php';
             </table>
         </div>
 
-        <!-- CARDS -->
         <div id="cardsContainer"></div>
 
     </div>
@@ -186,7 +184,19 @@ require_once __DIR__ . '/db.php';
 
 <script>
 const api = 'api1.php';
-let arrivalState = {}; // ESTADO VISUAL LOCAL
+let arrivalState = {}; 
+let lastRecords = [];
+
+// --- FUNCIÓN DE NORMALIZACIÓN ---
+function normalizeText(str) {
+    if (!str) return "";
+    return str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // Elimina tildes
+        .replace(/\./g, "")              // Elimina puntos
+        .trim();
+}
 
 async function fetchPrograms(){
     const res = await fetch(api + '?action=programs');
@@ -201,10 +211,6 @@ async function fetchRecords(params = {}){
     return j.success ? (j.records || []) : [];
 }
 
-/* ==========================
-   TOGGLE VISUAL + API
-   USA: toggle_program_arrival (independiente de arrived_count)
-========================== */
 async function toggleArrivalVisual(id){
     try {
         const form = new FormData();
@@ -231,9 +237,6 @@ async function toggleArrivalVisual(id){
     }
 }
 
-/* ==========================
-   CONTADOR VISUAL
-========================== */
 function updateCounter(){
     const llegados = Object.values(arrivalState).filter(v => v === 1).length;
     document.getElementById('contadorLlegadas').textContent =
@@ -319,8 +322,6 @@ function renderCards(records){
     });
 }
 
-let lastRecords = [];
-
 async function load(){
     const programSel = document.getElementById('programFilter');
     const list = await fetchPrograms();
@@ -333,12 +334,15 @@ async function load(){
 }
 
 async function applyFiltersServer(){
-    const q = document.getElementById('q').value || '';
+    // Aplicamos la normalización al valor del buscador antes de enviarlo
+    const qRaw = document.getElementById('q').value || '';
+    const qClean = normalizeText(qRaw);
+
     const program = document.getElementById('programFilter').value || '';
     const hour = document.getElementById('hourFilter').value || '';
 
     const params = {};
-    if(q) params.q = q;
+    if(qClean) params.q = qClean; 
     if(program) params.programa = program;
     if(hour) params.hora = hour;
 
