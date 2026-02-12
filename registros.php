@@ -258,9 +258,36 @@ async function saveRow(id, btn) {
 
 async function setArrived(id, val) {
     const params = new URLSearchParams({action: 'update', id: id, arrived_count: val});
-    await fetch(api, {method: 'POST', body: params});
-    load();
-    updateCounter();
+    const res = await fetch(api, {method: 'POST', body: params});
+    const result = await res.json();
+    
+    if(result.success) {
+        // Actualizar solo la fila visualmente
+        const tr = document.querySelector(`#recordsTable tbody tr td:first-child`).parentElement;
+        document.querySelectorAll('#recordsTable tbody tr').forEach(row => {
+            const firstCell = row.querySelector('td:first-child');
+            if(firstCell && firstCell.textContent == id) {
+                // Cambiar la clase del semáforo
+                row.className = `semaforo-${val}`;
+                
+                // Actualizar los botones
+                const buttons = row.querySelectorAll('.btn-group-arrive .btn');
+                const colors = ['#6c757d','#dc3545','#fd7e14','#198754'];
+                buttons.forEach((btn, index) => {
+                    if(index == val) {
+                        btn.style.backgroundColor = colors[index];
+                        btn.style.color = '#fff';
+                    } else {
+                        btn.style.backgroundColor = 'transparent';
+                        btn.style.color = '#000';
+                    }
+                });
+            }
+        });
+        
+        // Actualizar solo el contador
+        updateCounter();
+    }
 }
 
 async function deleteRow(id) {
