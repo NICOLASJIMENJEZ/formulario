@@ -348,7 +348,7 @@ if ($dbConnected) {
 
               <form id="regForm" action="register.php" method="post">
                 
-                <h5><i class="fas fa-user-graduate"></i> Datos del Graduado</h5>
+                <h5><i class="fas fa-user-graduate"></i> Datos del Graduadon Nicolas</h5>
 
                 <div class="row mb-3">
                   <div class="col-md-6">
