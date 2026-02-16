@@ -398,7 +398,7 @@ if ($dbConnected) {
                       <option value="">Seleccione una hora</option>
                       <option value="09:00">09:00 AM</option>
                       <option value="14:00">02:00 PM</option>
-                      <option value="16:30">04:30 PM</option>
+                      <option value="16:30">05:30 PM</option>
                     </select>
                   </div>
 
