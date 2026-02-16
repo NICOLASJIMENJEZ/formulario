@@ -4,7 +4,7 @@ $host = "dpg-d5pn3o75r7bs73d5if2g-a.oregon-postgres.render.com"; // HOSTNAME COM
 $dbname = "base_de_datos_graduandos_0852";
 $user = "base_de_datos_graduandos_0852_user";
 $pass = "Dp3mIyZaPKRlOPKbD42enOaGbccgMBt4";
-$port = "5432";
+$port = "5431";
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
 
