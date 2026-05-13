@@ -503,7 +503,7 @@ if ($dbConnected) {
   'Psicología'
 ],
 
-'4:30': [
+'16:30': [
   'Administración de Empresas',
   'Contaduría Pública',
   'Ingeniería de Sistemas',
