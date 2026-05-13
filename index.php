@@ -18,7 +18,7 @@ if ($dbConnected) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inscripción Ceremonia de Grado</title>
+  <title>Inscripción Ceremonia de Grado 22 mayo 2026</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -348,7 +348,7 @@ if ($dbConnected) {
 
               <form id="regForm" action="register.php" method="post">
                 
-                <h5><i class="fas fa-user-graduate"></i> Datos del Graduadon Nicolas</h5>
+                <h5><i class="fas fa-user-graduate"></i> Datos del Graduado</h5>
 
                 <div class="row mb-3">
                   <div class="col-md-6">
@@ -488,28 +488,31 @@ if ($dbConnected) {
   <script>
     // Programas por hora
     const programasPorHora = {
-      '09:00': [
-        'Administración de Empresas',
-        'Contaduría Pública',
-        'Licenciatura en Educación Física',
-        'Licenciatura en Educación Infantil',
-        'Tecnología en Contabilidad y Finanzas'
-      ],
-      '14:00': [
-        'Arquitectura',
-        'Derecho',
-        'Diseño Gráfico',
-        'Especialización en Arquitectura y Urbanismo Bioclimático',
-        'Especialización en Derecho Empresarial',
-        'Especialización en Gerencia de Proyectos',
-        'Especialización en Infancia, Cultura y Desarrollo',
-        'Especialización en Pedagogía del Entrenamiento Deportivo'
-      ],
-      '16:30': [
-        'Ingeniería de Sistemas',
-        'Ingeniería Electrónica',
-        'Psicología'
-      ]
+    '09:00': [
+  'Arquitectura',
+  'Diseño Gráfico',
+  'Especialización en Arquitectura y Urbanismo Bioclimático',
+  'Especialización en Derecho Empresarial',
+  'Especialización en Gerencia de Proyectos',
+  'Especialización en Infancia, Cultura y Desarrollo',
+  'Especialización en Pedagogía del Entrenamiento Deportivo'
+],
+
+'14:00': [
+  'Abogados',
+  'Psicología'
+],
+
+'16:30': [
+  'Administración de Empresas',
+  'Contaduría Pública',
+  'Ingeniería de Sistemas',
+  'Ingeniería Electrónica',
+  'Licenciatura en Educación Física',
+  'Licenciatura en Educación Infantil',
+  'Tecnología en Contabilidad y Finanzas',
+  'Tecnología en Gestión Financiera'
+]
     };
 
     // Mostrar formulario al aceptar
