@@ -394,7 +394,7 @@ if ($dbConnected) {
                     <label for="hora" class="form-label">
                       <i class="fas fa-clock"></i> Hora de ceremonia *
                     </label>
-                    <select class="form-select" id="hora" name="hora" required>
+                    <select class="form-select" id="hora" name="hora" required> 
                       <option value="">Seleccione una hora</option>
                       <option value="09:00">09:00 AM</option>
                       <option value="14:00">02:00 PM</option>
