@@ -1,6 +1,6 @@
 <?php
 // Configuración de base de datos PostgreSQL en Render
-$host = "a45p_user:cxIm2wuUm9pZNauvVX2LauO0HGoLEFOm@dpg-d883jnmq1p3s73fsmdf0-a.oregon-postgres.render.com"; // HOSTNAME COMPLETO
+$host = "dpg-d883jnmq1p3s73fsmdf0-a.oregon-postgres.render.com"; // HOSTNAME COMPLETO
 $dbname = "base_de_datos_graduandos_a45p";
 $user = "base_de_datos_graduandos_a45p_user";
 $pass = "cxIm2wuUm9pZNauvVX2LauO0HGoLEFOm";
