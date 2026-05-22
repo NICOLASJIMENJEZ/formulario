@@ -1,9 +1,9 @@
 <?php
 // Configuración de base de datos PostgreSQL en Render
-$host = "dpg-d7k1offavr4c73esdbeg-a.oregon-postgres.render.com"; // HOSTNAME COMPLETO
-$dbname = "life_gym_db_hvmq";
-$user = "life_gym_db_hvmq_user";
-$pass = "lEovCr88q2giz5REW4MwUPePidNosjc1";
+$host = "a45p_user:cxIm2wuUm9pZNauvVX2LauO0HGoLEFOm@dpg-d883jnmq1p3s73fsmdf0-a.oregon-postgres.render.com"; // HOSTNAME COMPLETO
+$dbname = "base_de_datos_graduandos_a45p";
+$user = "base_de_datos_graduandos_a45p_user";
+$pass = "cxIm2wuUm9pZNauvVX2LauO0HGoLEFOm";
 $port = "5432";
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
